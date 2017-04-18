@@ -1,0 +1,30 @@
+{# src/Oro/BugTrackerBundle/Resources/views/auth/login.html.twig #}
+{% extends 'BugTrackerBundle::base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ absolute_url(asset('bundles/bugtracker/css/login.css')) }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block body %}
+    {% block messages %}
+        {{ parent() }}
+    {% endblock %}
+    <div id="page">
+        {% block content %}
+            <div class="login-page">
+                {{ form_start(form, { 'attr': {'class': 'form-signin'} }) }}
+                <fieldset>
+                    <div class="input-prepend">
+                        {{ form_row(form.username,{'label_attr':{'class':'add-on'}}) }}
+                    </div>
+                    <div class="input-prepend">
+                        {{ form_row(form.password,{'label_attr':{'class':'add-on'}}) }}
+                    </div>
+                    {{ form_row(form.submit, { 'label': 'Submit me', 'attr' : {'class' : 'btn-primary btn-large pull-right'}}) }}
+                </fieldset>
+                {{ form_end(form) }}
+            </div>
+        {% endblock %}
+    </div>
+{% endblock %}

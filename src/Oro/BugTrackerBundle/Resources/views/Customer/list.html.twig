@@ -1,0 +1,14 @@
+{# src/Oro/BugTrackerBundle/Resources/views/customer/edit.html.twig #}
+{% extends 'BugTrackerBundle::base.html.twig' %}
+{% import 'BugTrackerBundle::macros.html.twig' as macros %}
+
+{% block content %}
+    <div id="customer-list">
+        {{ macros.renderGrid(collection, header, entityRouter) }}
+        <div class="pagination-centered">
+            {{ macros.renderPaginator(listRouteName, thisPage, maxPages) }}
+        </div>
+    </div>
+{% endblock %}
+
+

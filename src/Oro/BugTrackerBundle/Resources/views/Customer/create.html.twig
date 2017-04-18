@@ -1,0 +1,17 @@
+{# src/Oro/BugTrackerBundle/Resources/views/customer/create.html.twig #}
+{% extends 'BugTrackerBundle::base.html.twig' %}
+
+{% block content %}
+    <div class="register-page">
+        {{ form_start(form) }}
+        {{ form_row(form.username) }}
+        {{ form_row(form.fullName) }}
+        {{ form_row(form.email) }}
+        {{ form_row(form.plainPassword.first) }}
+        {{ form_row(form.plainPassword.second) }}
+
+        {{ form_row(form.submit) }}
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+

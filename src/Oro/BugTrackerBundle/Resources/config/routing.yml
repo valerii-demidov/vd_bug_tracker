@@ -1,0 +1,7 @@
+app:
+    resource: "@BugTrackerBundle/Controller/"
+    type:     annotation
+
+bug_tracker_homepage:
+    path:     /
+    defaults: { _controller: BugTrackerBundle:Default:index }

@@ -1,0 +1,40 @@
+{# src/Oro/BugTrackerBundle/Resources/views/base.html.twig #}
+{% extends "BugTrackerBundle:Navigation:topmenu.html.twig" %}
+
+{% block html %}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        {% block javascripts_base %}
+            <script type="text/javascript" src="{{ absolute_url(asset('bundles/bugtracker/js/jquery-3.2.1.min.js')) }}"></script>
+        {% endblock %}
+        {% block stylesheets %}
+            <link href="{{ absolute_url(asset('bundles/bugtracker/css/main.css')) }}" rel="stylesheet"/>
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            {% block navigation %}
+                {{ parent() }}
+            {% endblock %}
+            {#Event message processor#}
+            {% block messages %}
+                {% for type, flashes in app.session.flashbag.all %}
+                    {% for flash in flashes %}
+                        <div class="alert alert-{{ type }} fade in">
+                            {{ flash }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {% endblock %}
+
+            <div id="page">
+                {% block content %}{% endblock %}
+            </div>
+        {% endblock %}
+        {% block javascripts_custom %}
+            <script type="text/javascript" src="{{ absolute_url(asset('bundles/bugtracker/js/navigation/top-menu.js')) }}"></script>
+        {% endblock %}
+    </body>
+    </html>
+{% endblock %}
