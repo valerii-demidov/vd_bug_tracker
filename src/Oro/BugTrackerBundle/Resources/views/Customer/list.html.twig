@@ -5,7 +5,7 @@
 {% block content %}
     <div id="customer-list">
         {{ macros.renderGrid(collection, header, entityRouter) }}
-        <div class="pagination-centered">
+        <div class="text-center">
             {{ macros.renderPaginator(listRouteName, thisPage, maxPages) }}
         </div>
     </div>

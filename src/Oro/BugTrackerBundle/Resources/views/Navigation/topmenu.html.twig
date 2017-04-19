@@ -1,63 +1,33 @@
 {# src/Oro/BugTrackerBundle/Resources/views/topmenu.html.twig #}
 
-{% block html %}
-    {% block navigation %}
-        <header class="navbar" id="oroplatform-header">
-            <div class="navbar-inner">
-                <div class="container">
-                    <div id="organization-switcher">
-                        <h1 class="logo logo-text">
-                            <a href="/" title="default">
-                                default </a>
-                        </h1>
-                    </div>
-                    <ul class="nav pull-right user-menu">
-                        <li class="dropdown" id="user-menu">
-                            <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                                valerii demidovaa
-                            </a>
-                        </li>
-                    </ul>
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Features</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Pricing</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Customers
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{{ path('oro_bugtracker_customer_list') }}">Manage Customers</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
                 </div>
-            </div>
-            <div id="main-menu" class="main-menu-top">
-                <ul class="nav nav-multilevel main-menu">
-                    <li class="dropdown">
-                        <a href="#" class="unclickable">
-                            <span class="title">
-                                Customers
-                            </span></a>
-                        <ul class="dropdown-menu menu_level_1">
-                            <li data-route="orocrm_account_index" class="single first">
-                                <a href="{{ absolute_url(path('oro_bugtracker_customer_create')) }}"><span
-                                            class="title">Customer Create</span></a>
-                            </li>
-                            <li data-route="orocrm_contact_index" class="single">
-                                {#<a href="{{ absolute_url(path('oro_bugtracker_customer_list')) }}"><span
-                                            class="title">Manage Customers</span></a>#}
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#" class="unclickable">
-                            <span class="title">
-                                Sales
-                            </span>
-                        </a>
-                        <ul class="dropdown-menu menu_level_1">
-                            <li data-route="orocrm_magento_cart_index" class="single first">
-                                <a href="/app.php/magento/cart/"><span class="title">Magento Shopping Carts</span></a>
-                            </li>
-                            <li data-route="orocrm_magento_order_index" class="single last">
-                                <a href="/app.php/magento/order/"><span class="title">Magento Orders</span></a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </header>
-    {% endblock %}#}
-{% endblock %}
+            </li>
+        </ul>
+    </div>
+</nav>
+
 
 
 

@@ -8,16 +8,14 @@
 #}
 {% macro renderGrid(collection, header, entityRouter = '') %}
     <div class="grid-container">
-        <table class="grid table-hover table table-bordered table-condensed" style="border-right: none;">
-            <thead>
-            {% for header_item in header %}
-                <th class="renderable string-cell">
-                    <span>
-                        {{ header_item }}
-                    </span>
-                </th>
-            {% endfor %}
-            </thead>
+        <table class="table grid">
+            <thead class="thead-inverse">
+                <tr>
+                    {% for header_item in header %}
+                        <th> {{ header_item }} </th>
+                    {% endfor %}
+                    </thead>
+                </tr>
             <tbody>
                 {% for item in collection %}
                     {% if entityRouter is not empty %}
@@ -27,12 +25,12 @@
                             {% if entityRouter is not empty %}
                                 title="{{ entityUrl }}" onclick="window.location = '{{ entityUrl }}'"
                             {% endif %} >
-                    {% for val in item %}
-                        <td class="string-cell sortable renderable">
-                            {{ val }}
-                        </td>
-                    {% endfor %}
-                </tr>
+                        {% for val in item %}
+                            <td class="string-cell sortable renderable">
+                                {{ val }}
+                            </td>
+                        {% endfor %}
+                     </tr>
                 {% endfor %}
             </tbody>
         </table>

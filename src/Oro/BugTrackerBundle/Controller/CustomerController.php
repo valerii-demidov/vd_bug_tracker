@@ -44,10 +44,11 @@ class CustomerController extends Controller
         $entityRouter = 'oro_bugtracker_customer_edit';
         $listRouteName = 'oro_bugtracker_customer_list';
         $header = ['id', 'username', 'email', 'full name'];
-
+        $page_title = 'Manage customers';
 
         return $this->render('BugTrackerBundle:Customer:list.html.twig',
             compact(
+                'page_title',
                 'collection',
                 'header',
                 'entityRouter',
@@ -95,7 +96,10 @@ class CustomerController extends Controller
 
         return $this->render(
             'BugTrackerBundle:Customer:create.html.twig',
-            array('form' => $form->createView())
+            array(
+                'form' => $form->createView(),
+                'page_title' => 'New Customer'
+            )
         );
     }
 
@@ -143,7 +147,10 @@ class CustomerController extends Controller
         }
         return $this->render(
             'BugTrackerBundle:Customer:edit.html.twig',
-            array('form' => $form->createView())
+            array(
+                'form' => $form->createView(),
+                'page_title' => sprintf("Edit User '%s'", $customerEntityData->getUsername())
+            )
         );
     }
 }
