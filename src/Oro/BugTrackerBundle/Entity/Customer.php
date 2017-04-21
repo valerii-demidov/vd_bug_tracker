@@ -11,35 +11,46 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ORM\Entity
  * @ORM\Table(name="customer")
  */
-class Customer implements UserInterface
+class Customer implements UserInterface, \Serializable
 {
+    CONST ROLE_ADMIN = 'ROLE_ADMIN';
+    CONST ROLE_MANAGER = 'ROLE_MANAGER';
+    CONST ROLE_OPERATOR = 'ROLE_OPERATOR';
+
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", options={"comment":"Id"})
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255, unique=true, options={"comment":"User Name"})
      * @Assert\NotBlank()
      */
     private $username;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255, unique=true, options={"comment":"Email"})
      * @Assert\NotBlank()
      * @Assert\Email()
      */
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="string", length=100, options={"comment":"Full Name"})
      */
     private $fullName;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @var array
+     *
+     * @ORM\Column(type="json_array", options={"comment":"Roles"})
+     */
+    private $roles = [];
+
+    /**
+     * @ORM\Column(type="string", length=100, options={"comment":"Password"})
      */
     private $password;
 
@@ -129,6 +140,49 @@ class Customer implements UserInterface
     }
 
     /**
+     * Returns the roles granted to the user.
+     *
+     * <code>
+     * public function getRoles()
+     * {
+     *     return array('ROLE_USER');
+     * }
+     * </code>
+     *
+     * Alternatively, the roles might be stored on a ``roles`` property,
+     * and populated in any number of different ways when the user object
+     * is created.
+     *
+     * @return (Role|string)[] The user roles
+     */
+    public function getRoles()
+    {
+        $roles = $this->roles;
+
+        // guarantees that a user always has at least one role for security
+        if (empty($roles)) {
+            $roles[static::ROLE_ADMIN] = static::ROLE_ADMIN;
+            $roles[static::ROLE_MANAGER] = static::ROLE_MANAGER;
+            $roles[static::ROLE_OPERATOR] = static::ROLE_OPERATOR;
+        }
+
+        return array_unique($roles);
+    }
+
+    /**
+     * Set the roles granted to the user.
+     *
+     * @param string $roles
+     * @return $this
+     */
+    public function setRoles($roles)
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
      * Set Password
      *
      * @param string $password
@@ -175,27 +229,6 @@ class Customer implements UserInterface
     }
 
     /**
-     * Returns the roles granted to the user.
-     *
-     * <code>
-     * public function getRoles()
-     * {
-     *     return array('ROLE_USER');
-     * }
-     * </code>
-     *
-     * Alternatively, the roles might be stored on a ``roles`` property,
-     * and populated in any number of different ways when the user object
-     * is created.
-     *
-     * @return (Role|string)[] The user roles
-     */
-    public function getRoles()
-    {
-        // TODO: Implement getRoles() method.
-    }
-
-    /**
      * Returns the salt that was originally used to encode the password.
      *
      * This can return null if the password was not encoded using a salt.
@@ -216,5 +249,30 @@ class Customer implements UserInterface
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->username,
+            $this->password,
+        ));
+    }
+
+    /**
+     * @param string $serialized
+     * @return mixed|void
+     */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->username,
+            $this->password,
+            ) = unserialize($serialized);
     }
 }

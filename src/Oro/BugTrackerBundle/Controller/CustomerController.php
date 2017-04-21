@@ -69,10 +69,11 @@ class CustomerController extends Controller
     public function createAction(Request $request)
     {
         $em = $this->getDoctrine()->getEntityManager();
+
+        // 1) build the form
+        $customer = new Customer();
+        $form = $this->createForm(CustomerType::class, $customer);
         try {
-            // 1) build the form
-            $customer = new Customer();
-            $form = $this->createForm(CustomerType::class, $customer);
             // 2) handle the submit (will only happen on POST)
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
@@ -96,13 +97,12 @@ class CustomerController extends Controller
                 ->getFlashBag()
                 ->add('error', $exception->getMessage());
         }
-        $referUrl = $request->headers->get('referer');
+
         return $this->render(
             'BugTrackerBundle:Customer:create.html.twig',
             array(
                 'form' => $form->createView(),
-                'page_title' => 'New Customer',
-                'referUrl' => $referUrl
+                'page_title' => 'New Customer'
             )
         );
     }
@@ -131,7 +131,7 @@ class CustomerController extends Controller
 
         try {
             if ($request->getMethod() == 'POST') {
-                $form->submit($request);
+                $form->handleRequest($request);
                 if ($form->isValid()) {
                     $plainPassword = $form->get('plainPassword');
                     if (!$plainPassword->isEmpty()) {
@@ -154,14 +154,12 @@ class CustomerController extends Controller
                 ->add('error', $exception->getMessage());
         }
 
-        $referUrl = $request->headers->get('referer');
         return $this->render(
             'BugTrackerBundle:Customer:edit.html.twig',
             array(
                 'form' => $form->createView(),
                 'page_title' => sprintf("Edit User '%s'", $customerEntityData->getUsername()),
-                'entity_id' => $customerEntityData->getId(),
-                'referUrl' => $referUrl
+                'entity_id' => $customerEntityData->getId()
             )
         );
     }

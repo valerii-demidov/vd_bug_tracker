@@ -3,7 +3,7 @@
 {% block page_header_content %}
     {{ parent() }}
     <div class="p-2">
-        <a class="btn btn-secondary" href="{{ referUrl }}" role="button">Back</a>
+        <a class="btn btn-secondary" href="{{ absolute_url(path('oro_bugtracker_customer_list')) }}" role="button">Back</a>
     </div>
     <div class="p-2">
         {{ render(controller('BugTrackerBundle:Customer:delete', { 'id': entity_id } )) }}
@@ -34,6 +34,13 @@
             <div class="col-3">
                 {{ form_widget(form.email,{'attr': {'class': 'form-control'}}) }}
                 <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form_label(form.roles, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.roles) }}
+            <div class="col-3">
+                {{ form_widget(form.roles,{'attr': {'class': 'form-control'}}) }}
             </div>
         </div>
         <div class="form-group row">

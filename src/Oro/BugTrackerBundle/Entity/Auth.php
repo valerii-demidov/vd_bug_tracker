@@ -2,7 +2,7 @@
 
 namespace Oro\BugTrackerBundle\Entity;
 
-class AdminLogin
+class Auth
 {
     protected $username;
     protected $password;

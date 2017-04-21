@@ -1,3 +1,0 @@
-security:
-    encoders:
-        BugTrackerBundle\Entity\Customer: bcrypt

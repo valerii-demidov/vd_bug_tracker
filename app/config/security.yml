@@ -2,25 +2,58 @@
 # http://symfony.com/doc/current/security.html
 security:
     encoders:
-            Oro\BugTrackerBundle\Entity\Customer: bcrypt
+        Oro\BugTrackerBundle\Entity\Customer:
+            algorithm: bcrypt
 
     # http://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
     providers:
-        in_memory:
-            memory: ~
+            db_user:
+                entity:
+                    class: BugTrackerBundle:Customer
+                    property: username
 
     firewalls:
-        # disables authentication for assets and the profiler, adapt it according to your needs
         dev:
+            #pattern: ^/
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        main:
-            anonymous: ~
-            # activate different ways to authenticate
+        login_area:
+                  anonymous: ~
+                  pattern: ^/auth/(login|register|forgotpassword)$
 
-            # http://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
-            #http_basic: ~
+        secured_area:
+            # this firewall applies to all URLs
+            #pattern:
 
-            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
-            #form_login: ~
+            # but the firewall does not require login on every page
+            # denying access is done in access_control or in your controllers
+            #anonymous: true
+
+            # This allows the user to login by submitting a username and password
+            # Reference: http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+            form_login:
+                # The route name that the login form submits to
+                check_path: oro_bugtracker_auth_loginpost
+                # The name of the route where the login form lives
+                # When the user tries to access a protected page, they are redirected here
+                login_path: oro_bugtracker_auth_login
+                # Secure the login form against CSRF
+                # Reference: http://symfony.com/doc/current/cookbook/security/csrf_in_login_form.html
+                #csrf_token_generator: security.csrf.token_manager
+                # The page users are redirect to when there is no previous page stored in the
+                # session (for example when the users access directly to the login page).
+                default_target_path: /
+
+                username_parameter: login_form[username]
+                password_parameter: login_form[password]
+
+            logout:
+                # The route name the user can go to in order to logout
+                path: oro_bugtracker_auth_logout
+                # The name of the route to redirect to after logging out
+                target: oro_bugtracker_auth_login
+
+    #access_control:
+      #- { path: ^/auth/(login|register|forgotpassword), roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      #- { path: ^/, roles: ROLE_ADMIN }
