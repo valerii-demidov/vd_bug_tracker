@@ -1,9 +1,19 @@
 {# src/Oro/BugTrackerBundle/Resources/views/customer/edit.html.twig #}
 {% extends 'BugTrackerBundle::base.html.twig' %}
+{% block page_header_content %}
+    {{ parent() }}
+    <div class="p-2">
+        <a class="btn btn-secondary" href="{{ referUrl }}" role="button">Back</a>
+    </div>
+    <div class="p-2">
+        {{ render(controller('BugTrackerBundle:Customer:delete', { 'id': entity_id } )) }}
+    </div>
+{% endblock %}
 
 {% block content %}
     <div class="edit-customer-page container-fluid">
         {{ form_start(form) }}
+        {#{{ form.vars.value.id }}#}
         <div class="form-group row">
         {{ form_label(form.username, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
         {{ form_errors(form.username) }}

@@ -37,7 +37,8 @@ class CustomerType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => Customer::class
+            'data_class' => Customer::class,
+            'csrf_field_name' => '_token'
         ));
     }
 }

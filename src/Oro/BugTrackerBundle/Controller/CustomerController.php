@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomerController extends Controller
 {
@@ -41,6 +42,7 @@ class CustomerController extends Controller
 
         $maxPages = ceil($totalCount / self::CUSTOMER_LIST_PAGE_SIZE);
         $thisPage = $page;
+        $entityCreateRouter = 'oro_bugtracker_customer_create';
         $entityRouter = 'oro_bugtracker_customer_edit';
         $listRouteName = 'oro_bugtracker_customer_list';
         $header = ['id', 'username', 'email', 'full name'];
@@ -48,6 +50,7 @@ class CustomerController extends Controller
 
         return $this->render('BugTrackerBundle:Customer:list.html.twig',
             compact(
+                'entityCreateRouter',
                 'page_title',
                 'collection',
                 'header',
@@ -60,7 +63,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Create customer action
+     * Customer customer action
      * @Route("customer/create")
      */
     public function createAction(Request $request)
@@ -93,12 +96,13 @@ class CustomerController extends Controller
                 ->getFlashBag()
                 ->add('error', $exception->getMessage());
         }
-
+        $referUrl = $request->headers->get('referer');
         return $this->render(
             'BugTrackerBundle:Customer:create.html.twig',
             array(
                 'form' => $form->createView(),
-                'page_title' => 'New Customer'
+                'page_title' => 'New Customer',
+                'referUrl' => $referUrl
             )
         );
     }
@@ -112,14 +116,18 @@ class CustomerController extends Controller
         $em = $this->getDoctrine()->getEntityManager();
         $customerEntityData = $em->getRepository(Customer::class)->find($id);
 
-        if ($customerEntityData == null) {
+        if (!$customerEntityData) {
             $errorMessage = 'Required customer was not found!';
             $request->getSession()
                 ->getFlashBag()
                 ->add('error', $errorMessage);
             return $this->redirect('/');
         }
-        $form = $this->createForm(CustomerType::class, $customerEntityData, array('validation_groups' => array('edit')));
+        $form = $this->createForm(CustomerType::class, $customerEntityData,
+            array(
+                'validation_groups' => array('edit'),
+            )
+        );
 
         try {
             if ($request->getMethod() == 'POST') {
@@ -145,12 +153,56 @@ class CustomerController extends Controller
                 ->getFlashBag()
                 ->add('error', $exception->getMessage());
         }
+
+        $referUrl = $request->headers->get('referer');
         return $this->render(
             'BugTrackerBundle:Customer:edit.html.twig',
             array(
                 'form' => $form->createView(),
-                'page_title' => sprintf("Edit User '%s'", $customerEntityData->getUsername())
+                'page_title' => sprintf("Edit User '%s'", $customerEntityData->getUsername()),
+                'entity_id' => $customerEntityData->getId(),
+                'referUrl' => $referUrl
             )
         );
+    }
+
+    /**
+     * Customer delete action
+     * @Route("customer/delete/{id}",requirements={"id" = "\d+"})
+     */
+    public function deleteAction($id, Request $request)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $customer = $em->getRepository(Customer::class)->find($id);
+        if (!$customer) {
+            throw $this->createNotFoundException(
+                'No news found for id ' . $id
+            );
+        }
+
+        $actionUrl = $this->generateUrl('oro_bugtracker_customer_delete',
+            array('id' => $customer->getId()), UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $form = $this->createFormBuilder($customer, array('validation_groups' => array('edit')))
+            ->setAction($actionUrl)
+            ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
+            ->getForm();
+
+        if ($request->getMethod() == 'POST') {
+            $form->submit($request);
+            if ($form->isValid()) {
+                $em->remove($customer);
+                $em->flush();
+                $request->getSession()
+                    ->getFlashBag()
+                    ->add('success', sprintf("Customer '%s' was deleted successfully!", $customer->getUsername()));
+                return $this->redirectToRoute('oro_bugtracker_customer_list');
+            }
+        }
+
+        return $this->render('BugTrackerBundle:Widget:form.html.twig', array(
+            'form' => $form->createView()
+        ));
     }
 }

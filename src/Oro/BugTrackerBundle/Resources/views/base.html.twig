@@ -30,24 +30,28 @@
                 {{ include('BugTrackerBundle:Navigation:topmenu.html.twig') }}
             {% endblock %}
             {% block page_header %}
-                <div class = "jumbotron page-header m-3 p-3">
-                    {% if page_title is defined %}
-                        <h3>{{ page_title }}</h3>
-                    {% endif %}
+                <div class="d-flex page-header m-3 p-3 jumbotron justify-content-end">
+                {% block page_header_content %}
+                    <div class="mr-auto p-2">
+                        {% if page_title is defined %}
+                            <h3>{{ page_title }}</h3>
+                        {% endif %}
+                    </div>
+                {% endblock %}
                 </div>
             {% endblock %}
             {#Event message processor#}
             {% block messages %}
                 {% for type, flashes in app.session.flashbag.all %}
                     {% for flash in flashes %}
-                        <div class="alert alert-{{ type }} fade in">
+                        <div class="alert alert-{{ type }} m-3">
                             {{ flash }}
                         </div>
                     {% endfor %}
                 {% endfor %}
             {% endblock %}
 
-            <div id="page" class="container-fluid mt-3">
+            <div id="page" class="container-fluid mt-3" >
                 {% block content %}{% endblock %}
             </div>
         {% endblock %}

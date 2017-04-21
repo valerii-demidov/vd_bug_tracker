@@ -1,6 +1,13 @@
 {# src/Oro/BugTrackerBundle/Resources/views/customer/create.html.twig #}
 {% extends 'BugTrackerBundle::base.html.twig' %}
 
+{% block page_header_content %}
+    {{ parent() }}
+    <div class="p-2">
+        <a class="btn btn-secondary" href="{{ referUrl }}" role="button">Back</a>
+    </div>
+{% endblock %}
+
 {% block content %}
     <div class="create-customer-page container-fluid">
         {{ form_start(form) }}
