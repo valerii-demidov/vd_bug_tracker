@@ -1,0 +1,65 @@
+{#
+    Renders datagrid widget
+
+    parameters:
+        collection: assoc mass items
+        header: labels for headerr
+        entityRouter: customer edit router
+#}
+{% macro renderGrid(collection, header, entityRouter = '') %}
+    <div class="grid-container">
+        <table class="table grid">
+            <thead class="thead-inverse">
+                <tr>
+                    {% for header_item in header %}
+                        <th> {{ header_item }} </th>
+                    {% endfor %}
+                    </thead>
+                </tr>
+            <tbody>
+                {% for item in collection %}
+                    {% if entityRouter is not empty %}
+                        {% set entityUrl = absolute_url(path(entityRouter, {'id': item.id})) %}
+                    {% endif %}
+                    <tr class="row-click-action"
+                            {% if entityRouter is not empty %}
+                                title="{{ entityUrl }}" onclick="window.location = '{{ entityUrl }}'"
+                            {% endif %} >
+                        {% for val in item %}
+                            <td class="string-cell sortable renderable">
+                                {{ val }}
+                            </td>
+                        {% endfor %}
+                     </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endmacro %}
+
+{#
+    Renders paginator widget
+
+    parameters:
+        listRouteName: full name to the required router
+        thisPage: current page number
+        maxPages: quantity pages
+#}
+{% macro renderPaginator(listRouteName, thisPage, maxPages) %}
+    {% if maxPages > 1 %}
+        <div class="pagination">
+            {# `«` arrow  #}
+            <a {{ thisPage == 1 ? 'class="disabled"' }}
+                    href="{{ path(listRouteName, {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>
+
+            {# Render each page number #}
+            {% for i in 1..maxPages %}
+                <a {{ thisPage == i ? 'class="active"' }} href="{{ path(listRouteName, {page: i}) }}">{{ i }}</a>
+            {% endfor %}
+
+            {# `»` arrow #}
+            <a {{ thisPage == maxPages ? 'class="disabled"' }}
+                    href="{{ path(listRouteName, {page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}">»</a>
+        </div>
+    {% endif %}
+{% endmacro %}

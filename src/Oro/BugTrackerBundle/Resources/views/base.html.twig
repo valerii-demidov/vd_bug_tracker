@@ -1,0 +1,63 @@
+{# src/Oro/BugTrackerBundle/Resources/views/base.html.twig #}
+
+{% block html %}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        {% block stylesheets %}
+            {% stylesheets
+            'bundles/bugtracker/css/bootstrap.min.css'
+            'bundles/bugtracker/css/main.css'
+            filter='cssrewrite' output='css/compiled/bugtracker.css' %}
+                <link rel="stylesheet" href="{{ absolute_url(asset_url) }}" />
+            {% endstylesheets %}
+        {% endblock %}
+
+        {% block javascripts_base %}
+            <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+            {% javascripts
+            'bundles/bugtracker/js/jquery-3.2.1.min.js'
+            'bundles/bugtracker/js/tether.min.js'
+            'bundles/bugtracker/js/bootstrap.min.js'
+            output='js/compiled/bugtracker.js' %}
+                <script src="{{ absolute_url(asset_url) }}"></script>
+            {% endjavascripts %}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            {% block navigation %}
+                {{ include('BugTrackerBundle:Navigation:topmenu.html.twig') }}
+            {% endblock %}
+            {% block page_header %}
+                <div class="d-flex page-header m-3 p-3 jumbotron justify-content-end">
+                {% block page_header_content %}
+                    <div class="mr-auto p-2">
+                        {% if page_title is defined %}
+                            <h3>{{ page_title }}</h3>
+                        {% endif %}
+                    </div>
+                {% endblock %}
+                </div>
+            {% endblock %}
+            {#Event message processor#}
+            {% block messages %}
+                {% for type, flashes in app.session.flashbag.all %}
+                    {% for flash in flashes %}
+                        <div class="alert alert-{{ type }} m-3">
+                            {{ flash }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {% endblock %}
+
+            <div id="page" class="container-fluid mt-3" >
+                {% block content %}{% endblock %}
+            </div>
+        {% endblock %}
+        {% block javascripts_custom %}
+            <script type="text/javascript" src="{{ absolute_url(asset('bundles/bugtracker/js/navigation/top-menu.js')) }}"></script>
+        {% endblock %}
+    </body>
+    </html>
+{% endblock %}

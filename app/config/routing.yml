@@ -1,3 +1,4 @@
-app:
-    resource: '@AppBundle/Controller/'
-    type: annotation
+bug_tracker:
+    resource: "@BugTrackerBundle/Resources/config/routing.yml"
+    prefix:   /
+

@@ -1,0 +1,21 @@
+{# src/Oro/BugTrackerBundle/Resources/views/customer/edit.html.twig #}
+{% extends 'BugTrackerBundle::base.html.twig' %}
+{% import 'BugTrackerBundle::macros.html.twig' as macros %}
+
+{% block page_header_content %}
+    {{ parent() }}
+    <div class="p-2">
+        <a class="btn btn-primary" href="{{ absolute_url(path(entityCreateRouter)) }}" role="button">Create Customer</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div id="customer-list">
+        {{ macros.renderGrid(collection, header, entityRouter) }}
+        <div class="text-center">
+            {{ macros.renderPaginator(listRouteName, thisPage, maxPages) }}
+        </div>
+    </div>
+{% endblock %}
+
+
