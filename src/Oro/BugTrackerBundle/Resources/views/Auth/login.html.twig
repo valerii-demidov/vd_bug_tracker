@@ -8,23 +8,37 @@
 
 {% block body %}
     {% block messages %}
-        {{ parent() }}
     {% endblock %}
-    <div id="page">
-        {% block content %}
-            <div class="login-page">
-                {{ form_start(form, { 'attr': {'class': 'form-signin'} }) }}
-                <fieldset>
-                    <div class="input-prepend">
-                        {{ form_row(form.username,{'label_attr':{'class':'add-on'}}) }}
+
+    <div class="container">
+        <div class="card card-container">
+            <img id="profile-img" class="profile-img-card" src="//ssl.gstatic.com/accounts/ui/avatar_2x.png" />
+                {% if error %}
+                    <div class="alert alert-danger mb-0">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
                     </div>
-                    <div class="input-prepend">
-                        {{ form_row(form.password,{'label_attr':{'class':'add-on'}}) }}
-                    </div>
-                    {{ form_row(form.submit, { 'label': 'Submit me', 'attr' : {'class' : 'btn-primary btn-large pull-right'}}) }}
-                </fieldset>
-                {{ form_end(form) }}
+                {% endif %}
+                {% for type, flashes in app.session.flashbag.all %}
+                    {% for flash in flashes %}
+                        <div class="alert alert-{{ type }} m-3">
+                            {{ flash }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {{ form_start(form, { 'attr': {'class': 'form-signin'} }) }}
+            <fieldset>
+                <div class="input-prepend">
+                    {{ form_row(form.username,{'label_attr':{'class':'add-on'}, 'value': last_username}) }}
+                </div>
+                <div class="input-prepend">
+                    {{ form_row(form.password,{'label_attr':{'class':'add-on'}}) }}
+                </div>
+                {{ form_row(form.submit, { 'label': 'Submit me', 'attr' : {'class' : 'btn btn-lg btn-primary btn-block btn-signin'}}) }}
+            </fieldset>
+            {{ form_end(form) }}
+            <div class="panel-footer">Not Registered? <a href="{{ absolute_url(path('oro_bugtracker_auth_register')) }}"
+                                                         class="">Register here</a>
             </div>
-        {% endblock %}
+        </div>
     </div>
 {% endblock %}

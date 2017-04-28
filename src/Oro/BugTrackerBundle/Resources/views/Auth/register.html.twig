@@ -1,0 +1,70 @@
+{# src/Oro/BugTrackerBundle/Resources/views/auth/register.html.twig #}
+{% extends 'BugTrackerBundle::base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ absolute_url(asset('bundles/bugtracker/css/register.css')) }}" rel="stylesheet"/>
+{% endblock %}
+
+{% block body %}
+    {% block messages %}
+    {% endblock %}
+
+    <div class="container">
+        <div class="card card-container">
+            {{ form_start(form) }}
+            <div id="legend" class="text-center">
+                <h3 class="panel-title">Register form</h3>
+            </div>
+            {% for type, flashes in app.session.flashbag.all %}
+                {% for flash in flashes %}
+                    <div class="alert alert-{{ type }} m-3">
+                        {{ flash }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            <div class="form-group row">
+                {{ form_label(form.username, null, {'label_attr': {'class': 'col-3 col-form-label'}}) }}
+                {{ form_errors(form.username) }}
+                <div class="col-9">
+                    {{ form_widget(form.username,{'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+            <div class="form-group row">
+                {{ form_label(form.fullName, null, {'label_attr': {'class': 'col-3 col-form-label'}}) }}
+                {{ form_errors(form.fullName) }}
+                <div class="col-9">
+                    {{ form_widget(form.fullName,{'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+            <div class="form-group row">
+                {{ form_label(form.email, null, {'label_attr': {'class': 'col-3 col-form-label'}}) }}
+                {{ form_errors(form.email) }}
+                <div class="col-9">
+                    {{ form_widget(form.email,{'attr': {'class': 'form-control'}}) }}
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                </div>
+            </div>
+            {% do form.roles.setRendered %}
+            <div class="form-group row">
+                {{ form_label(form.plainPassword.first, null, {'label_attr': {'class': 'col-3 col-form-label'}}) }}
+                {{ form_errors(form.plainPassword.first) }}
+                <div class="col-9">
+                    {{ form_widget(form.plainPassword.first,{'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+            <div class="form-group row">
+                {{ form_label(form.plainPassword.second, null, {'label_attr': {'class': 'col-3 col-form-label'}}) }}
+                {{ form_errors(form.plainPassword.second) }}
+                <div class="col-9">
+                    {{ form_widget(form.plainPassword.second,{'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+            {{ form_row(form.submit, { 'attr': { 'class': 'btn btn-lg btn-primary btn-block btn-register' }, 'label' : 'Register' }) }}
+            {{ form_end(form) }}
+            <div class="pt-3 pb-0 text-right">
+                <a href="{{ absolute_url(path('oro_bugtracker_auth_login')) }}"><span class="icon-arrow-left"></span>Back to Login</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
