@@ -6,10 +6,10 @@
         header: labels for headerr
         entityRouter: customer edit router
 #}
-{% macro renderGrid(collection, header, entityRouter = '') %}
+{% macro renderGrid(collection, header, entityRouter = '', headerClass = 'thead-inverse') %}
     <div class="grid-container">
         <table class="table grid">
-            <thead class="thead-inverse">
+            <thead class="{{ headerClass }}">
                 <tr>
                     {% for header_item in header %}
                         <th> {{ header_item }} </th>
