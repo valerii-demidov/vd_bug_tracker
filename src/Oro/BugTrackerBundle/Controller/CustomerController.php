@@ -32,7 +32,7 @@ class CustomerController extends Controller
             ->getQuery()
             ->setFirstResult(self::CUSTOMER_LIST_PAGE_SIZE * ($page - 1))// Offset
             ->setMaxResults(self::CUSTOMER_LIST_PAGE_SIZE)
-            ->getArrayResult();
+            ->getResult();
         // get collection qty
         $queryBuilder = $em
             ->getRepository('BugTrackerBundle:Customer')
@@ -43,9 +43,17 @@ class CustomerController extends Controller
         $maxPages = ceil($totalCount / self::CUSTOMER_LIST_PAGE_SIZE);
         $thisPage = $page;
         $entityCreateRouter = 'oro_bugtracker_customer_create';
-        $entityRouter = 'oro_bugtracker_customer_edit';
         $listRouteName = 'oro_bugtracker_customer_list';
-        $header = ['id', 'username', 'email', 'full name'];
+
+        $columns = ['id' => 'Id', 'username' => 'User Name', 'email' => 'Email', 'fullName' => 'Full Name'];
+        $actions[] = [
+            'label' => 'Edit',
+            'router' => 'oro_bugtracker_customer_edit',
+            'router_parameters' => [
+                ['collection_key' => 'id', 'router_key' => 'id'],
+            ],
+        ];
+
         $page_title = 'Manage customers';
 
         return $this->render(
@@ -54,8 +62,8 @@ class CustomerController extends Controller
                 'entityCreateRouter',
                 'page_title',
                 'collection',
-                'header',
-                'entityRouter',
+                'columns',
+                'actions',
                 'maxPages',
                 'thisPage',
                 'listRouteName'

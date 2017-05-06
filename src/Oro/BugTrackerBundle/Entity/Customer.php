@@ -277,4 +277,17 @@ class Customer implements UserInterface, \Serializable
             $this->password,
             ) = unserialize($serialized);
     }
+
+    /**
+     * Return any of exist property
+     *
+     * @param $key
+     * @return mixed
+     */
+    public function getData($key)
+    {
+        if (isset($this->$key)) {
+            return $this->$key;
+        }
+    }
 }

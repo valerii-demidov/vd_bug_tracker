@@ -19,7 +19,7 @@ class CustomerRepository extends EntityRepository
      * @param bool $isSingleResult
      * @return array|mixed
      */
-    public function findByCondition(array $conditionCollection, $isSingleResult = false)
+    public function findByCondition(array $conditionCollection)
     {
 
         $customerQb = $this->createQueryBuilder('customer');
@@ -38,7 +38,7 @@ class CustomerRepository extends EntityRepository
 
         $customerQbQuery = $customerQb->getQuery();
 
-        return ($isSingleResult) ? $customerQbQuery->getResult() : $customerQbQuery->getSingleResult();
+        return $customerQbQuery->getResult();
     }
 
     /**

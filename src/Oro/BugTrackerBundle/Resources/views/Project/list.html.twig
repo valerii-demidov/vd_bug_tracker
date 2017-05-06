@@ -11,7 +11,7 @@
 
 {% block content %}
     <div id="project-list">
-        {{ macros.renderGrid(collection, header, entityRouter) }}
+        {{ macros.renderGrid(collection, columns, actions) }}
         <div class="text-center">
             {{ macros.renderPaginator(listRouteName, thisPage, maxPages) }}
         </div>

@@ -35,7 +35,7 @@ class ProjectController extends Controller
             ->getQuery()
             ->setFirstResult(self::PROJECT_LIST_PAGE_SIZE * ($page - 1))
             ->setMaxResults(self::PROJECT_LIST_PAGE_SIZE)
-            ->getArrayResult();
+            ->getResult();
 
         $queryBuilder = $em
             ->getRepository('BugTrackerBundle:Project')
@@ -46,22 +46,29 @@ class ProjectController extends Controller
         $maxPages = ceil($totalCount / self::PROJECT_LIST_PAGE_SIZE);
         $thisPage = $page;
         $entityCreateRouter = 'oro_bugtracker_project_create';
-        $entityRouter = 'oro_bugtracker_project_edit';
         $listRouteName = 'oro_bugtracker_project_list';
-        $header = ['id', 'Label', 'Summary', 'Code'];
         $page_title = 'Manage projects';
+
+        $columns = ['id' => 'Id', 'label' => 'Label', 'summary' => 'Summary', 'code' => 'Code'];
+        $actions[] = [
+            'label' => 'Edit',
+            'router' => 'oro_bugtracker_project_edit',
+            'router_parameters' => [
+                ['collection_key' => 'id', 'router_key' => 'id']
+            ],
+        ];
 
         return $this->render(
             'BugTrackerBundle:Project:list.html.twig',
             compact(
-                'entityCreateRouter',
+                'collection', // grid
+                'columns',  // grid
+                'actions',  // grid
                 'page_title',
-                'collection',
-                'header',
-                'entityRouter',
-                'maxPages',
-                'thisPage',
-                'listRouteName'
+                'entityCreateRouter', //buttons
+                'listRouteName', //paginator
+                'maxPages', //paginator
+                'thisPage' //paginator
             )
         );
     }
@@ -156,11 +163,7 @@ class ProjectController extends Controller
         }
 
         $projectRepository = $em->getRepository(Project::class);
-        $membersCollection = $projectRepository->find($id)->getCustomers()->toArray();
-        $membersCollectionAssoc = $projectRepository->convertCollectionToAssoc(
-            $membersCollection,
-            ['id', 'username', 'email', 'fullName']
-        );
+        $membersCollection = $projectRepository->find($id)->getCustomers();
 
         return $this->render(
             'BugTrackerBundle:Project:edit.html.twig',
@@ -168,7 +171,7 @@ class ProjectController extends Controller
                 'form' => $form->createView(),
                 'page_title' => sprintf("Edit Project '%s'", $projectEntityData->getId()),
                 'entity_id' => $projectEntityData->getId(),
-                'members_grid_html' => $this->getMembersGridHtml($membersCollectionAssoc),
+                'members_grid_html' => $this->getMembersGridHtml($id, $membersCollection),
             )
         );
     }
@@ -232,7 +235,6 @@ class ProjectController extends Controller
         $result = [];
         $result['success'] = true;
         $em = $this->getDoctrine()->getManager();
-        $membersCollection = [['id' => 1, 123, 123, 123]];
 
         if ($request->getMethod() == 'POST') {
             $customerRepository = $em->getRepository(Customer::class);
@@ -248,18 +250,37 @@ class ProjectController extends Controller
                 $em->flush();
 
                 $projectRepository = $em->getRepository(Project::class);
-                $membersCollection = $projectRepository->find($projectid)->getCustomers()->toArray();
-                $membersCollectionAssoc = $projectRepository->convertCollectionToAssoc(
-                    $membersCollection,
-                    ['id', 'username', 'email', 'fullName']
-                );
+                $membersCollection = $projectRepository->find($projectid)->getCustomers();
             }
         }
 
-        $result['members_grid_html'] = $this->getMembersGridHtml($membersCollectionAssoc);
+        $result['members_grid_html'] = $this->getMembersGridHtml($projectid, $membersCollection);
         $response->setData($result);
 
         return $response;
+    }
+
+    /**
+     * Add new Project Member
+     * @Route("project/{projectid}/removemember/{memberid}",requirements={"projectid" = "\d+","memberid" = "\d+"})
+     */
+    public function removememberAction($projectid, $memberid, Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $customerRepository = $em->getRepository(Customer::class);
+        $customerEntity = $customerRepository->find($memberid);
+        if ($customerEntity) {
+            $projectRepository = $em->getRepository(Project::class);
+            $projectEntity = $projectRepository->find($projectid);
+            $projectEntity->removeCustomer($customerEntity);
+
+            $em->persist($customerEntity);
+            $em->persist($projectEntity);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('oro_bugtracker_project_edit', array('id' => $projectid));
     }
 
     /**
@@ -293,17 +314,34 @@ class ProjectController extends Controller
         return $response;
     }
 
-    protected function getMembersGridHtml($collection = [])
+    /**
+     * @param $projectId
+     * @param array $collection
+     * @return string
+     */
+    protected function getMembersGridHtml($projectId, $collection = [])
     {
-        $entityRouter = 'oro_bugtracker_customer_edit';
-        $header = $memberHeaderLabels = ['id', 'username', 'email', 'Full Name'];;
+        $columns = ['id' => 'Id', 'username' => 'User Name', 'email' => 'Email', 'fullName' => 'Full Name'];
+        $actions[] = [
+            'label' => 'Edit',
+            'router' => 'oro_bugtracker_customer_edit',
+            'router_parameters' => [['collection_key' => 'id', 'router_key' => 'id']],
+        ];
+        $actions[] = [
+            'label' => 'Delete',
+            'router' => 'oro_bugtracker_project_removemember',
+            'router_parameters' => [
+                ['router_key' => 'projectid', 'router_value' => $projectId],
+                ['router_key' => 'memberid', 'collection_key' => 'id'],
+            ],
+        ];
 
         $membersHtml = $this->render(
             'BugTrackerBundle:Project:members.html.twig',
             compact(
                 'collection',
-                'header',
-                'entityRouter'
+                'columns',
+                'actions'
             )
         )->getContent();
 

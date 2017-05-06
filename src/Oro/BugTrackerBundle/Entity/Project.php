@@ -172,4 +172,17 @@ class Project
     {
         return $this->customers;
     }
+
+    /**
+     * Return any of exist property
+     *
+     * @param $key
+     * @return mixed
+     */
+    public function getData($key)
+    {
+        if (isset($this->$key)) {
+            return $this->$key;
+        }
+    }
 }
