@@ -1,37 +1,68 @@
 {#
     Renders datagrid widget
 
-    parameters:
-        collection: assoc mass items
-        header: labels for headerr
-        entityRouter: customer edit router
+    columns = ['id' => 'Id', 'username' => 'User Name', 'email' => 'Email', 'fullName' => 'Full Name'];
+    actions[] = [
+        'label' => 'Edit',
+        'router' => 'oro_bugtracker_customer_edit',
+        'router_parameters' => [['collection_key' => 'id', 'router_key' => 'projectid', 'router_value' => 5]],
+    ];
 #}
-{% macro renderGrid(collection, header, entityRouter = '') %}
+{% macro renderGrid(collection, columns,  actions = '', properties = '') %}
     <div class="grid-container">
         <table class="table grid">
-            <thead class="thead-inverse">
-                <tr>
-                    {% for header_item in header %}
-                        <th> {{ header_item }} </th>
-                    {% endfor %}
-                    </thead>
-                </tr>
-            <tbody>
-                {% for item in collection %}
-                    {% if entityRouter is not empty %}
-                        {% set entityUrl = absolute_url(path(entityRouter, {'id': item.id})) %}
-                    {% endif %}
-                    <tr class="row-click-action"
-                            {% if entityRouter is not empty %}
-                                title="{{ entityUrl }}" onclick="window.location = '{{ entityUrl }}'"
-                            {% endif %} >
-                        {% for val in item %}
-                            <td class="string-cell sortable renderable">
-                                {{ val }}
-                            </td>
-                        {% endfor %}
-                     </tr>
+            <thead {% if properties is iterable %}
+                    class="{{ properties.header_class }} {% endif %}">
+            <tr>
+                {% for key,value in columns %}
+                    <th> {{ value }} </th>
                 {% endfor %}
+                {% if actions is iterable %}
+                    <th>{{ 'Actions'|trans }}</th>
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in collection %}
+                <tr>
+                    {% for key,value in columns %}
+                        <td class="string-cell sortable renderable">
+                            {% if item[key] is defined %}
+                                {{ item[key] }}
+                            {% else %}
+                                {{ item.getData(key) }}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    {% if actions is iterable %}
+                        <td class="string-cell sortable renderable">
+                            <span class="item-actions">
+                                {% for action in actions %}
+                                    {% set router_parameters = {} %}
+                                    {% if action.router_parameters is defined %}
+                                        {% for parameter in action.router_parameters %}
+                                            {% if parameter.router_value is defined %}
+                                                {% set router_value = parameter.router_value %}
+                                            {% else %}
+                                                {% if item[parameter.collection_key] is defined %}
+                                                    {% set router_value = item[parameter.collection_key] %}
+                                                {% else %}
+                                                    {% set router_value = item.getData(parameter.collection_key) %}
+                                                {% endif %}
+                                            {% endif %}
+                                            {% set router_parameters =
+                                            router_parameters|merge({ (parameter.router_key) : router_value}) %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    <a href="{{ url(action.router, router_parameters) }}" class="btn btn-sm btn-default">
+                                            {{ action.label }}
+                                    </a>
+                                {% endfor %}
+                            </span>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>

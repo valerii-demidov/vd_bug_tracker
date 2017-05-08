@@ -9,13 +9,20 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="customer")
+ * @ORM\Table(name="bugtracker_customer")
+ * @ORM\Entity(repositoryClass="Oro\BugTrackerBundle\Repository\CustomerRepository")
  */
 class Customer implements UserInterface, \Serializable
 {
     CONST ROLE_ADMIN = 'ROLE_ADMIN';
     CONST ROLE_MANAGER = 'ROLE_MANAGER';
     CONST ROLE_OPERATOR = 'ROLE_OPERATOR';
+
+    /**
+     * Many Customers have Many Projects.
+     * @ORM\ManyToMany(targetEntity="Project", mappedBy="customers")
+     */
+    private $projects;
 
     /**
      * @ORM\Column(type="integer", options={"comment":"Id"})
@@ -159,20 +166,14 @@ class Customer implements UserInterface, \Serializable
     {
         $roles = $this->roles;
 
-        // guarantees that a user always has at least one role for security
-        if (empty($roles)) {
-            $roles[static::ROLE_ADMIN] = static::ROLE_ADMIN;
-            $roles[static::ROLE_MANAGER] = static::ROLE_MANAGER;
-            $roles[static::ROLE_OPERATOR] = static::ROLE_OPERATOR;
-        }
-
         return array_unique($roles);
     }
 
     /**
      * Set the roles granted to the user.
      *
-     * @param string $roles
+     * @param array $roles
+     *
      * @return $this
      */
     public function setRoles($roles)
@@ -186,6 +187,7 @@ class Customer implements UserInterface, \Serializable
      * Set Password
      *
      * @param string $password
+     *
      * @return Customer
      */
     public function setPassword($password)
@@ -274,5 +276,18 @@ class Customer implements UserInterface, \Serializable
             $this->username,
             $this->password,
             ) = unserialize($serialized);
+    }
+
+    /**
+     * Return any of exist property
+     *
+     * @param $key
+     * @return mixed
+     */
+    public function getData($key)
+    {
+        if (isset($this->$key)) {
+            return $this->$key;
+        }
     }
 }

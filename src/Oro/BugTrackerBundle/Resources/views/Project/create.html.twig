@@ -1,0 +1,40 @@
+{# src/Oro/BugTrackerBundle/Resources/views/project/create.html.twig #}
+{% extends 'BugTrackerBundle::base.html.twig' %}
+
+{% block page_header_content %}
+    {{ parent() }}
+    <div class="p-2">
+        <a class="btn btn-secondary" href="{{ absolute_url(path('oro_bugtracker_project_list')) }}" role="button">Back</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="create-project-page container-fluid">
+        {{ form_start(form) }}
+        <div class="form-group row">
+            {{ form_label(form.label, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.label) }}
+            <div class="col-3">
+                {{ form_widget(form.label,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form_label(form.summary, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.summary) }}
+            <div class="col-3">
+                {{ form_widget(form.summary,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form_label(form.code, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.code) }}
+            <div class="col-3">
+                {{ form_widget(form.code,{'attr': {'class': 'form-control'}}) }}
+                <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
+            </div>
+        </div>
+        {{ form_row(form.submit, { 'attr': { 'class': 'btn btn-primary' } }) }}
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+
