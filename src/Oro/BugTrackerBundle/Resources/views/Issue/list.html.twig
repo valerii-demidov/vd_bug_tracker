@@ -1,0 +1,22 @@
+{# src/Oro/BugTrackerBundle/Resources/views/project/edit.html.twig #}
+{% extends 'BugTrackerBundle::base.html.twig' %}
+{% import 'BugTrackerBundle::macros.html.twig' as macros %}
+
+{% block page_header_content %}
+    {{ parent() }}
+    <div class="p-2">
+        <a class="btn btn-primary" href="{{ absolute_url(path(entityCreateRouter)) }}"
+           role="button">{{ 'Create Project'|trans }}</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div id="issue-list">
+        {{ macros.renderGrid(collection, columns) }}
+        <div class="text-center">
+            {{ macros.renderPaginator(listRouteName, thisPage, maxPages) }}
+        </div>
+    </div>
+{% endblock %}
+
+
