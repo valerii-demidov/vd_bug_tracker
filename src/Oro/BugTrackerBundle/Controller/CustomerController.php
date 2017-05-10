@@ -188,7 +188,7 @@ class CustomerController extends Controller
         $customer = $em->getRepository(Customer::class)->find($id);
         if (!$customer) {
             throw $this->createNotFoundException(
-                'No customer found for id '.$id
+                'No customers found for id '.$id
             );
         }
 

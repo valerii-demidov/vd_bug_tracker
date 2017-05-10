@@ -165,14 +165,61 @@ class IssueController extends Controller
                 ->add('error', $exception->getMessage());
         }
 
-        //$issueRepository = $em->getRepository(Issue::class);
-
         return $this->render(
             'BugTrackerBundle:Issue:edit.html.twig',
             array(
                 'form' => $form->createView(),
                 'page_title' => sprintf("Edit Project '%s'", $issueEntityData->getId()),
                 'entity_id' => $issueEntityData->getId()
+            )
+        );
+    }
+
+    /**
+     * Issue delete action
+     * @Route("issue/delete/{id}",requirements={"id" = "\d+"}, name="oro_bugtracker_issue_delete")
+     */
+    public function deleteAction($id, Request $request)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $issue = $em->getRepository(Issue::class)->find($id);
+        if (!$issue) {
+            throw $this->createNotFoundException(
+                'No issues found for id '.$id
+            );
+        }
+
+        $actionUrl = $this->generateUrl(
+            'oro_bugtracker_issue_delete',
+            array('id' => $issue->getId()),
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $form = $this->createFormBuilder($issue, array('validation_groups' => array('edit')))
+            ->setAction($actionUrl)
+            ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
+            ->getForm();
+
+        if ($request->getMethod() == 'POST') {
+            $form->submit($request);
+            if ($form->isValid()) {
+                $issueId = $issue->getId();
+                $em->remove($issue);
+                $em->flush();
+                $em->clear();
+                $request->getSession()
+                    ->getFlashBag()
+                    ->add('success', sprintf("Issue '%s' was deleted successfully!", $issueId));
+
+                return $this->redirectToRoute('oro_bugtracker_issue_list');
+            }
+        }
+
+        return $this->render(
+            'BugTrackerBundle:Widget:form.html.twig',
+            array(
+                'form' => $form->createView(),
             )
         );
     }

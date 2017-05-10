@@ -5,9 +5,9 @@
     <div class="p-2">
         <a class="btn btn-secondary" href="{{ absolute_url(path('oro_bugtracker_issue_list')) }}" role="button">{{ 'Back'|trans }}</a>
     </div>
-    {#<div class="p-2">
-        {{ render(controller('BugTrackerBundle:Project:delete', { 'id': entity_id } )) }}
-    </div>#}
+    <div class="p-2">
+        {{ render(controller('BugTrackerBundle:Issue:delete', { 'id': entity_id } )) }}
+    </div>
 {% endblock %}
 
 {% block content %}

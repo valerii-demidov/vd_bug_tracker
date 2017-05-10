@@ -19,7 +19,7 @@ class ProjectController extends Controller
 
     /**
      * Project list action
-     * @Route("project/list/{page}", requirements={"page" = "\d+"}, defaults={"page" = 1})
+     * @Route("project/list/{page}", name="oro_bugtracker_project_list", requirements={"page" = "\d+"}, defaults={"page" = 1})
      */
     public function listAction($page)
     {
@@ -75,7 +75,7 @@ class ProjectController extends Controller
 
     /**
      * Project create action
-     * @Route("project/create")
+     * @Route("project/create", name="oro_bugtracker_project_create")
      */
     public function createAction(Request $request)
     {
@@ -116,7 +116,7 @@ class ProjectController extends Controller
     /**
      * Project edit action
      *
-     * @Route("project/edit/{id}",requirements={"id" = "\d+"})
+     * @Route("project/edit/{id}", name="oro_bugtracker_project_edit", requirements={"id" = "\d+"})
      * @param $id
      * @param Request $request
      *
@@ -178,7 +178,7 @@ class ProjectController extends Controller
 
     /**
      * Project delete action
-     * @Route("project/delete/{id}",requirements={"id" = "\d+"})
+     * @Route("project/delete/{id}", name="oro_bugtracker_project_delete", requirements={"id" = "\d+"})
      */
     public function deleteAction($id, Request $request)
     {
@@ -187,7 +187,7 @@ class ProjectController extends Controller
         $project = $em->getRepository(Project::class)->find($id);
         if (!$project) {
             throw $this->createNotFoundException(
-                'No project found for id '.$id
+                'No projects found for id '.$id
             );
         }
 
