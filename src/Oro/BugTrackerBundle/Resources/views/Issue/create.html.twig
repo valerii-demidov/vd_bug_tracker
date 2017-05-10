@@ -1,0 +1,86 @@
+{# src/Oro/BugTrackerBundle/Resources/views/project/create.html.twig #}
+{% extends 'BugTrackerBundle::base.html.twig' %}
+
+{% block page_header_content %}
+    {{ parent() }}
+    <div class="p-2">
+        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_issue_list') }}" role="button">{{ 'Back'|trans }}</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-primary panel-bold p-3">
+    <div class="panel-body">
+    <div class="create-project-page container-fluid">
+        {{ form_start(form) }}
+        <div class="form-group row">
+            {{ form_label(form.code, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.code) }}
+            <div class="col-3">
+                {{ form_widget(form.code,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form_label(form.project, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.project) }}
+            <div class="col-3">
+                {{ form_widget(form.project,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        {#{% do form.reporter.setRendered %}#}
+        <div class="form-group row">
+            {{ form_label(form.assignee, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.assignee) }}
+            <div class="col-3">
+                {{ form_widget(form.assignee,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form_label(form.summary, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.summary) }}
+            <div class="col-3">
+                {{ form_widget(form.summary,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form_label(form.description, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.description) }}
+            <div class="col-3">
+                {{ form_widget(form.description,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form_label(form.type, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.type) }}
+            <div class="col-3">
+                {{ form_widget(form.type,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form_label(form.priority, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.priority) }}
+            <div class="col-3">
+                {{ form_widget(form.priority,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form_label(form.status, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.status) }}
+            <div class="col-3">
+                {{ form_widget(form.status,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group row">
+            {{ form_label(form.resolution, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+            {{ form_errors(form.resolution) }}
+            <div class="col-3">
+                {{ form_widget(form.resolution,{'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        {{ form_row(form.submit, { 'attr': { 'class': 'btn btn-primary' } }) }}
+        {{ form_end(form) }}
+    </div>
+    </div>
+</div>
+{% endblock %}
+

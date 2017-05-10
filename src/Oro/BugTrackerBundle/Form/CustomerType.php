@@ -10,7 +10,6 @@ namespace Oro\BugTrackerBundle\Form;
 
 use Oro\BugTrackerBundle\Entity\Customer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;

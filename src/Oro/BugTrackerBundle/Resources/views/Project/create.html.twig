@@ -9,6 +9,8 @@
 {% endblock %}
 
 {% block content %}
+<div class="panel panel-primary panel-bold p-3">
+    <div class="panel-body">
     <div class="create-project-page container-fluid">
         {{ form_start(form) }}
         <div class="form-group row">
@@ -36,5 +38,7 @@
         {{ form_row(form.submit, { 'attr': { 'class': 'btn btn-primary' } }) }}
         {{ form_end(form) }}
     </div>
+    </div>
+</div>
 {% endblock %}
 
