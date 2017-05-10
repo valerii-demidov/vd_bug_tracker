@@ -1,0 +1,19 @@
+{# src/Oro/BugTrackerBundle/Resources/views/issue/collaboration.html.twig #}
+{% if collaboration is not empty %}
+    <div class="panel panel-default mb-3">
+        <div class="panel-heading p-1 pl-2">{{ 'Collaborators'|trans }}</div>
+        <div class="panel-body pt-1 pb-1">
+            <ul class="list-box">
+                {% for item in collaboration %}
+                    <li>
+                        <a href="{{ url('oro_bugtracker_customer_edit', { 'id': item.id}) }}">{{ item.username }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endif %}
+
+
+
+
