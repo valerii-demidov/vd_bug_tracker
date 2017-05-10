@@ -3,78 +3,108 @@
 {% block page_header_content %}
     {{ parent() }}
     <div class="p-2">
-        <a class="btn btn-secondary" href="{{ absolute_url(path('oro_bugtracker_project_list')) }}" role="button">{{ 'Back'|trans }}</a>
+        <a class="btn btn-secondary" href="{{ absolute_url(path('oro_bugtracker_issue_list')) }}" role="button">{{ 'Back'|trans }}</a>
     </div>
-    <div class="p-2">
+    {#<div class="p-2">
         {{ render(controller('BugTrackerBundle:Project:delete', { 'id': entity_id } )) }}
-    </div>
+    </div>#}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-primary panel-bold p-3">
-    <div class="panel-body">
-    <div class="edit-customer-page container-fluid">
-        {{ form_start(form) }}
-        <div class="form-group row">
-            {{ form_label(form.label, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
-            {{ form_errors(form.label) }}
-            <div class="col-3">
-                {{ form_widget(form.label,{'attr': {'class': 'form-control'}}) }}
-            </div>
-        </div>
-        <div class="form-group row">
-            {{ form_label(form.summary, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
-            {{ form_errors(form.summary) }}
-            <div class="col-3">
-                {{ form_widget(form.summary,{'attr': {'class': 'form-control'}}) }}
-            </div>
-        </div>
-
-        <div class="form-group row">
-            {{ form_label(form.code, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
-            {{ form_errors(form.code) }}
-            <div class="col-3">
-                {{ form_widget(form.code,{'attr': {'class': 'form-control'}}) }}
-                <small id="emailHelp" class="form-text text-muted">{{ 'Code must have unique value'|trans }}</small>
-            </div>
-        </div>
-        {{ form_row(form.submit, { 'attr': { 'class': 'btn btn-primary' } }) }}
-        {{ form_end(form) }}
-    </div>
-    </div>
-</div>
-
-
-    <div class="panel panel-default mt-3 panel-bold">
-        <!-- Default panel contents -->
-        <div class="panel-heading p-2">{{ 'Add project members'|trans }}</div>
-        <div class="panel-body p-2">
-            <p>
-            <form class="form-inline" action="{{ url('oro_bugtracker_project_addmember', {projectid: entity_id}) }}"
-                  method="post"
-                  data-confirmation="true" id="addmember-form">
-                <div class="form-group mx-sm-3">
-                    <label for="inputUsername" class="sr-only">{{ 'Enter username'|trans }}</label>
-                    <input autocomplete-url="{{ url('oro_bugtracker_project_members', {projectid: entity_id}) }}"
-                           type="text" class="form-control" id="input-username" name="username" placeholder="Enter username">
-                    <input type="hidden" name="token" value="{{ csrf_token('addmembers') }}"/>
+    <div class="panel panel-primary panel-bold p-3">
+        <div class="panel-body">
+            <div class="create-project-page container-fluid">
+                {{ form_start(form) }}
+                <div class="form-group row">
+                    {{ form_label(form.code, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+                    {{ form_errors(form.code) }}
+                    <div class="col-3">
+                        {{ form_widget(form.code,{'attr': {'class': 'form-control'}}) }}
+                    </div>
                 </div>
-                <button type="submit" id="add-project-member" class="btn btn-primary">{{ 'Add'|trans }}</button>
-                <span class="loader" style="display: none">
-                    <img src="{{ absolute_url(asset('bundles/bugtracker/images/ajax-load.gif')) }}">
-                </span>
-            </form>
-            </p>
+                <div class="form-group row">
+                    {{ form_label(form.project, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+                    {{ form_errors(form.project) }}
+                    <div class="col-3">
+                        {{ form_widget(form.project,{'attr': {'class': 'form-control'}}) }}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    {{ form_label(form.summary, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+                    {{ form_errors(form.summary) }}
+                    <div class="col-3">
+                        {{ form_widget(form.summary,{'attr': {'class': 'form-control'}}) }}
+                        <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    {{ form_label(form.description, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+                    {{ form_errors(form.description) }}
+                    <div class="col-3">
+                        {{ form_widget(form.description,{'attr': {'class': 'form-control'}}) }}
+                        <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    {{ form_label(form.type, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+                    {{ form_errors(form.type) }}
+                    <div class="col-3">
+                        {{ form_widget(form.type,{'attr': {'class': 'form-control'}}) }}
+                        <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    {{ form_label(form.priority, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+                    {{ form_errors(form.priority) }}
+                    <div class="col-3">
+                        {{ form_widget(form.priority,{'attr': {'class': 'form-control'}}) }}
+                        <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    {{ form_label(form.status, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+                    {{ form_errors(form.status) }}
+                    <div class="col-3">
+                        {{ form_widget(form.status,{'attr': {'class': 'form-control'}}) }}
+                        <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    {{ form_label(form.resolution, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+                    {{ form_errors(form.resolution) }}
+                    <div class="col-3">
+                        {{ form_widget(form.resolution,{'attr': {'class': 'form-control'}}) }}
+                        <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    {{ form_label(form.assignee, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+                    {{ form_errors(form.assignee) }}
+                    <div class="col-3">
+                        {{ form_widget(form.assignee,{'attr': {'class': 'form-control'}}) }}
+                        <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
+                    </div>
+                </div>
+                {{ form_row(form.submit, { 'attr': { 'class': 'btn btn-primary' }, 'label': 'Update'  }) }}
+                {{ form_end(form) }}
+            </div>
         </div>
-
-        <!-- Table -->
-        <div id="members-grid">
-            {{ members_grid_html|raw }}
+    </div>
+    <div id="issue-main-tab" class="p-3 mt-3 mb-5">
+        <ul>
+            <li><a href="#comments">{{ 'Comments'|trans }}</a></li>
+            <li><a href="#activity">{{ 'Activity'|trans }}</a></li>
+        </ul>
+        <div id="comments">
+            11111111111111
+        </div>
+        <div id="activity">
+            222222222222222222
         </div>
     </div>
 {% endblock %}
 
 {% block javascripts_custom %}
     {{ parent() }}
-    <script type="text/javascript" src="{{ absolute_url(asset('bundles/bugtracker/js/project/members.js')) }}"></script>
+    <script type="text/javascript" src="{{ absolute_url(asset('bundles/bugtracker/js/issue/custom.js')) }}"></script>
 {% endblock %}

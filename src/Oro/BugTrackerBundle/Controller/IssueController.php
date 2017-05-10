@@ -53,20 +53,20 @@ class IssueController extends Controller
         $page_title = 'Manage Issues';
 
         $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary'];
-        /*$actions[] = [
+        $actions[] = [
             'label' => 'Edit',
-            'router' => 'oro_bugtracker_project_edit',
+            'router' => 'oro_bugtracker_issue_edit',
             'router_parameters' => [
                 ['collection_key' => 'id', 'router_key' => 'id']
             ],
-        ];*/
+        ];
 
         return $this->render(
             'BugTrackerBundle:Issue:list.html.twig',
             compact(
                 'collection', // grid
                 'columns',  // grid
-                //'actions',  // grid
+                'actions',  // grid
                 'page_title',
                 'entityCreateRouter', //buttons
                 'listRouteName', //paginator
@@ -91,6 +91,8 @@ class IssueController extends Controller
             // 2) handle the submit (will only happen on POST)
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
+                $reporter = $this->get('security.token_storage')->getToken()->getUser();
+                $issue->setReporter($reporter);
                 $em->persist($issue);
                 $em->flush();
 
@@ -98,7 +100,7 @@ class IssueController extends Controller
                     ->getFlashBag()
                     ->add('success', 'Issue has been created successfully!');
 
-                return $this->redirectToRoute('oro_bugtracker_issue_list', array('id' => $issue->getId()));
+                return $this->redirectToRoute('oro_bugtracker_issue_edit', array('id' => $issue->getId()));
             }
 
         } catch (\Exception $exception) {
@@ -112,6 +114,65 @@ class IssueController extends Controller
             array(
                 'form' => $form->createView(),
                 'page_title' => 'New Issue',
+            )
+        );
+    }
+
+    /**
+     * Issue edit action
+     *
+     * @Route("issue/edit/{id}", name="oro_bugtracker_issue_edit", requirements={"id" = "\d+"})
+     * @param $id
+     * @param Request $request
+     */
+    public function editAction($id, Request $request)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $issueEntityData = $em->getRepository(Issue::class)->find($id);
+
+        if (!$issueEntityData) {
+            $errorMessage = 'Required issue was not found!';
+            $request->getSession()
+                ->getFlashBag()
+                ->add('error', $errorMessage);
+
+            return $this->redirect('/');
+        }
+        $form = $this->createForm(
+            IssueType::class,
+            $issueEntityData,
+            array(
+                'validation_groups' => array('edit'),
+            )
+        );
+
+        try {
+            if ($request->getMethod() == 'POST') {
+                $form->handleRequest($request);
+                if ($form->isValid()) {
+                    $em->merge($issueEntityData);
+
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('success', 'Issue has been updated successfully!');
+                    $em->flush();
+                }
+            }
+        } catch (\Exception $exception) {
+            $request->getSession()
+                ->getFlashBag()
+                ->add('error', $exception->getMessage());
+        }
+
+        //$issueRepository = $em->getRepository(Issue::class);
+
+        return $this->render(
+            'BugTrackerBundle:Issue:edit.html.twig',
+            array(
+                'form' => $form->createView(),
+                'page_title' => sprintf("Edit Project '%s'", $issueEntityData->getId()),
+                'entity_id' => $issueEntityData->getId()
             )
         );
     }

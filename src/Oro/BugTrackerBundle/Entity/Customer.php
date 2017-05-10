@@ -290,4 +290,44 @@ class Customer implements UserInterface, \Serializable
             return $this->$key;
         }
     }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->projects = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add projects
+     *
+     * @param \Oro\BugTrackerBundle\Entity\Project $projects
+     * @return Customer
+     */
+    public function addProject(\Oro\BugTrackerBundle\Entity\Project $projects)
+    {
+        $this->projects[] = $projects;
+
+        return $this;
+    }
+
+    /**
+     * Remove projects
+     *
+     * @param \Oro\BugTrackerBundle\Entity\Project $projects
+     */
+    public function removeProject(\Oro\BugTrackerBundle\Entity\Project $projects)
+    {
+        $this->projects->removeElement($projects);
+    }
+
+    /**
+     * Get projects
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getProjects()
+    {
+        return $this->projects;
+    }
 }

@@ -12,6 +12,22 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Issue
 {
+    const TYPE_STORY = 1;
+    const TYPE_TASK = 2;
+    const TYPE_SUBTASK = 3;
+    const TYPE_BUG = 4;
+
+    const PRIORITY_LOW = 1;
+    const PRIORITY_MEDIUM = 2;
+    const PRIORITY_HIGH = 3;
+
+    const STATUS_OPEN = 'open';
+    const STATUS_IN_PROGRESS = 'in_progress';
+    const STATUS_RESOLVED = 'resolved';
+
+    const RESOLUTION_UNRESOLVED = 'unresolved';
+    const RESOLUTION_RESOLVED = 'resolved';
+
     /**
      * @var int
      *
@@ -24,7 +40,7 @@ class Issue
     /**
      * @var string
      *
-     * @ORM\Column(name="summary", type="text", nullable=true)
+     * @ORM\Column(name="summary", type="string", length=255)
      */
     private $summary;
 
@@ -52,7 +68,7 @@ class Issue
     /**
      * @var string
      *
-     * @ORM\Column(name="string", type="string", length=255)
+     * @ORM\Column(name="priority", type="string", length=255)
      */
     private $priority;
 
@@ -71,30 +87,27 @@ class Issue
     private $resolution;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="reporter", type="integer")
+     * One Issue has One Csutomer
+     * @ORM\ManyToOne(targetEntity="Customer")
      */
     private $reporter;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="assignee", type="integer")
+     * One Issue has One Customer.
+     * @ORM\ManyToOne(targetEntity="Customer")
      */
     private $assignee;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="parent", type="integer")
+     * @ORM\Column(name="parent", type="integer", nullable=true)
      */
     private $parent;
 
     /**
-     * @var int
-     *
-     * @ORM\Column(name="project", type="integer")
+     * One Issue has One Project.
+     * @ORM\ManyToOne(targetEntity="Project")
      */
     private $project;
 
@@ -261,51 +274,6 @@ class Issue
         return $this->resolution;
     }
 
-    /**
-     * Set reporter
-     *
-     * @param integer $reporter
-     * @return Issue
-     */
-    public function setReporter($reporter)
-    {
-        $this->reporter = $reporter;
-
-        return $this;
-    }
-
-    /**
-     * Get reporter
-     *
-     * @return integer 
-     */
-    public function getReporter()
-    {
-        return $this->reporter;
-    }
-
-    /**
-     * Set assignee
-     *
-     * @param integer $assignee
-     * @return Issue
-     */
-    public function setAssignee($assignee)
-    {
-        $this->assignee = $assignee;
-
-        return $this;
-    }
-
-    /**
-     * Get assignee
-     *
-     * @return integer 
-     */
-    public function getAssignee()
-    {
-        return $this->assignee;
-    }
 
     /**
      * Set parent
@@ -420,5 +388,93 @@ class Issue
     public function getPriority()
     {
         return $this->priority;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->created = new \DateTime();
+        $this->updated = new \DateTime();
+        $this->projects = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add projects
+     *
+     * @param \Oro\BugTrackerBundle\Entity\Project $projects
+     * @return Issue
+     */
+    public function addProject(\Oro\BugTrackerBundle\Entity\Project $projects)
+    {
+        $this->projects[] = $projects;
+
+        return $this;
+    }
+
+    /**
+     * Remove projects
+     *
+     * @param \Oro\BugTrackerBundle\Entity\Project $projects
+     */
+    public function removeProject(\Oro\BugTrackerBundle\Entity\Project $projects)
+    {
+        $this->projects->removeElement($projects);
+    }
+
+    /**
+     * Get projects
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getProjects()
+    {
+        return $this->projects;
+    }
+
+    /**
+     * Set assignee
+     *
+     * @param \Oro\BugTrackerBundle\Entity\Customer $assignee
+     * @return Issue
+     */
+    public function setAssignee(\Oro\BugTrackerBundle\Entity\Customer $assignee = null)
+    {
+        $this->assignee = $assignee;
+
+        return $this;
+    }
+
+    /**
+     * Get assignee
+     *
+     * @return \Oro\BugTrackerBundle\Entity\Customer 
+     */
+    public function getAssignee()
+    {
+        return $this->assignee;
+    }
+
+    /**
+     * Set reporter
+     *
+     * @param \Oro\BugTrackerBundle\Entity\Customer $reporter
+     * @return Issue
+     */
+    public function setReporter(\Oro\BugTrackerBundle\Entity\Customer $reporter = null)
+    {
+        $this->reporter = $reporter;
+
+        return $this;
+    }
+
+    /**
+     * Get reporter
+     *
+     * @return \Oro\BugTrackerBundle\Entity\Customer 
+     */
+    public function getReporter()
+    {
+        return $this->reporter;
     }
 }
