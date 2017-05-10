@@ -29,6 +29,13 @@ class Issue
     const RESOLUTION_RESOLVED = 'resolved';
 
     /**
+     * Many Customers have Many Projects.
+     * @ORM\ManyToMany(targetEntity="Customer")
+     * @ORM\JoinTable(name="bugtracker_issue_collaboration")
+     */
+    private $collaboration;
+
+    /**
      * @var int
      *
      * @ORM\Column(name="id", type="integer")
@@ -476,5 +483,41 @@ class Issue
     public function getReporter()
     {
         return $this->reporter;
+    }
+
+    /**
+     * Add collaboration
+     *
+     * @param \Oro\BugTrackerBundle\Entity\Customer $collaboration
+     * @return Issue
+     */
+    public function addCollaboration(\Oro\BugTrackerBundle\Entity\Customer $collaboration)
+    {
+        if (!$this->collaboration->contains($collaboration)) {
+
+            $this->collaboration->add($collaboration);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove collaboration
+     *
+     * @param \Oro\BugTrackerBundle\Entity\Customer $collaboration
+     */
+    public function removeCollaboration(\Oro\BugTrackerBundle\Entity\Customer $collaboration)
+    {
+        $this->collaboration->removeElement($collaboration);
+    }
+
+    /**
+     * Get collaboration
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getCollaboration()
+    {
+        return $this->collaboration;
     }
 }

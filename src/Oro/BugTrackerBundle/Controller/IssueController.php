@@ -94,6 +94,8 @@ class IssueController extends Controller
                 $reporter = $this->get('security.token_storage')->getToken()->getUser();
                 $issue->setReporter($reporter);
                 $em->persist($issue);
+                $issue->addCollaboration($issue->getAssignee());
+                $issue->addCollaboration($issue->getReporter());
                 $em->flush();
 
                 $request->getSession()
@@ -151,6 +153,7 @@ class IssueController extends Controller
             if ($request->getMethod() == 'POST') {
                 $form->handleRequest($request);
                 if ($form->isValid()) {
+                    $issueEntityData->addCollaboration($issueEntityData->getAssignee());
                     $em->merge($issueEntityData);
 
                     $request->getSession()
@@ -168,9 +171,9 @@ class IssueController extends Controller
         return $this->render(
             'BugTrackerBundle:Issue:edit.html.twig',
             array(
+                'entity' => $issueEntityData,
                 'form' => $form->createView(),
-                'page_title' => sprintf("Edit Project '%s'", $issueEntityData->getId()),
-                'entity_id' => $issueEntityData->getId()
+                'page_title' => sprintf("Edit Project '%s'", $issueEntityData->getId())
             )
         );
     }
