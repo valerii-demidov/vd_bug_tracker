@@ -5,8 +5,8 @@
 {% block page_header_content %}
     {{ parent() }}
     <div class="p-2">
-        <a class="btn btn-primary" href="{{ absolute_url(path(entityCreateRouter)) }}"
-           role="button">{{ 'Create Project'|trans }}</a>
+        <a class="btn btn-primary" href="{{ url(entityCreateRouter) }}"
+           role="button">{{ 'Create Issue'|trans }}</a>
     </div>
 {% endblock %}
 

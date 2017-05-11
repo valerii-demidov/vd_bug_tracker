@@ -1,0 +1,132 @@
+{# src/Oro/BugTrackerBundle/Resources/views/project/edit.html.twig #}
+{% extends 'BugTrackerBundle::base.html.twig' %}
+{% block page_header_content %}
+    {{ parent() }}
+    <div class="p-2">
+        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_issue_list') }}" role="button">{{ 'Back'|trans }}</a>
+    </div>
+    <div class="p-2">
+        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_issue_edit',{'id': entity.id}) }}"
+           role="button">{{ 'Edit'|trans }}</a>
+    </div>
+    <div class="p-2">
+        {{ render(controller('BugTrackerBundle:Issue:delete', { 'id': entity.id } )) }}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-9">
+            <div class="block">
+                <div class="panel panel-default panel-bold">
+                    <div class="panel-heading p-1 pl-2">{{ 'Details'|trans }}</div>
+                    <div class="panel-body p-3">
+                        <div class="create-project-page container-fluid">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-4 font-weight-bold">
+                                            {{ 'Type'|trans }}
+                                        </div>
+                                        <div class="col-1">
+                                            {{ entity.type }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-4 font-weight-bold">
+                                            {{ 'Priority'|trans }}
+                                        </div>
+                                        <div class="col-1">
+                                            {{ entity.priority }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-4 font-weight-bold">
+                                            {{ 'Status'|trans }}
+                                        </div>
+                                        <div class="col-1">
+                                            {{ entity.status }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-4 font-weight-bold">
+                                            {{ 'Resolution'|trans }}
+                                        </div>
+                                        <div class="col-1">
+                                            {{ entity.resolution }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-4 font-weight-bold">
+                                            {{ 'Created At'|trans }}
+                                        </div>
+                                        <div class="col-1">
+                                            {{ entity.created|date("m/d/Y g:ia") }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="row">
+                                        <div class="col-4 font-weight-bold">
+                                            {{ 'Updated At'|trans }}
+                                        </div>
+                                        <div class="col-1">
+                                            {{ entity.updated|date("m/d/Y g:ia") }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="block pt-4">
+                <div class="panel panel-default panel-bold">
+                    <div class="panel-heading p-1 pl-2">{{ 'Description'|trans }}</div>
+                    <div class="panel-body p-3">{{ entity.description }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="panel panel-primary panel-bold p-3">
+                <div class="panel-body">
+                    {{ include('BugTrackerBundle:Issue:people.html.twig',
+                    {'reporter': entity.reporter,'assignee':entity.assignee }) }}
+                    {{ include('BugTrackerBundle:Issue:collaboration.html.twig',
+                    {'collaboration': entity.collaboration}) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="issue-main-tab" class="p-3 mt-3 mb-5">
+        <ul>
+            <li><a href="#comments">{{ 'Comments'|trans }}</a></li>
+            <li><a href="#activity">{{ 'Activity'|trans }}</a></li>
+        </ul>
+        <div id="comments">
+            11111111111111
+        </div>
+        <div id="activity">
+            222222222222222222
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts_custom %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ absolute_url(asset('bundles/bugtracker/js/issue/custom.js')) }}"></script>
+{% endblock %}
