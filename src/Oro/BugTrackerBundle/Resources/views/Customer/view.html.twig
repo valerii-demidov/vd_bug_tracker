@@ -1,0 +1,73 @@
+{# src/Oro/BugTrackerBundle/Resources/views/customer/view.html.twig #}
+{% extends 'BugTrackerBundle::base.html.twig' %}
+{% block page_header_content %}
+    {{ parent() }}
+    <div class="p-2">
+        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_customer_list') }}" role="button">{{ 'Back'|trans }}</a>
+    </div>
+    <div class="p-2">
+        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_customer_edit', { 'id': entity.id } ) }}"
+           role="button">{{ 'Edit'|trans }}</a>
+    </div>
+    <div class="p-2">
+        {{ render(controller('BugTrackerBundle:Customer:delete', { 'id': entity.id } )) }}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-primary panel-bold p-3">
+        <div class="panel-body">
+            <div class="view-customer-page container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-2 font-weight-bold">
+                                {{ 'Username'|trans }}
+                            </div>
+                            <div class="col-3">
+                                {{ entity.username }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-2 font-weight-bold">
+                                {{ 'Full name'|trans }}
+                            </div>
+                            <div class="col-3">
+                                {{ entity.fullName }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-2 font-weight-bold">
+                                {{ 'Email'|trans }}
+                            </div>
+                            <div class="col-3">
+                                {{ entity.email }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-2 font-weight-bold">
+                                {{ 'Roles'|trans }}
+                            </div>
+                            <div class="col-3">
+                                {{ entity.roles|join(', ') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

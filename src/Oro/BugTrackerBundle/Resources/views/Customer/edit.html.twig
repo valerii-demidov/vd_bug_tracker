@@ -6,6 +6,10 @@
         <a class="btn btn-secondary" href="{{ url('oro_bugtracker_customer_list') }}" role="button">{{ 'Back'|trans }}</a>
     </div>
     <div class="p-2">
+        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_customer_view', { 'id': entity_id } ) }}"
+           role="button">{{ 'View'|trans }}</a>
+    </div>
+    <div class="p-2">
         {{ render(controller('BugTrackerBundle:Customer:delete', { 'id': entity_id } )) }}
     </div>
 {% endblock %}
@@ -15,7 +19,6 @@
         <div class="panel-body">
             <div class="edit-customer-page container-fluid">
                 {{ form_start(form) }}
-                {#{{ form.vars.value.id }}#}
                 <div class="form-group row">
                     {{ form_label(form.username, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
                     {{ form_errors(form.username) }}
