@@ -3,7 +3,7 @@
 {% block page_header_content %}
     {{ parent() }}
     <div class="p-2">
-        <a class="btn btn-secondary" href="{{ absolute_url(path('oro_bugtracker_project_list')) }}" role="button">{{ 'Back'|trans }}</a>
+        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_project_list') }}" role="button">{{ 'Back'|trans }}</a>
     </div>
     <div class="p-2">
         {{ render(controller('BugTrackerBundle:Project:delete', { 'id': entity_id } )) }}

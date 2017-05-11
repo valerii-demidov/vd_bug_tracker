@@ -54,6 +54,13 @@ class IssueController extends Controller
 
         $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary'];
         $actions[] = [
+            'label' => 'View',
+            'router' => 'oro_bugtracker_issue_view',
+            'router_parameters' => [
+                ['collection_key' => 'id', 'router_key' => 'id']
+            ],
+        ];
+        $actions[] = [
             'label' => 'Edit',
             'router' => 'oro_bugtracker_issue_edit',
             'router_parameters' => [
@@ -93,9 +100,9 @@ class IssueController extends Controller
             if ($form->isSubmitted() && $form->isValid()) {
                 $reporter = $this->get('security.token_storage')->getToken()->getUser();
                 $issue->setReporter($reporter);
-                $em->persist($issue);
                 $issue->addCollaboration($issue->getAssignee());
                 $issue->addCollaboration($issue->getReporter());
+                $em->persist($issue);
                 $em->flush();
 
                 $request->getSession()
@@ -116,6 +123,37 @@ class IssueController extends Controller
             array(
                 'form' => $form->createView(),
                 'page_title' => 'New Issue',
+            )
+        );
+    }
+
+    /**
+     * Issue view action
+     *
+     * @Route("issue/view/{id}", name="oro_bugtracker_issue_view", requirements={"id" = "\d+"})
+     * @param $id
+     * @param Request $request
+     */
+    public function viewAction($id, Request $request)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $issueEntityData = $em->getRepository(Issue::class)->find($id);
+
+        if (!$issueEntityData) {
+            $errorMessage = 'Required issue was not found!';
+            $request->getSession()
+                ->getFlashBag()
+                ->add('error', $errorMessage);
+
+            return $this->redirect('/');
+        }
+
+        return $this->render(
+            'BugTrackerBundle:Issue:view.html.twig',
+            array(
+                'entity' => $issueEntityData,
+                'page_title' => sprintf("View Issue '%s'", $issueEntityData->getSummary())
             )
         );
     }
@@ -173,7 +211,7 @@ class IssueController extends Controller
             array(
                 'entity' => $issueEntityData,
                 'form' => $form->createView(),
-                'page_title' => sprintf("Edit Project '%s'", $issueEntityData->getId())
+                'page_title' => sprintf("Edit Issue '%s'", $issueEntityData->getSummary())
             )
         );
     }

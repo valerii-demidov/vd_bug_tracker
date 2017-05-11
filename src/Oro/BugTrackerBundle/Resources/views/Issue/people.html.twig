@@ -1,0 +1,28 @@
+{# src/Oro/BugTrackerBundle/Resources/views/issue/people.html.twig #}
+{% if reporter is not empty and assignee is not empty  %}
+    <div class="panel panel-default mb-3">
+        <div class="panel-heading p-1 pl-2">{{ 'People'|trans }}</div>
+        <div class="panel-body p-2 pl-3">
+            <div class="row">
+                <div class="col-6 font-weight-bold">
+                    {{ 'Reporter'|trans }}
+                </div>
+                <div class="col-6">
+                    {{ reporter.username }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6 font-weight-bold">
+                    {{ 'Assignee'|trans }}
+                </div>
+                <div class="col-6">
+                    {{ assignee.username }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+
+
+

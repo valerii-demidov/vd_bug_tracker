@@ -58,14 +58,6 @@ class IssueType extends AbstractType
                     'choice_label' => 'label',
                 )
             )
-            /*->add(
-                'reporter',
-                EntityType::class,
-                array(
-                    'class' => 'Oro\BugTrackerBundle\Entity\Customer',
-                    'property' => 'username'
-                )
-            )*/
             ->add(
                 'assignee',
                 EntityType::class,

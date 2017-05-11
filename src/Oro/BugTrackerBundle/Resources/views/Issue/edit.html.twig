@@ -6,6 +6,10 @@
         <a class="btn btn-secondary" href="{{ absolute_url(path('oro_bugtracker_issue_list')) }}" role="button">{{ 'Back'|trans }}</a>
     </div>
     <div class="p-2">
+        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_issue_view',{'id': entity.id}) }}"
+           role="button">{{ 'View'|trans }}</a>
+    </div>
+    <div class="p-2">
         {{ render(controller('BugTrackerBundle:Issue:delete', { 'id': entity.id } )) }}
     </div>
 {% endblock %}
@@ -22,6 +26,8 @@
                             {{ form_errors(form.code) }}
                             <div class="col-4">
                                 {{ form_widget(form.code,{'attr': {'class': 'form-control'}}) }}
+                                <small id="emailHelp"
+                                       class="form-text text-muted">{{ 'Code must have unique value'|trans }}</small>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -36,7 +42,6 @@
                             {{ form_errors(form.summary) }}
                             <div class="col-4">
                                 {{ form_widget(form.summary,{'attr': {'class': 'form-control'}}) }}
-                                <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -44,7 +49,6 @@
                             {{ form_errors(form.description) }}
                             <div class="col-4">
                                 {{ form_widget(form.description,{'attr': {'class': 'form-control'}}) }}
-                                <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -52,7 +56,6 @@
                             {{ form_errors(form.type) }}
                             <div class="col-4">
                                 {{ form_widget(form.type,{'attr': {'class': 'form-control'}}) }}
-                                <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -60,7 +63,6 @@
                             {{ form_errors(form.priority) }}
                             <div class="col-4">
                                 {{ form_widget(form.priority,{'attr': {'class': 'form-control'}}) }}
-                                <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -68,7 +70,6 @@
                             {{ form_errors(form.status) }}
                             <div class="col-4">
                                 {{ form_widget(form.status,{'attr': {'class': 'form-control'}}) }}
-                                <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -76,7 +77,6 @@
                             {{ form_errors(form.resolution) }}
                             <div class="col-4">
                                 {{ form_widget(form.resolution,{'attr': {'class': 'form-control'}}) }}
-                                <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -84,7 +84,6 @@
                             {{ form_errors(form.assignee) }}
                             <div class="col-4">
                                 {{ form_widget(form.assignee,{'attr': {'class': 'form-control'}}) }}
-                                <small id="emailHelp" class="form-text text-muted">Code must have unique value</small>
                             </div>
                         </div>
                         {{ form_row(form.submit, { 'attr': { 'class': 'btn btn-primary' }, 'label': 'Update'  }) }}
