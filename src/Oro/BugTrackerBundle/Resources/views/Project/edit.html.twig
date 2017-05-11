@@ -6,6 +6,10 @@
         <a class="btn btn-secondary" href="{{ url('oro_bugtracker_project_list') }}" role="button">{{ 'Back'|trans }}</a>
     </div>
     <div class="p-2">
+        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_project_view', { 'id': entity_id }) }}"
+           role="button">{{ 'View'|trans }}</a>
+    </div>
+    <div class="p-2">
         {{ render(controller('BugTrackerBundle:Project:delete', { 'id': entity_id } )) }}
     </div>
 {% endblock %}

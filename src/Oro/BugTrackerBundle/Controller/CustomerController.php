@@ -119,6 +119,66 @@ class CustomerController extends Controller
 
     /**
      * Create edit action
+     * @Route("customer/view/{id}", name="oro_bugtracker_customer_view", requirements={"id" = "\d+"})
+     */
+    public function viewAction($id, Request $request)
+    {
+        /*$em = $this->getDoctrine()->getEntityManager();
+        $customerEntityData = $em->getRepository(Customer::class)->find($id);
+
+        if (!$customerEntityData) {
+            $errorMessage = 'Required customer was not found!';
+            $request->getSession()
+                ->getFlashBag()
+                ->add('error', $errorMessage);
+
+            return $this->redirect('/');
+        }
+        $form = $this->createForm(
+            CustomerType::class,
+            $customerEntityData,
+            array(
+                'validation_groups' => array('edit'),
+            )
+        );
+
+        try {
+            if ($request->getMethod() == 'POST') {
+                $form->handleRequest($request);
+                if ($form->isValid()) {
+                    $plainPassword = $form->get('plainPassword');
+                    if (!$plainPassword->isEmpty()) {
+                        $passwordEncoder = $this->get('security.password_encoder');
+                        $password = $passwordEncoder->encodePassword($customerEntityData, $plainPassword->getData());
+                        $customerEntityData->setPassword($password);
+                    }
+
+                    $em->merge($customerEntityData);
+
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('success', 'Customer has been updated successfully!');
+                    $em->flush();
+                }
+            }
+        } catch (\Exception $exception) {
+            $request->getSession()
+                ->getFlashBag()
+                ->add('error', $exception->getMessage());
+        }
+
+        return $this->render(
+            'BugTrackerBundle:Customer:edit.html.twig',
+            array(
+                'form' => $form->createView(),
+                'page_title' => sprintf("Edit User '%s'", $customerEntityData->getUsername()),
+                'entity_id' => $customerEntityData->getId(),
+            )
+        );*/
+    }
+
+    /**
+     * Create edit action
      * @Route("customer/edit/{id}",requirements={"id" = "\d+"})
      */
     public function editAction($id, Request $request)

@@ -51,6 +51,13 @@ class ProjectController extends Controller
 
         $columns = ['id' => 'Id', 'label' => 'Label', 'summary' => 'Summary', 'code' => 'Code'];
         $actions[] = [
+            'label' => 'View',
+            'router' => 'oro_bugtracker_project_view',
+            'router_parameters' => [
+                ['collection_key' => 'id', 'router_key' => 'id']
+            ],
+        ];
+        $actions[] = [
             'label' => 'Edit',
             'router' => 'oro_bugtracker_project_edit',
             'router_parameters' => [
@@ -114,6 +121,47 @@ class ProjectController extends Controller
     }
 
     /**
+     * Project view action
+     *
+     * @Route("project/view/{id}", name="oro_bugtracker_project_view", requirements={"id" = "\d+"})
+     * @param $id
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function viewAction($id, Request $request)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $projectEntityData = $em->getRepository(Project::class)->find($id);
+
+        if (!$projectEntityData) {
+            $errorMessage = 'Required project was not found!';
+            $request->getSession()
+                ->getFlashBag()
+                ->add('error', $errorMessage);
+
+            return $this->redirect('/');
+        }
+
+        $projectRepository = $em->getRepository(Project::class);
+        $membersCollection = $projectRepository->find($id)->getCustomers();
+        $actions = $this->getMemberGridAction($id, true, false);
+
+        return $this->render(
+            'BugTrackerBundle:Project:view.html.twig',
+            array(
+                'page_title' => sprintf(
+                    "View Project '%s'",
+                    $projectEntityData->getCode()
+                ),
+                'entity' => $projectEntityData,
+                'members_grid_html' => $this->getMembersGridHtml($membersCollection, $actions),
+            )
+        );
+    }
+
+    /**
      * Project edit action
      *
      * @Route("project/edit/{id}", name="oro_bugtracker_project_edit", requirements={"id" = "\d+"})
@@ -125,7 +173,7 @@ class ProjectController extends Controller
     public function editAction($id, Request $request)
     {
 
-        $em = $this->getDoctrine()->getEntityManager();
+        $em = $this->getDoctrine()->getManager();
         $projectEntityData = $em->getRepository(Project::class)->find($id);
 
         if (!$projectEntityData) {
@@ -164,14 +212,19 @@ class ProjectController extends Controller
 
         $projectRepository = $em->getRepository(Project::class);
         $membersCollection = $projectRepository->find($id)->getCustomers();
+        $actions = $this->getMemberGridAction($id, true, true);
+
 
         return $this->render(
             'BugTrackerBundle:Project:edit.html.twig',
             array(
                 'form' => $form->createView(),
-                'page_title' => sprintf("Edit Project '%s'", $projectEntityData->getId()),
+                'page_title' => sprintf(
+                    "Edit Project '%s'",
+                    $projectEntityData->getCode()
+                ),
                 'entity_id' => $projectEntityData->getId(),
-                'members_grid_html' => $this->getMembersGridHtml($id, $membersCollection),
+                'members_grid_html' => $this->getMembersGridHtml($membersCollection, $actions),
             )
         );
     }
@@ -254,7 +307,8 @@ class ProjectController extends Controller
             }
         }
 
-        $result['members_grid_html'] = $this->getMembersGridHtml($projectid, $membersCollection);
+        $actions = $this->getMemberGridAction($projectid, true, true);
+        $result['members_grid_html'] = $this->getMembersGridHtml($membersCollection, $actions);
         $response->setData($result);
 
         return $response;
@@ -315,26 +369,43 @@ class ProjectController extends Controller
     }
 
     /**
-     * @param $projectId
+     * @param $projectid
+     * @param bool $useView
+     * @param bool $useEdit
+     * @param bool $useDelete
+     */
+    public function getMemberGridAction($projectid, $useView = true, $useDelete = true)
+    {
+        $actions = [];
+        if ($useView) {
+            $actions[] = [
+                'label' => 'View',
+                'router' => 'oro_bugtracker_customer_view',
+                'router_parameters' => [['collection_key' => 'id', 'router_key' => 'id']],
+            ];
+        }
+        if ($useDelete) {
+            $actions[] = [
+                'label' => 'Delete Member',
+                'router' => 'oro_bugtracker_project_removemember',
+                'router_parameters' => [
+                    ['router_key' => 'projectid', 'router_value' => $projectid],
+                    ['router_key' => 'memberid', 'collection_key' => 'id'],
+                ],
+            ];
+        }
+
+        return $actions;
+    }
+
+    /**
      * @param array $collection
+     * @param $actions
      * @return string
      */
-    protected function getMembersGridHtml($projectId, $collection = [])
+    protected function getMembersGridHtml($collection = [], $actions)
     {
         $columns = ['id' => 'Id', 'username' => 'User Name', 'email' => 'Email', 'fullName' => 'Full Name'];
-        $actions[] = [
-            'label' => 'Edit',
-            'router' => 'oro_bugtracker_customer_edit',
-            'router_parameters' => [['collection_key' => 'id', 'router_key' => 'id']],
-        ];
-        $actions[] = [
-            'label' => 'Delete',
-            'router' => 'oro_bugtracker_project_removemember',
-            'router_parameters' => [
-                ['router_key' => 'projectid', 'router_value' => $projectId],
-                ['router_key' => 'memberid', 'collection_key' => 'id'],
-            ],
-        ];
 
         $membersHtml = $this->render(
             'BugTrackerBundle:Project:members.html.twig',

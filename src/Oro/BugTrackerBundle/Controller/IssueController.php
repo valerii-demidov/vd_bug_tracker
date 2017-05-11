@@ -153,7 +153,7 @@ class IssueController extends Controller
             'BugTrackerBundle:Issue:view.html.twig',
             array(
                 'entity' => $issueEntityData,
-                'page_title' => sprintf("View Issue '%s'", $issueEntityData->getSummary())
+                'page_title' => sprintf("View Issue '%s'", $issueEntityData->getCode())
             )
         );
     }
@@ -211,7 +211,7 @@ class IssueController extends Controller
             array(
                 'entity' => $issueEntityData,
                 'form' => $form->createView(),
-                'page_title' => sprintf("Edit Issue '%s'", $issueEntityData->getSummary())
+                'page_title' => sprintf("Edit Issue '%s'", $issueEntityData->getCode())
             )
         );
     }
