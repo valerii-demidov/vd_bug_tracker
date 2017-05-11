@@ -47,6 +47,13 @@ class CustomerController extends Controller
 
         $columns = ['id' => 'Id', 'username' => 'User Name', 'email' => 'Email', 'fullName' => 'Full Name'];
         $actions[] = [
+            'label' => 'View',
+            'router' => 'oro_bugtracker_customer_view',
+            'router_parameters' => [
+                ['collection_key' => 'id', 'router_key' => 'id'],
+            ],
+        ];
+        $actions[] = [
             'label' => 'Edit',
             'router' => 'oro_bugtracker_customer_edit',
             'router_parameters' => [
@@ -77,7 +84,7 @@ class CustomerController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getEntityManager();
+        $em = $this->getDoctrine()->getManager();
 
         // 1) build the form
         $customer = new Customer();
@@ -123,7 +130,7 @@ class CustomerController extends Controller
      */
     public function viewAction($id, Request $request)
     {
-        /*$em = $this->getDoctrine()->getEntityManager();
+        $em = $this->getDoctrine()->getManager();
         $customerEntityData = $em->getRepository(Customer::class)->find($id);
 
         if (!$customerEntityData) {
@@ -134,47 +141,14 @@ class CustomerController extends Controller
 
             return $this->redirect('/');
         }
-        $form = $this->createForm(
-            CustomerType::class,
-            $customerEntityData,
-            array(
-                'validation_groups' => array('edit'),
-            )
-        );
-
-        try {
-            if ($request->getMethod() == 'POST') {
-                $form->handleRequest($request);
-                if ($form->isValid()) {
-                    $plainPassword = $form->get('plainPassword');
-                    if (!$plainPassword->isEmpty()) {
-                        $passwordEncoder = $this->get('security.password_encoder');
-                        $password = $passwordEncoder->encodePassword($customerEntityData, $plainPassword->getData());
-                        $customerEntityData->setPassword($password);
-                    }
-
-                    $em->merge($customerEntityData);
-
-                    $request->getSession()
-                        ->getFlashBag()
-                        ->add('success', 'Customer has been updated successfully!');
-                    $em->flush();
-                }
-            }
-        } catch (\Exception $exception) {
-            $request->getSession()
-                ->getFlashBag()
-                ->add('error', $exception->getMessage());
-        }
 
         return $this->render(
-            'BugTrackerBundle:Customer:edit.html.twig',
+            'BugTrackerBundle:Customer:view.html.twig',
             array(
-                'form' => $form->createView(),
-                'page_title' => sprintf("Edit User '%s'", $customerEntityData->getUsername()),
-                'entity_id' => $customerEntityData->getId(),
+                'page_title' => sprintf("View User '%s'", $customerEntityData->getUsername()),
+                'entity' => $customerEntityData,
             )
-        );*/
+        );
     }
 
     /**
@@ -183,7 +157,7 @@ class CustomerController extends Controller
      */
     public function editAction($id, Request $request)
     {
-        $em = $this->getDoctrine()->getEntityManager();
+        $em = $this->getDoctrine()->getManager();
         $customerEntityData = $em->getRepository(Customer::class)->find($id);
 
         if (!$customerEntityData) {
