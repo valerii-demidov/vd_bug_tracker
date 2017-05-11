@@ -371,8 +371,8 @@ class ProjectController extends Controller
     /**
      * @param $projectid
      * @param bool $useView
-     * @param bool $useEdit
      * @param bool $useDelete
+     * @return array
      */
     public function getMemberGridAction($projectid, $useView = true, $useDelete = true)
     {

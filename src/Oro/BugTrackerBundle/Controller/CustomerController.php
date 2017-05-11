@@ -142,11 +142,16 @@ class CustomerController extends Controller
             return $this->redirect('/');
         }
 
+
+        $issueGridActions = $this->getIssueGridAction();
+        $issueGridHtml = $this->getIssuesGridHtml($customerEntityData->getIssues(), $issueGridActions);
+
         return $this->render(
             'BugTrackerBundle:Customer:view.html.twig',
             array(
                 'page_title' => sprintf("View User '%s'", $customerEntityData->getUsername()),
                 'entity' => $customerEntityData,
+                'issue_grid_html' => $issueGridHtml
             )
         );
     }
@@ -256,5 +261,56 @@ class CustomerController extends Controller
                 'form' => $form->createView(),
             )
         );
+    }
+
+    /**
+     * @param $projectid
+     * @param bool $useView
+     * @param bool $useDelete
+     * @return array
+     */
+    public function getIssueGridAction($useView = true, $useDelete = true)
+    {
+        $actions = [];
+        if ($useView) {
+            $actions[] = [
+                'label' => 'View',
+                'router' => 'oro_bugtracker_issue_view',
+                'router_parameters' => [['collection_key' => 'id', 'router_key' => 'id']],
+            ];
+        }
+        /*if ($useDelete) {
+            $actions[] = [
+                'label' => 'Delete Member',
+                'router' => 'oro_bugtracker_project_removemember',
+                'router_parameters' => [
+                    ['router_key' => 'projectid', 'router_value' => $projectid],
+                    ['router_key' => 'memberid', 'collection_key' => 'id'],
+                ],
+            ];
+        }*/
+
+        return $actions;
+    }
+
+    /**
+     * @param array $collection
+     * @param $actions
+     * @return string
+     */
+    protected function getIssuesGridHtml($collection = [], $actions)
+    {
+        $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary'];
+
+        $membersHtml = $this->render(
+            'BugTrackerBundle:Customer:issue.html.twig',
+            compact(
+                'collection',
+                'columns',
+                'actions'
+            )
+        )->getContent();
+
+        return $membersHtml;
     }
 }
