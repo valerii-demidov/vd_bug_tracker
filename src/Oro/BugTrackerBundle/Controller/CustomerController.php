@@ -130,15 +130,6 @@ class CustomerController extends Controller
      */
     public function viewAction(Customer $customerEntity, Request $request)
     {
-        if (!$customerEntity || !$customerEntity->getId()) {
-            $errorMessage = 'Required customer was not found!';
-            $request->getSession()
-                ->getFlashBag()
-                ->add('error', $errorMessage);
-
-            return $this->redirect('/');
-        }
-
         $issueGridActions = $this->getIssueGridAction();
         $issueGridHtml = $this->getIssuesGridHtml($customerEntity->getIssues(), $issueGridActions);
 
@@ -159,14 +150,6 @@ class CustomerController extends Controller
     public function editAction(Customer $customerEntity, Request $request)
     {
         $em = $this->getDoctrine()->getManager();
-        if (!$customerEntity) {
-            $errorMessage = 'Required customer was not found!';
-            $request->getSession()
-                ->getFlashBag()
-                ->add('error', $errorMessage);
-
-            return $this->redirect('/');
-        }
         $form = $this->createForm(
             CustomerType::class,
             $customerEntity,
@@ -216,12 +199,6 @@ class CustomerController extends Controller
      */
     public function deleteAction(Customer $customerEntity, Request $request)
     {
-        if (!$customerEntity) {
-            throw $this->createNotFoundException(
-                'No customers found for id '.''
-            );
-        }
-
         $em = $this->getDoctrine()->getManager();
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_customer_delete',
