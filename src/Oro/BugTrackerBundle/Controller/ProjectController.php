@@ -6,6 +6,7 @@ use Oro\BugTrackerBundle\Form\ProjectType;
 use Oro\BugTrackerBundle\Entity\Project;
 use Oro\BugTrackerBundle\Entity\Customer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -23,7 +24,7 @@ class ProjectController extends Controller
      */
     public function listAction($page)
     {
-        $em = $this->getDoctrine()->getEntityManager();
+        $em = $this->getDoctrine()->getManager();
         $queryBuilder = $em
             ->getRepository('BugTrackerBundle:Project')
             ->createQueryBuilder('pr');
@@ -86,7 +87,7 @@ class ProjectController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getEntityManager();
+        $em = $this->getDoctrine()->getManager();
 
         // 1) build the form
         $project = new Project();
@@ -124,38 +125,20 @@ class ProjectController extends Controller
      * Project view action
      *
      * @Route("project/view/{id}", name="oro_bugtracker_project_view", requirements={"id" = "\d+"})
-     * @param $id
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction($id, Request $request)
+    public function viewAction(Project $projectEntity, Request $request)
     {
-
-        $em = $this->getDoctrine()->getManager();
-        $projectEntityData = $em->getRepository(Project::class)->find($id);
-
-        if (!$projectEntityData) {
-            $errorMessage = 'Required project was not found!';
-            $request->getSession()
-                ->getFlashBag()
-                ->add('error', $errorMessage);
-
-            return $this->redirect('/');
-        }
-
-        $projectRepository = $em->getRepository(Project::class);
-        $membersCollection = $projectRepository->find($id)->getCustomers();
-        $actions = $this->getMemberGridAction($id, true, false);
+        $membersCollection = $projectEntity->getCustomers();
+        $actions = $this->getMemberGridAction($projectEntity->getId(), true, false);
 
         return $this->render(
             'BugTrackerBundle:Project:view.html.twig',
             array(
                 'page_title' => sprintf(
                     "View Project '%s'",
-                    $projectEntityData->getCode()
+                    $projectEntity->getCode()
                 ),
-                'entity' => $projectEntityData,
+                'entity' => $projectEntity,
                 'members_grid_html' => $this->getMembersGridHtml($membersCollection, $actions),
             )
         );
@@ -170,33 +153,21 @@ class ProjectController extends Controller
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction($id, Request $request)
+    public function editAction(Project $projectEntity, Request $request)
     {
-
-        $em = $this->getDoctrine()->getManager();
-        $projectEntityData = $em->getRepository(Project::class)->find($id);
-
-        if (!$projectEntityData) {
-            $errorMessage = 'Required project was not found!';
-            $request->getSession()
-                ->getFlashBag()
-                ->add('error', $errorMessage);
-
-            return $this->redirect('/');
-        }
         $form = $this->createForm(
             ProjectType::class,
-            $projectEntityData,
+            $projectEntity,
             array(
                 'validation_groups' => array('edit'),
             )
         );
-
+        $em = $this->getDoctrine()->getManager();
         try {
             if ($request->getMethod() == 'POST') {
                 $form->handleRequest($request);
                 if ($form->isValid()) {
-                    $em->merge($projectEntityData);
+                    $em->merge($projectEntity);
 
                     $request->getSession()
                         ->getFlashBag()
@@ -210,10 +181,9 @@ class ProjectController extends Controller
                 ->add('error', $exception->getMessage());
         }
 
-        $projectRepository = $em->getRepository(Project::class);
-        $membersCollection = $projectRepository->find($id)->getCustomers();
-        $actions = $this->getMemberGridAction($id, true, true);
 
+        $membersCollection = $projectEntity->getCustomers();
+        $actions = $this->getMemberGridAction($projectEntity->getId(), true, true);
 
         return $this->render(
             'BugTrackerBundle:Project:edit.html.twig',
@@ -221,9 +191,9 @@ class ProjectController extends Controller
                 'form' => $form->createView(),
                 'page_title' => sprintf(
                     "Edit Project '%s'",
-                    $projectEntityData->getCode()
+                    $projectEntity->getCode()
                 ),
-                'entity_id' => $projectEntityData->getId(),
+                'entity_id' => $projectEntity->getId(),
                 'members_grid_html' => $this->getMembersGridHtml($membersCollection, $actions),
             )
         );
@@ -233,38 +203,30 @@ class ProjectController extends Controller
      * Project delete action
      * @Route("project/delete/{id}", name="oro_bugtracker_project_delete", requirements={"id" = "\d+"})
      */
-    public function deleteAction($id, Request $request)
+    public function deleteAction(Project $projectEntity, Request $request)
     {
-
-        $em = $this->getDoctrine()->getManager();
-        $project = $em->getRepository(Project::class)->find($id);
-        if (!$project) {
-            throw $this->createNotFoundException(
-                'No projects found for id '.$id
-            );
-        }
-
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_project_delete',
-            array('id' => $project->getId()),
+            array('id' => $projectEntity->getId()),
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $form = $this->createFormBuilder($project, array('validation_groups' => array('edit')))
+        $form = $this->createFormBuilder($projectEntity, array('validation_groups' => array('edit')))
             ->setAction($actionUrl)
             ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
             ->getForm();
 
+        $em = $this->getDoctrine()->getManager();
         if ($request->getMethod() == 'POST') {
             $form->submit($request);
             if ($form->isValid()) {
-                $projectId = $project->getId();
-                $em->remove($project);
+                $projectEntityId = $projectEntity->getId();
+                $em->remove($projectEntity);
                 $em->flush();
                 $em->clear();
                 $request->getSession()
                     ->getFlashBag()
-                    ->add('success', sprintf("Project '%s' was deleted successfully!", $projectId));
+                    ->add('success', sprintf("Project '%s' was deleted successfully!", $projectEntityId));
 
                 return $this->redirectToRoute('oro_bugtracker_project_list');
             }
@@ -280,53 +242,61 @@ class ProjectController extends Controller
 
     /**
      * Add new Project Member
-     * @Route("project/{projectid}/addmember",requirements={"projectid" = "\d+"})
+     *
+     * @Route("project/{id}/addmember", name="oro_bugtracker_project_addmember", requirements={"id" = "\d+"})
      */
-    public function addmemberAction($projectid, Request $request)
+    public function addmemberAction(Project $projectEntity, Request $request)
     {
         $response = new JsonResponse();
         $result = [];
         $result['success'] = true;
         $em = $this->getDoctrine()->getManager();
 
+        $membersCollection = [];
         if ($request->getMethod() == 'POST') {
             $customerRepository = $em->getRepository(Customer::class);
             $requiredUsername = $request->get('username');
             $customerEntity = $customerRepository->findOneBy(['username' => $requiredUsername]);
             if ($customerEntity) {
-                $projectRepository = $em->getRepository(Project::class);
-                $projectEntity = $projectRepository->find($projectid);
                 $projectEntity->addCustomer($customerEntity);
 
                 $em->persist($customerEntity);
                 $em->persist($projectEntity);
                 $em->flush();
 
-                $projectRepository = $em->getRepository(Project::class);
-                $membersCollection = $projectRepository->find($projectid)->getCustomers();
+                $membersCollection = $projectEntity->getCustomers();
             }
         }
 
-        $actions = $this->getMemberGridAction($projectid, true, true);
+        $actions = $this->getMemberGridAction($projectEntity->getId(), true, true);
         $result['members_grid_html'] = $this->getMembersGridHtml($membersCollection, $actions);
         $response->setData($result);
 
         return $response;
     }
 
+
+
+    /**
+     * @Route("/blog/{id}/comments/{comment_id}")
+     * @ParamConverter("comment", class="SensioBlogBundle:Comment", options={"id" = "comment_id"})
+     */
+    public function showAction(Post $post, Comment $comment)
+    {
+    }
+
+
+
     /**
      * Add new Project Member
-     * @Route("project/{projectid}/removemember/{memberid}",requirements={"projectid" = "\d+","memberid" = "\d+"})
+     *
+     * @Route("project/{id}/removemember/{member_id}", name="oro_bugtracker_project_removemember")
      */
-    public function removememberAction($projectid, $memberid, Request $request)
+    public function removememberAction(Project $projectEntity, $member_id, Request $request)
     {
         $em = $this->getDoctrine()->getManager();
-
-        $customerRepository = $em->getRepository(Customer::class);
-        $customerEntity = $customerRepository->find($memberid);
+        $customerEntity = $em->getRepository(Customer::class)->find($member_id);
         if ($customerEntity) {
-            $projectRepository = $em->getRepository(Project::class);
-            $projectEntity = $projectRepository->find($projectid);
             $projectEntity->removeCustomer($customerEntity);
 
             $em->persist($customerEntity);
@@ -334,7 +304,7 @@ class ProjectController extends Controller
             $em->flush();
         }
 
-        return $this->redirectToRoute('oro_bugtracker_project_edit', array('id' => $projectid));
+        return $this->redirectToRoute('oro_bugtracker_project_edit', array('id' => $projectEntity->getId()));
     }
 
     /**
@@ -389,8 +359,8 @@ class ProjectController extends Controller
                 'label' => 'Delete Member',
                 'router' => 'oro_bugtracker_project_removemember',
                 'router_parameters' => [
-                    ['router_key' => 'projectid', 'router_value' => $projectid],
-                    ['router_key' => 'memberid', 'collection_key' => 'id'],
+                    ['router_key' => 'id', 'router_value' => $projectid],
+                    ['router_key' => 'member_id', 'collection_key' => 'id'],
                 ],
             ];
         }

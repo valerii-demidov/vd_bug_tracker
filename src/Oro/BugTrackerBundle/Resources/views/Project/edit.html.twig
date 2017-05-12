@@ -54,7 +54,7 @@
         <div class="panel-heading p-2">{{ 'Add project members'|trans }}</div>
         <div class="panel-body p-2">
             <p>
-            <form class="form-inline" action="{{ url('oro_bugtracker_project_addmember', {projectid: entity_id}) }}"
+            <form class="form-inline" action="{{ url('oro_bugtracker_project_addmember', {id: entity_id}) }}"
                   method="post"
                   data-confirmation="true" id="addmember-form">
                 <div class="form-group mx-sm-3">
