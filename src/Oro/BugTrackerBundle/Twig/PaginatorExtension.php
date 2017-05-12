@@ -12,15 +12,22 @@ class PaginatorExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('paginator_object', [$this, 'getPaginatorObject']),
+            new \Twig_SimpleFunction('paginator_object_by_qb', [$this, 'getPaginatorObjectByQb']),
         );
     }
 
-    /*public function getPaginatorObject()*/
     public function getPaginatorObject($entityRepository, $currentPage)
     {
-        $cloneEntityRepository = clone $entityRepository;
         $queryBuilder = $entityRepository->createQueryBuilder('entity');
+        $result = $this->getPaginatorObjectByQb($queryBuilder, $currentPage);
 
+        return $result;
+    }
+
+    public function getPaginatorObjectByQb($queryBuilder, $currentPage)
+    {
+        $entityAlias = current($queryBuilder->getRootAliases());
+        $cloneQb = clone $queryBuilder;
         $paginator = new Paginator($queryBuilder, false);
 
         $entityCollection = $paginator
@@ -30,8 +37,8 @@ class PaginatorExtension extends \Twig_Extension
             ->getResult();
 
         // get collection qty
-        $cloneQueryBuilder = $cloneEntityRepository->createQueryBuilder('entity');
-        $cloneQueryBuilder->select('count(entity.id)');
+        $cloneQueryBuilder = $cloneQb;
+        $cloneQueryBuilder->select("count($entityAlias.id)");
         $totalCount = $cloneQueryBuilder->getQuery()->getSingleScalarResult();
 
         $result['max_pages'] = ceil($totalCount / self::DEFAULT_PAGE_SIZE);

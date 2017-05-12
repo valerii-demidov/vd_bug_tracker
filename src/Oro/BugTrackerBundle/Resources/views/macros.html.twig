@@ -76,21 +76,26 @@
         thisPage: current page number
         maxPages: quantity pages
 #}
-{% macro renderPaginator(listRouteName, thisPage, maxPages) %}
+{% macro renderPaginator(listRouteName, thisPage, maxPages, staticRouteParams = {}) %}
     {% if maxPages > 1 %}
         <div class="pagination">
             {# `«` arrow  #}
             <a {{ thisPage == 1 ? 'class="disabled"' }}
-                    href="{{ path(listRouteName, {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>
+                    {% set prev_page_val =  thisPage-1 < 1 ? 1 : thisPage-1 %}
+                    {% set preve_page_param = staticRouteParams|merge({page: prev_page_val}) %}
+                    href="{{ path(listRouteName, preve_page_param) }}">«</a>
 
             {# Render each page number #}
             {% for i in 1..maxPages %}
-                <a {{ thisPage == i ? 'class="active"' }} href="{{ path(listRouteName, {page: i}) }}">{{ i }}</a>
+                {% set list_page_param = staticRouteParams|merge({page: i}) %}
+                <a {{ thisPage == i ? 'class="active"' }} href="{{ path(listRouteName, list_page_param) }}">{{ i }}</a>
             {% endfor %}
 
             {# `»` arrow #}
             <a {{ thisPage == maxPages ? 'class="disabled"' }}
-                    href="{{ path(listRouteName, {page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}">»</a>
+                    {% set next_page_val =  thisPage+1 <= maxPages ? thisPage+1 : thisPage %}
+                    {% set next_page_param = staticRouteParams|merge({page: next_page_val}) %}
+                    href="{{ path(listRouteName, next_page_param) }}">»</a>
         </div>
     {% endif %}
 {% endmacro %}

@@ -38,6 +38,7 @@ class IssueType extends AbstractType
 
         $statusChoiceList = [
             Issue::STATUS_OPEN => 'Open',
+            Issue::STATUS_REOPEN => 'Reopen',
             Issue::STATUS_IN_PROGRESS => 'In Progress',
             Issue::STATUS_RESOLVED => 'Resolved'
         ];

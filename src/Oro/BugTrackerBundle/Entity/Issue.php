@@ -24,6 +24,7 @@ class Issue
     const STATUS_OPEN = 'open';
     const STATUS_IN_PROGRESS = 'in_progress';
     const STATUS_RESOLVED = 'resolved';
+    const STATUS_REOPEN = 'reopen';
 
     const RESOLUTION_UNRESOLVED = 'unresolved';
     const RESOLUTION_RESOLVED = 'resolved';

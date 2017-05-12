@@ -4,6 +4,7 @@ namespace Oro\BugTrackerBundle\Controller;
 
 use Oro\BugTrackerBundle\Form\CustomerType;
 use Oro\BugTrackerBundle\Entity\Customer;
+use Oro\BugTrackerBundle\Entity\Issue;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -101,26 +102,32 @@ class CustomerController extends Controller
 
     /**
      * Create edit action
-     * @Route("customer/view/{id}", name="oro_bugtracker_customer_view", requirements={"id" = "\d+"})
+     * @Route("customer/view/{id}/{page}", name="oro_bugtracker_customer_view", requirements={"id" = "\d+"}, defaults={"page" = 1})
      */
-    public function viewAction(Customer $customerEntity, Request $request)
+    public function viewAction(Customer $customerEntity, $page, Request $request)
     {
         $issueGridActions = $this->getIssueGridAction();
-        $issueGridHtml = $this->getIssuesGridHtml($customerEntity->getIssues(), $issueGridActions);
+        $issuesQb = $this->getDoctrine()->getRepository(Issue::class)->findByCondition(
+            [
+                'assignee' => ['=' => $customerEntity->getId()],
+                'status' => ['in' => [Issue::STATUS_OPEN, Issue::STATUS_REOPEN, Issue::STATUS_IN_PROGRESS]],
+            ]
+        );
 
+        $issueGridHtml = $this->getIssuesGridHtml($issuesQb, $issueGridActions, $page, $customerEntity->getId());
         return $this->render(
             'BugTrackerBundle:Customer:view.html.twig',
             array(
                 'page_title' => sprintf("View User '%s'", $customerEntity->getUsername()),
                 'entity' => $customerEntity,
-                'issue_grid_html' => $issueGridHtml
+                'issue_grid_html' => $issueGridHtml,
             )
         );
     }
 
     /**
      * Create edit action
-     * @Route("customer/edit/{id}",requirements={"id" = "\d+"})
+     * @Route("customer/edit/{id}/{page}", name="oro_bugtracker_customer_edit", requirements={"id" = "\d+"}, defaults={"page" = 1})
      */
     public function editAction(Customer $customerEntity, Request $request)
     {
@@ -193,7 +200,10 @@ class CustomerController extends Controller
                 $em->flush();
                 $request->getSession()
                     ->getFlashBag()
-                    ->add('success', sprintf("Customer '%s' was deleted successfully!", $customerEntity->getUsername()));
+                    ->add(
+                        'success',
+                        sprintf("Customer '%s' was deleted successfully!", $customerEntity->getUsername())
+                    );
 
                 return $this->redirectToRoute('oro_bugtracker_customer_list');
             }
@@ -218,7 +228,9 @@ class CustomerController extends Controller
             $actions[] = [
                 'label' => 'View',
                 'router' => 'oro_bugtracker_issue_view',
-                'router_parameters' => [['collection_key' => 'id', 'router_key' => 'id']],
+                'router_parameters' => [
+                    ['collection_key' => 'id', 'router_key' => 'id']
+                ],
             ];
         }
 
@@ -226,21 +238,23 @@ class CustomerController extends Controller
     }
 
     /**
-     * @param array $collection
+     * @param $entityQueryBuilder
      * @param $actions
+     * @param $currentPage
      * @return string
      */
-    protected function getIssuesGridHtml($collection = [], $actions)
+    protected function getIssuesGridHtml($entityQueryBuilder, $actions, $currentPage, $staticRouteParam)
     {
         $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary', 'status' => 'Status'];
-
         $membersHtml = $this->render(
             'BugTrackerBundle:Customer:issue.html.twig',
-            compact(
-                'collection',
-                'columns',
-                'actions'
-            )
+            [
+                'entity_query_builder' => $entityQueryBuilder,
+                'columns' => $columns,
+                'actions' => $actions,
+                'current_page' => $currentPage,
+                'static_route_params' => $staticRouteParam
+            ]
         )->getContent();
 
         return $membersHtml;
