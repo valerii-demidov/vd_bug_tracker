@@ -99,7 +99,8 @@ class Issue
 
     /**
      * One Issue has One Customer.
-     * @ORM\ManyToOne(targetEntity="Customer")
+     * @ORM\ManyToOne(targetEntity="Customer", inversedBy="issues")
+     * @ORM\JoinColumn(name="assignee_id", referencedColumnName="id")
      */
     private $assignee;
 
@@ -517,5 +518,18 @@ class Issue
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Return any of exist property
+     *
+     * @param $key
+     * @return mixed
+     */
+    public function getData($key)
+    {
+        if (isset($this->$key)) {
+            return $this->$key;
+        }
     }
 }

@@ -25,8 +25,8 @@ class Customer implements UserInterface, \Serializable
     private $projects;
 
     /**
-     * One Customer have Many Issues.
-     * @ORM\OneToMany(targetEntity="Issue", mappedBy="assignee")
+     * Many Customers have Many Projects.
+     * @ORM\ManyToMany(targetEntity="Issue", mappedBy="assignee")
      */
     private $issues;
 
@@ -264,13 +264,11 @@ class Customer implements UserInterface, \Serializable
      */
     public function serialize()
     {
-        return serialize(
-            array(
-                $this->id,
-                $this->username,
-                $this->password,
-            )
-        );
+        return serialize(array(
+            $this->id,
+            $this->username,
+            $this->password,
+        ));
     }
 
     /**
@@ -298,7 +296,6 @@ class Customer implements UserInterface, \Serializable
             return $this->$key;
         }
     }
-
     /**
      * Constructor
      */
@@ -334,43 +331,10 @@ class Customer implements UserInterface, \Serializable
     /**
      * Get projects
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection 
      */
     public function getProjects()
     {
         return $this->projects;
-    }
-
-    /**
-     * Add issues
-     *
-     * @param \Oro\BugTrackerBundle\Entity\Issue $issues
-     * @return Customer
-     */
-    public function addIssue(\Oro\BugTrackerBundle\Entity\Issue $issues)
-    {
-        $this->issues[] = $issues;
-
-        return $this;
-    }
-
-    /**
-     * Remove issues
-     *
-     * @param \Oro\BugTrackerBundle\Entity\Issue $issues
-     */
-    public function removeIssue(\Oro\BugTrackerBundle\Entity\Issue $issues)
-    {
-        $this->issues->removeElement($issues);
-    }
-
-    /**
-     * Get issues
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getIssues()
-    {
-        return $this->issues;
     }
 }

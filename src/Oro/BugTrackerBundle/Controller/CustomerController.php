@@ -20,7 +20,7 @@ class CustomerController extends Controller
      */
     public function listAction($page)
     {
-        $em = $this->getDoctrine()->getEntityManager();
+        $em = $this->getDoctrine()->getManager();
         $queryBuilder = $em
             ->getRepository('BugTrackerBundle:Customer')
             ->createQueryBuilder('cust');
@@ -128,12 +128,9 @@ class CustomerController extends Controller
      * Create edit action
      * @Route("customer/view/{id}", name="oro_bugtracker_customer_view", requirements={"id" = "\d+"})
      */
-    public function viewAction($id, Request $request)
+    public function viewAction(Customer $customerEntity, Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $customerEntityData = $em->getRepository(Customer::class)->find($id);
-
-        if (!$customerEntityData) {
+        if (!$customerEntity || !$customerEntity->getId()) {
             $errorMessage = 'Required customer was not found!';
             $request->getSession()
                 ->getFlashBag()
@@ -142,11 +139,15 @@ class CustomerController extends Controller
             return $this->redirect('/');
         }
 
+        $issueGridActions = $this->getIssueGridAction();
+        $issueGridHtml = $this->getIssuesGridHtml($customerEntity->getIssues(), $issueGridActions);
+
         return $this->render(
             'BugTrackerBundle:Customer:view.html.twig',
             array(
-                'page_title' => sprintf("View User '%s'", $customerEntityData->getUsername()),
-                'entity' => $customerEntityData,
+                'page_title' => sprintf("View User '%s'", $customerEntity->getUsername()),
+                'entity' => $customerEntity,
+                'issue_grid_html' => $issueGridHtml
             )
         );
     }
@@ -155,12 +156,10 @@ class CustomerController extends Controller
      * Create edit action
      * @Route("customer/edit/{id}",requirements={"id" = "\d+"})
      */
-    public function editAction($id, Request $request)
+    public function editAction(Customer $customerEntity, Request $request)
     {
         $em = $this->getDoctrine()->getManager();
-        $customerEntityData = $em->getRepository(Customer::class)->find($id);
-
-        if (!$customerEntityData) {
+        if (!$customerEntity) {
             $errorMessage = 'Required customer was not found!';
             $request->getSession()
                 ->getFlashBag()
@@ -170,7 +169,7 @@ class CustomerController extends Controller
         }
         $form = $this->createForm(
             CustomerType::class,
-            $customerEntityData,
+            $customerEntity,
             array(
                 'validation_groups' => array('edit'),
             )
@@ -183,11 +182,11 @@ class CustomerController extends Controller
                     $plainPassword = $form->get('plainPassword');
                     if (!$plainPassword->isEmpty()) {
                         $passwordEncoder = $this->get('security.password_encoder');
-                        $password = $passwordEncoder->encodePassword($customerEntityData, $plainPassword->getData());
-                        $customerEntityData->setPassword($password);
+                        $password = $passwordEncoder->encodePassword($customerEntity, $plainPassword->getData());
+                        $customerEntity->setPassword($password);
                     }
 
-                    $em->merge($customerEntityData);
+                    $em->merge($customerEntity);
 
                     $request->getSession()
                         ->getFlashBag()
@@ -205,8 +204,8 @@ class CustomerController extends Controller
             'BugTrackerBundle:Customer:edit.html.twig',
             array(
                 'form' => $form->createView(),
-                'page_title' => sprintf("Edit User '%s'", $customerEntityData->getUsername()),
-                'entity_id' => $customerEntityData->getId(),
+                'page_title' => sprintf("Edit User '%s'", $customerEntity->getUsername()),
+                'entity_id' => $customerEntity->getId(),
             )
         );
     }
@@ -215,24 +214,22 @@ class CustomerController extends Controller
      * Customer delete action
      * @Route("customer/delete/{id}",requirements={"id" = "\d+"})
      */
-    public function deleteAction($id, Request $request)
+    public function deleteAction(Customer $customerEntity, Request $request)
     {
-
-        $em = $this->getDoctrine()->getManager();
-        $customer = $em->getRepository(Customer::class)->find($id);
-        if (!$customer) {
+        if (!$customerEntity) {
             throw $this->createNotFoundException(
-                'No customers found for id '.$id
+                'No customers found for id '.''
             );
         }
 
+        $em = $this->getDoctrine()->getManager();
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_customer_delete',
-            array('id' => $customer->getId()),
+            array('id' => $customerEntity->getId()),
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $form = $this->createFormBuilder($customer, array('validation_groups' => array('edit')))
+        $form = $this->createFormBuilder($customerEntity, array('validation_groups' => array('edit')))
             ->setAction($actionUrl)
             ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
             ->getForm();
@@ -240,11 +237,11 @@ class CustomerController extends Controller
         if ($request->getMethod() == 'POST') {
             $form->submit($request);
             if ($form->isValid()) {
-                $em->remove($customer);
+                $em->remove($customerEntity);
                 $em->flush();
                 $request->getSession()
                     ->getFlashBag()
-                    ->add('success', sprintf("Customer '%s' was deleted successfully!", $customer->getUsername()));
+                    ->add('success', sprintf("Customer '%s' was deleted successfully!", $customerEntity->getUsername()));
 
                 return $this->redirectToRoute('oro_bugtracker_customer_list');
             }
@@ -256,5 +253,44 @@ class CustomerController extends Controller
                 'form' => $form->createView(),
             )
         );
+    }
+
+    /**
+     * @param bool $useView
+     * @return array
+     */
+    public function getIssueGridAction($useView = true)
+    {
+        $actions = [];
+        if ($useView) {
+            $actions[] = [
+                'label' => 'View',
+                'router' => 'oro_bugtracker_issue_view',
+                'router_parameters' => [['collection_key' => 'id', 'router_key' => 'id']],
+            ];
+        }
+
+        return $actions;
+    }
+
+    /**
+     * @param array $collection
+     * @param $actions
+     * @return string
+     */
+    protected function getIssuesGridHtml($collection = [], $actions)
+    {
+        $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary', 'status' => 'Status'];
+
+        $membersHtml = $this->render(
+            'BugTrackerBundle:Customer:issue.html.twig',
+            compact(
+                'collection',
+                'columns',
+                'actions'
+            )
+        )->getContent();
+
+        return $membersHtml;
     }
 }
