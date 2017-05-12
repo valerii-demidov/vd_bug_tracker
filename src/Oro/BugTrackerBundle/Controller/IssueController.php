@@ -131,29 +131,14 @@ class IssueController extends Controller
      * Issue view action
      *
      * @Route("issue/view/{id}", name="oro_bugtracker_issue_view", requirements={"id" = "\d+"})
-     * @param $id
-     * @param Request $request
      */
-    public function viewAction($id, Request $request)
+    public function viewAction(Issue $issueEntity, Request $request)
     {
-
-        $em = $this->getDoctrine()->getManager();
-        $issueEntityData = $em->getRepository(Issue::class)->find($id);
-
-        if (!$issueEntityData) {
-            $errorMessage = 'Required issue was not found!';
-            $request->getSession()
-                ->getFlashBag()
-                ->add('error', $errorMessage);
-
-            return $this->redirect('/');
-        }
-
         return $this->render(
             'BugTrackerBundle:Issue:view.html.twig',
             array(
-                'entity' => $issueEntityData,
-                'page_title' => sprintf("View Issue '%s'", $issueEntityData->getCode())
+                'entity' => $issueEntity,
+                'page_title' => sprintf("View Issue '%s'", $issueEntity->getCode()),
             )
         );
     }
@@ -162,37 +147,24 @@ class IssueController extends Controller
      * Issue edit action
      *
      * @Route("issue/edit/{id}", name="oro_bugtracker_issue_edit", requirements={"id" = "\d+"})
-     * @param $id
-     * @param Request $request
      */
-    public function editAction($id, Request $request)
+    public function editAction(Issue $issueEntity, Request $request)
     {
-
-        $em = $this->getDoctrine()->getManager();
-        $issueEntityData = $em->getRepository(Issue::class)->find($id);
-
-        if (!$issueEntityData) {
-            $errorMessage = 'Required issue was not found!';
-            $request->getSession()
-                ->getFlashBag()
-                ->add('error', $errorMessage);
-
-            return $this->redirect('/');
-        }
         $form = $this->createForm(
             IssueType::class,
-            $issueEntityData,
+            $issueEntity,
             array(
                 'validation_groups' => array('edit'),
             )
         );
 
+        $em = $this->getDoctrine()->getManager();
         try {
             if ($request->getMethod() == 'POST') {
                 $form->handleRequest($request);
                 if ($form->isValid()) {
-                    $issueEntityData->addCollaboration($issueEntityData->getAssignee());
-                    $em->merge($issueEntityData);
+                    $issueEntity->addCollaboration($issueEntity->getAssignee());
+                    $em->merge($issueEntity);
 
                     $request->getSession()
                         ->getFlashBag()
@@ -209,9 +181,9 @@ class IssueController extends Controller
         return $this->render(
             'BugTrackerBundle:Issue:edit.html.twig',
             array(
-                'entity' => $issueEntityData,
+                'entity' => $issueEntity,
                 'form' => $form->createView(),
-                'page_title' => sprintf("Edit Issue '%s'", $issueEntityData->getCode())
+                'page_title' => sprintf("Edit Issue '%s'", $issueEntity->getCode())
             )
         );
     }
@@ -220,33 +192,25 @@ class IssueController extends Controller
      * Issue delete action
      * @Route("issue/delete/{id}",requirements={"id" = "\d+"}, name="oro_bugtracker_issue_delete")
      */
-    public function deleteAction($id, Request $request)
+    public function deleteAction(Issue $issueEntity, Request $request)
     {
-
-        $em = $this->getDoctrine()->getManager();
-        $issue = $em->getRepository(Issue::class)->find($id);
-        if (!$issue) {
-            throw $this->createNotFoundException(
-                'No issues found for id '.$id
-            );
-        }
-
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_issue_delete',
-            array('id' => $issue->getId()),
+            array('id' => $issueEntity->getId()),
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $form = $this->createFormBuilder($issue, array('validation_groups' => array('edit')))
+        $form = $this->createFormBuilder($issueEntity, array('validation_groups' => array('edit')))
             ->setAction($actionUrl)
             ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
             ->getForm();
 
+        $em = $this->getDoctrine()->getManager();
         if ($request->getMethod() == 'POST') {
             $form->submit($request);
             if ($form->isValid()) {
-                $issueId = $issue->getId();
-                $em->remove($issue);
+                $issueId = $issueEntity->getId();
+                $em->remove($issueEntity);
                 $em->flush();
                 $em->clear();
                 $request->getSession()
