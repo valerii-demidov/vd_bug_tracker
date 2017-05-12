@@ -21,30 +21,8 @@ class CustomerController extends Controller
     public function listAction($page)
     {
         $em = $this->getDoctrine()->getManager();
-        $queryBuilder = $em
-            ->getRepository('BugTrackerBundle:Customer')
-            ->createQueryBuilder('cust');
-        $queryBuilder->select(['cust.id', 'cust.username', 'cust.email', 'cust.fullName']);
-
-        $paginator = new Paginator($queryBuilder, false);
-        // init template params
-        $collection = $paginator
-            ->getQuery()
-            ->setFirstResult(self::CUSTOMER_LIST_PAGE_SIZE * ($page - 1))// Offset
-            ->setMaxResults(self::CUSTOMER_LIST_PAGE_SIZE)
-            ->getResult();
-        // get collection qty
-        $queryBuilder = $em
-            ->getRepository('BugTrackerBundle:Customer')
-            ->createQueryBuilder('cust');
-        $queryBuilder->select('count(cust.id)');
-        $totalCount = $queryBuilder->getQuery()->getSingleScalarResult();
-
-        $maxPages = ceil($totalCount / self::CUSTOMER_LIST_PAGE_SIZE);
-        $thisPage = $page;
-        $entityCreateRouter = 'oro_bugtracker_customer_create';
-        $listRouteName = 'oro_bugtracker_customer_list';
-
+        $entityRepository = $em->getRepository('BugTrackerBundle:Customer');
+        $pageTitle = 'Manage customers';
         $columns = ['id' => 'Id', 'username' => 'User Name', 'email' => 'Email', 'fullName' => 'Full Name'];
         $actions[] = [
             'label' => 'View',
@@ -61,20 +39,17 @@ class CustomerController extends Controller
             ],
         ];
 
-        $page_title = 'Manage customers';
 
         return $this->render(
             'BugTrackerBundle:Customer:list.html.twig',
-            compact(
-                'entityCreateRouter',
-                'page_title',
-                'collection',
-                'columns',
-                'actions',
-                'maxPages',
-                'thisPage',
-                'listRouteName'
-            )
+            [
+                'page_title' => $pageTitle,
+                'entity_create_router' => 'oro_bugtracker_customer_create',
+                'entity_repository' => $entityRepository,
+                'columns' => $columns,
+                'actions' => $actions,
+                'current_page' => $page,
+            ]
         );
     }
 

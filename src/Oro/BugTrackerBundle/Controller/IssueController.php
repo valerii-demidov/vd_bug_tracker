@@ -27,30 +27,8 @@ class IssueController extends Controller
     public function listAction($page)
     {
         $em = $this->getDoctrine()->getManager();
-        $queryBuilder = $em
-            ->getRepository('BugTrackerBundle:Issue')
-            ->createQueryBuilder('issue');
-        $queryBuilder->select(['issue.id', 'issue.code', 'issue.summary']);
-
-        $paginator = new Paginator($queryBuilder, false);
-
-        $collection = $paginator
-            ->getQuery()
-            ->setFirstResult(self::ISSUE_LIST_PAGE_SIZE * ($page - 1))
-            ->setMaxResults(self::ISSUE_LIST_PAGE_SIZE)
-            ->getResult();
-
-        $queryBuilder = $em
-            ->getRepository('BugTrackerBundle:Issue')
-            ->createQueryBuilder('issue');
-        $queryBuilder->select('count(issue.id)');
-        $totalCount = $queryBuilder->getQuery()->getSingleScalarResult();
-
-        $maxPages = ceil($totalCount / self::ISSUE_LIST_PAGE_SIZE);
-        $thisPage = $page;
-        $entityCreateRouter = 'oro_bugtracker_issue_create';
-        $listRouteName = 'oro_bugtracker_issue_list';
-        $page_title = 'Manage Issues';
+        $entityRepository = $em->getRepository('BugTrackerBundle:Issue');
+        $pageTitle = 'Manage Issues';
 
         $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary'];
         $actions[] = [
@@ -69,17 +47,15 @@ class IssueController extends Controller
         ];
 
         return $this->render(
-            'BugTrackerBundle:Issue:list.html.twig',
-            compact(
-                'collection', // grid
-                'columns',  // grid
-                'actions',  // grid
-                'page_title',
-                'entityCreateRouter', //buttons
-                'listRouteName', //paginator
-                'maxPages', //paginator
-                'thisPage' //paginator
-            )
+            'BugTrackerBundle:Project:list.html.twig',
+            [
+                'page_title' => $pageTitle,
+                'entity_create_router' => 'oro_bugtracker_issue_create',
+                'entity_repository' => $entityRepository,
+                'columns' => $columns,
+                'actions' => $actions,
+                'current_page' => $page,
+            ]
         );
     }
 

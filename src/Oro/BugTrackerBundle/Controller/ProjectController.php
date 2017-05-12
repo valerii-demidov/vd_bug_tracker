@@ -25,31 +25,9 @@ class ProjectController extends Controller
     public function listAction($page)
     {
         $em = $this->getDoctrine()->getManager();
-        $queryBuilder = $em
-            ->getRepository('BugTrackerBundle:Project')
-            ->createQueryBuilder('pr');
-        $queryBuilder->select(['pr.id', 'pr.label', 'pr.summary', 'pr.code']);
+        $entityRepository = $em->getRepository('BugTrackerBundle:Project');
 
-        $paginator = new Paginator($queryBuilder, false);
-
-        $collection = $paginator
-            ->getQuery()
-            ->setFirstResult(self::PROJECT_LIST_PAGE_SIZE * ($page - 1))
-            ->setMaxResults(self::PROJECT_LIST_PAGE_SIZE)
-            ->getResult();
-
-        $queryBuilder = $em
-            ->getRepository('BugTrackerBundle:Project')
-            ->createQueryBuilder('pr');
-        $queryBuilder->select('count(pr.id)');
-        $totalCount = $queryBuilder->getQuery()->getSingleScalarResult();
-
-        $maxPages = ceil($totalCount / self::PROJECT_LIST_PAGE_SIZE);
-        $thisPage = $page;
-        $entityCreateRouter = 'oro_bugtracker_project_create';
-        $listRouteName = 'oro_bugtracker_project_list';
-        $page_title = 'Manage projects';
-
+        $pageTitle = 'Manage projects';
         $columns = ['id' => 'Id', 'label' => 'Label', 'summary' => 'Summary', 'code' => 'Code'];
         $actions[] = [
             'label' => 'View',
@@ -68,16 +46,14 @@ class ProjectController extends Controller
 
         return $this->render(
             'BugTrackerBundle:Project:list.html.twig',
-            compact(
-                'collection', // grid
-                'columns',  // grid
-                'actions',  // grid
-                'page_title',
-                'entityCreateRouter', //buttons
-                'listRouteName', //paginator
-                'maxPages', //paginator
-                'thisPage' //paginator
-            )
+            [
+                'page_title' => $pageTitle,
+                'entity_create_router' => 'oro_bugtracker_project_create',
+                'entity_repository' => $entityRepository,
+                'columns' => $columns,
+                'actions' => $actions,
+                'current_page' => $page,
+            ]
         );
     }
 
@@ -310,7 +286,7 @@ class ProjectController extends Controller
     /**
      * Return members list
      *
-     * @Route("project/{projectid}/members", requirements={"projectid" = "\d+"})
+     * @Route("project/{projectid}/members", name="oro_bugtracker_project_members", requirements={"projectid" = "\d+"})
      */
     public function membersAction($projectid, Request $request)
     {
