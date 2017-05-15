@@ -6,10 +6,8 @@ use Oro\BugTrackerBundle\Form\ProjectType;
 use Oro\BugTrackerBundle\Entity\Project;
 use Oro\BugTrackerBundle\Entity\Customer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -237,7 +235,6 @@ class ProjectController extends Controller
 
     /**
      * @Route("/blog/{id}/comments/{comment_id}")
-     * @ParamConverter("comment", class="SensioBlogBundle:Comment", options={"id" = "comment_id"})
      */
     public function showAction(Post $post, Comment $comment)
     {

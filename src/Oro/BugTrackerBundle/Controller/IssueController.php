@@ -63,7 +63,6 @@ class IssueController extends Controller
      */
     public function createAction(Request $request)
     {
-
         $issue = new Issue();
         $form = $this->createForm(IssueType::class, $issue);
         try {

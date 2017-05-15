@@ -5,8 +5,6 @@ namespace Oro\BugTrackerBundle\Form\Handler;
 use Oro\BugTrackerBundle\Entity\Issue;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\BugTrackerBundle\Entity\Project;
-use Oro\BugTrackerBundle\Entity\Customer;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 class IssueHandler
