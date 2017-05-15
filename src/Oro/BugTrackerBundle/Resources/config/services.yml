@@ -16,3 +16,9 @@ services:
             public: true
             arguments:
                 ["@request_stack","@doctrine.orm.entity_manager","@security.token_storage"]
+
+    oro_bugtracker.handler.customer:
+            class: Oro\BugTrackerBundle\Form\Handler\CustomerHandler
+            public: true
+            arguments:
+                ["@request_stack","@doctrine.orm.entity_manager","@security.password_encoder"]

@@ -8,7 +8,6 @@ use Oro\BugTrackerBundle\Entity\Issue;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomerController extends Controller
@@ -40,7 +39,6 @@ class CustomerController extends Controller
             ],
         ];
 
-
         return $this->render(
             'BugTrackerBundle:Customer:list.html.twig',
             [
@@ -60,31 +58,25 @@ class CustomerController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-
-        // 1) build the form
         $customer = new Customer();
         $form = $this->createForm(CustomerType::class, $customer);
         try {
-            // 2) handle the submit (will only happen on POST)
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                // 3) Encode the password (you could also do this via Doctrine listener)
-                $password = $this->get('security.password_encoder')
-                    ->encodePassword($customer, $customer->getPlainPassword());
-                $customer->setPassword($password);
+            $formHandler = $this->getCustomerHandler();
+            if ($request->getMethod() == 'POST') {
+                if ($formHandler->handleCreateForm($form)) {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('success', 'User has been created successfully!');
 
-                // 4) save the User!
-                $em->persist($customer);
-                $em->flush();
+                    return $this->redirectToRoute('oro_bugtracker_customer_edit', array('id' => $customer->getId()));
+                } else {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('success', "User wasn't created successfully!");
 
-                $request->getSession()
-                    ->getFlashBag()
-                    ->add('success', 'User has been created successfully!');
-
-                return $this->redirectToRoute('oro_bugtracker_customer_edit', array('id' => $customer->getId()));
+                    return $this->redirectToRoute('oro_bugtracker_customer_create');
+                }
             }
-
         } catch (\Exception $exception) {
             $request->getSession()
                 ->getFlashBag()
@@ -131,7 +123,6 @@ class CustomerController extends Controller
      */
     public function editAction(Customer $customerEntity, Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
         $form = $this->createForm(
             CustomerType::class,
             $customerEntity,
@@ -141,25 +132,15 @@ class CustomerController extends Controller
         );
 
         try {
+            $formHandler = $this->getCustomerHandler();
             if ($request->getMethod() == 'POST') {
-                $form->handleRequest($request);
-                if ($form->isValid()) {
-                    $plainPassword = $form->get('plainPassword');
-                    if (!$plainPassword->isEmpty()) {
-                        $passwordEncoder = $this->get('security.password_encoder');
-                        $password = $passwordEncoder->encodePassword($customerEntity, $plainPassword->getData());
-                        $customerEntity->setPassword($password);
-                    }
-
-                    $em->merge($customerEntity);
-
+                if ($formHandler->handleEditForm($form)) {
                     $request->getSession()
                         ->getFlashBag()
                         ->add('success', 'Customer has been updated successfully!');
-                    $em->flush();
                 }
             }
-        } catch (\Exception $exception) {
+        }catch (\Exception $exception) {
             $request->getSession()
                 ->getFlashBag()
                 ->add('error', $exception->getMessage());
@@ -181,7 +162,6 @@ class CustomerController extends Controller
      */
     public function deleteAction(Customer $customerEntity, Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_customer_delete',
             array('id' => $customerEntity->getId()),
@@ -194,15 +174,15 @@ class CustomerController extends Controller
             ->getForm();
 
         if ($request->getMethod() == 'POST') {
-            $form->submit($request);
-            if ($form->isValid()) {
-                $em->remove($customerEntity);
-                $em->flush();
+            $username = $customerEntity->getUsername();
+            $formHandler = $this->getCustomerHandler();
+
+            if ($formHandler->handleDeleteForm($form)) {
                 $request->getSession()
                     ->getFlashBag()
                     ->add(
                         'success',
-                        sprintf("Customer '%s' was deleted successfully!", $customerEntity->getUsername())
+                        sprintf("Customer '%s' was deleted successfully!", $username)
                     );
 
                 return $this->redirectToRoute('oro_bugtracker_customer_list');
@@ -258,5 +238,10 @@ class CustomerController extends Controller
         )->getContent();
 
         return $membersHtml;
+    }
+
+    public function getCustomerHandler()
+    {
+        return $this->get('oro_bugtracker.handler.customer');
     }
 }
