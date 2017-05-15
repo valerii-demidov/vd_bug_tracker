@@ -12,4 +12,40 @@ use Doctrine\ORM\EntityRepository;
  */
 class IssueRepository extends EntityRepository
 {
+    /**
+     *
+     *
+     * @param array $conditionCollection
+     * @param bool $isSingleResult
+     * @return array|mixed
+     */
+
+    /**
+     * Example for $conditionCollection = ['assignee_id' => ['=' => '9']]
+     *
+     * @param array $conditionCollection
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function findByCondition($conditionCollection = [])
+    {
+        $customerQb = $this->createQueryBuilder('entity');
+        $paramInc = 0;
+        $condInc = 0;
+        foreach ($conditionCollection as $fieldName => $fieldConditions) {
+            foreach ($fieldConditions as $conditionName => $conditionValue) {
+                    $parameterName = 'param'.$paramInc;
+                    if (is_array($conditionValue)) {
+                        $query = "entity.$fieldName $conditionName (:$parameterName)";
+                    } else {
+                        $query = "entity.$fieldName $conditionName :$parameterName";
+                    }
+                    (!$condInc) ? $customerQb->where($query) : $customerQb->andWhere($query);
+                    $customerQb->setParameter($parameterName, $conditionValue);
+                    $condInc++;
+            }
+            $paramInc++;
+        }
+
+        return $customerQb;
+    }
 }

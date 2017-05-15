@@ -5,16 +5,17 @@
 {% block page_header_content %}
     {{ parent() }}
     <div class="p-2">
-        <a class="btn btn-primary" href="{{ url(entityCreateRouter) }}"
+        <a class="btn btn-primary" href="{{ url(entity_create_router) }}"
            role="button">{{ 'Create Issue'|trans }}</a>
     </div>
 {% endblock %}
 
 {% block content %}
     <div id="issue-list">
-        {{ macros.renderGrid(collection, columns, actions) }}
+        {% set entity_paginator = paginator_object(entity_repository, current_page) %}
+        {{ macros.renderGrid(entity_paginator.entity_collection, columns, actions) }}
         <div class="text-center">
-            {{ macros.renderPaginator(listRouteName, thisPage, maxPages) }}
+            {{ macros.renderPaginator(app.request.attributes.get('_route'), current_page, entity_paginator.max_pages) }}
         </div>
     </div>
 {% endblock %}
