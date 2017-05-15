@@ -67,30 +67,23 @@ class AuthController extends Controller
      */
     public function registerAction(Request $request)
     {
-        $em = $this->getDoctrine()->getEntityManager();
-
-        // 1) build the form
         $customer = new Customer();
         $form = $this->createForm(CustomerType::class, $customer);
         try {
-            // 2) handle the submit (will only happen on POST)
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                // 3) Encode the password (you could also do this via Doctrine listener)
-                $password = $this->get('security.password_encoder')
-                    ->encodePassword($customer, $customer->getPlainPassword());
-                $customer->setPassword($password);
-                $customer->setRoles([Customer::ROLE_OPERATOR]);
+            $formHandler = $this->getCustomerHandler();
+            if ($request->getMethod() == 'POST') {
+                if ($formHandler->handleCreateForm($form)) {
+                    $this->addFlash('success', 'User has been created successfully! Please log in.');
 
-                // 4) save the User!
-                $em->persist($customer);
-                $em->flush();
+                    return $this->redirectToRoute('oro_bugtracker_customer_edit', array('id' => $customer->getId()));
+                } else {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('success', "User wasn't created successfully!");
 
-                $this->addFlash('success', 'User has been created successfully! Please log in.');
-
-                return $this->redirectToRoute('oro_bugtracker_auth_login');
+                    return $this->redirectToRoute('oro_bugtracker_auth_login');
+                }
             }
-
         } catch (\Exception $exception) {
             $request->getSession()
                 ->getFlashBag()
@@ -118,5 +111,10 @@ class AuthController extends Controller
     public function loginpostAction()
     {
         return new Response();
+    }
+
+    public function getCustomerHandler()
+    {
+        return $this->get('oro_bugtracker.handler.customer');
     }
 }
