@@ -4,13 +4,11 @@ namespace Oro\BugTrackerBundle\Controller;
 
 use Oro\BugTrackerBundle\Form\IssueType;
 use Oro\BugTrackerBundle\Entity\Issue;
-use Oro\BugTrackerBundle\Entity\Customer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 class IssueController extends Controller
@@ -65,29 +63,24 @@ class IssueController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
 
-        // 1) build the form
         $issue = new Issue();
         $form = $this->createForm(IssueType::class, $issue);
         try {
-            // 2) handle the submit (will only happen on POST)
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $reporter = $this->get('security.token_storage')->getToken()->getUser();
-                $issue->setReporter($reporter);
-                $issue->addCollaboration($issue->getAssignee());
-                $issue->addCollaboration($issue->getReporter());
-                $em->persist($issue);
-                $em->flush();
+            $formHandler = $this->getIssueHandler();
+            if ($request->getMethod() == 'POST') {
+                if ($formHandler->handleCreateForm($form)) {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('success', 'Issue has been created successfully!');
 
-                $request->getSession()
-                    ->getFlashBag()
-                    ->add('success', 'Issue has been created successfully!');
-
-                return $this->redirectToRoute('oro_bugtracker_issue_edit', array('id' => $issue->getId()));
+                    return $this->redirectToRoute('oro_bugtracker_issue_edit', array('id' => $issue->getId()));
+                } else {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('error', "Issue wasn't created successfully!");
+                }
             }
-
         } catch (\Exception $exception) {
             $request->getSession()
                 ->getFlashBag()
@@ -134,18 +127,19 @@ class IssueController extends Controller
             )
         );
 
-        $em = $this->getDoctrine()->getManager();
         try {
             if ($request->getMethod() == 'POST') {
-                $form->handleRequest($request);
-                if ($form->isValid()) {
-                    $issueEntity->addCollaboration($issueEntity->getAssignee());
-                    $em->merge($issueEntity);
-
-                    $request->getSession()
-                        ->getFlashBag()
-                        ->add('success', 'Issue has been updated successfully!');
-                    $em->flush();
+                $formHandler = $this->getIssueHandler();
+                if ($request->getMethod() == 'POST') {
+                    if ($formHandler->handleCreateForm($form)) {
+                        $request->getSession()
+                            ->getFlashBag()
+                            ->add('success', 'Issue has been updated successfully!');
+                    }else {
+                        $request->getSession()
+                            ->getFlashBag()
+                            ->add('error', "Issue wasn't updated successfully!");
+                    }
                 }
             }
         } catch (\Exception $exception) {
@@ -181,19 +175,17 @@ class IssueController extends Controller
             ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
             ->getForm();
 
-        $em = $this->getDoctrine()->getManager();
         if ($request->getMethod() == 'POST') {
-            $form->submit($request);
-            if ($form->isValid()) {
+            if ($request->getMethod() == 'POST') {
                 $issueId = $issueEntity->getId();
-                $em->remove($issueEntity);
-                $em->flush();
-                $em->clear();
-                $request->getSession()
-                    ->getFlashBag()
-                    ->add('success', sprintf("Issue '%s' was deleted successfully!", $issueId));
+                $formHandler = $this->getIssueHandler();
+                if ($formHandler->handleDeleteForm($form)) {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('success', sprintf("Issue '%s' was deleted successfully!", $issueId));
 
-                return $this->redirectToRoute('oro_bugtracker_issue_list');
+                    return $this->redirectToRoute('oro_bugtracker_issue_list');
+                }
             }
         }
 
@@ -203,5 +195,10 @@ class IssueController extends Controller
                 'form' => $form->createView(),
             )
         );
+    }
+
+    public function getIssueHandler()
+    {
+        return $this->get('oro_bugtracker.handler.issue');
     }
 }

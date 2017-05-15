@@ -10,3 +10,9 @@ services:
         public: true
         arguments:
             ["@request_stack","@doctrine.orm.entity_manager"]
+
+    oro_bugtracker.handler.issue:
+            class: Oro\BugTrackerBundle\Form\Handler\IssueHandler
+            public: true
+            arguments:
+                ["@request_stack","@doctrine.orm.entity_manager","@security.token_storage"]
