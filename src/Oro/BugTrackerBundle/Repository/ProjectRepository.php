@@ -3,6 +3,7 @@
 namespace Oro\BugTrackerBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\BugTrackerBundle\Entity\Customer;
 
 /**
  * ProjectRepository
@@ -38,5 +39,21 @@ class ProjectRepository extends EntityRepository
         }
 
         return $result;
+    }
+
+    public function getProjectMembersListBySlug($slug)
+    {
+        $em = $this->getEntityManager();
+        $customerRepository = $em->getRepository(Customer::class);
+        if ($slug) {
+            $conditionCollection = ['username' => ['like' => $slug.'%']];
+            $findResult = $customerRepository->findByCondition($conditionCollection);
+            $findResult = (is_array($findResult)) ? $findResult : [$findResult];
+
+            $memberListAssoc = $customerRepository->convertCollectionToAssoc($findResult, ['username']);
+            return (empty($memberListAssoc)) ? [] : array_column($memberListAssoc, 'username');
+        }
+
+        return false;
     }
 }

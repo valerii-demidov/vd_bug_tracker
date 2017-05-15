@@ -47,7 +47,7 @@ class IssueController extends Controller
         ];
 
         return $this->render(
-            'BugTrackerBundle:Project:list.html.twig',
+            'BugTrackerBundle:Issue:list.html.twig',
             [
                 'page_title' => $pageTitle,
                 'entity_create_router' => 'oro_bugtracker_issue_create',

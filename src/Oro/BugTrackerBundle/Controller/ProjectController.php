@@ -63,25 +63,22 @@ class ProjectController extends Controller
      */
     public function createAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-
-        // 1) build the form
         $project = new Project();
         $form = $this->createForm(ProjectType::class, $project);
         try {
-            // 2) handle the submit (will only happen on POST)
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $em->persist($project);
-                $em->flush();
+            $formHandler = $this->getProjectHandler();
+            if ($request->getMethod() == 'POST') {
+                if ($formHandler->handleCreateForm($form)) {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('success', 'Project has been created successfully!');
 
-                $request->getSession()
-                    ->getFlashBag()
-                    ->add('success', 'Project has been created successfully!');
-
-                return $this->redirectToRoute('oro_bugtracker_project_edit', array('id' => $project->getId()));
+                    return $this->redirectToRoute(
+                        'oro_bugtracker_project_edit',
+                        array('id' => $project->getId())
+                    );
+                }
             }
-
         } catch (\Exception $exception) {
             $request->getSession()
                 ->getFlashBag()
@@ -138,17 +135,18 @@ class ProjectController extends Controller
                 'validation_groups' => array('edit'),
             )
         );
-        $em = $this->getDoctrine()->getManager();
         try {
             if ($request->getMethod() == 'POST') {
-                $form->handleRequest($request);
-                if ($form->isValid()) {
-                    $em->merge($projectEntity);
+                $formHandler = $this->getProjectHandler();
 
+                if ($formHandler->handleEditForm($form)) {
                     $request->getSession()
                         ->getFlashBag()
                         ->add('success', 'Project has been updated successfully!');
-                    $em->flush();
+                } else {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('error', "Project wasn't update successfully!");
                 }
             }
         } catch (\Exception $exception) {
@@ -156,7 +154,6 @@ class ProjectController extends Controller
                 ->getFlashBag()
                 ->add('error', $exception->getMessage());
         }
-
 
         $membersCollection = $projectEntity->getCustomers();
         $actions = $this->getMemberGridAction($projectEntity->getId(), true, true);
@@ -192,14 +189,11 @@ class ProjectController extends Controller
             ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
             ->getForm();
 
-        $em = $this->getDoctrine()->getManager();
         if ($request->getMethod() == 'POST') {
-            $form->submit($request);
-            if ($form->isValid()) {
-                $projectEntityId = $projectEntity->getId();
-                $em->remove($projectEntity);
-                $em->flush();
-                $em->clear();
+            $projectEntityId = $projectEntity->getId();
+            $formHandler = $this->getProjectHandler();
+
+            if ($formHandler->handleDeleteForm($form)) {
                 $request->getSession()
                     ->getFlashBag()
                     ->add('success', sprintf("Project '%s' was deleted successfully!", $projectEntityId));
@@ -226,26 +220,14 @@ class ProjectController extends Controller
         $response = new JsonResponse();
         $result = [];
         $result['success'] = true;
-        $em = $this->getDoctrine()->getManager();
 
-        $membersCollection = [];
         if ($request->getMethod() == 'POST') {
-            $customerRepository = $em->getRepository(Customer::class);
-            $requiredUsername = $request->get('username');
-            $customerEntity = $customerRepository->findOneBy(['username' => $requiredUsername]);
-            if ($customerEntity) {
-                $projectEntity->addCustomer($customerEntity);
-
-                $em->persist($customerEntity);
-                $em->persist($projectEntity);
-                $em->flush();
-
-                $membersCollection = $projectEntity->getCustomers();
-            }
+            $formHandler = $this->getProjectHandler();
+            $formHandler->handleAddMemberForm($projectEntity);
         }
 
         $actions = $this->getMemberGridAction($projectEntity->getId(), true, true);
-        $result['members_grid_html'] = $this->getMembersGridHtml($membersCollection, $actions);
+        $result['members_grid_html'] = $this->getMembersGridHtml($projectEntity->getCustomers(), $actions);
         $response->setData($result);
 
         return $response;
@@ -296,16 +278,11 @@ class ProjectController extends Controller
         $result['members_list'] = '';
 
         if ($request->getMethod() == 'POST') {
-            $em = $this->getDoctrine()->getManager();
-            $customerRepository = $em->getRepository(Customer::class);
-            $usernameTemplate = $request->get('username');
-            if (!empty($usernameTemplate)) {
-                $conditionCollection = ['username' => ['like' => $usernameTemplate.'%']];
-                $findResult = $customerRepository->findByCondition($conditionCollection);
-                $findResult = (is_array($findResult)) ? $findResult : [$findResult];
-
-                $memberListAssoc = $customerRepository->convertCollectionToAssoc($findResult, ['username']);
-                $result['members_list'] = (empty($memberListAssoc)) ? [] : array_column($memberListAssoc, 'username');
+            $projectRepository = $this->getDoctrine()->getRepository(Project::class);
+            $requiredUsername = $request->get('username');
+            $membersList = $projectRepository->getProjectMembersListBySlug($requiredUsername);
+            if ($membersList) {
+                $result['members_list'] = $membersList;
             }
         }
 
@@ -363,5 +340,10 @@ class ProjectController extends Controller
         )->getContent();
 
         return $membersHtml;
+    }
+
+    public function getProjectHandler()
+    {
+        return $this->get('oro_bugtracker.handler.project');
     }
 }

@@ -4,3 +4,9 @@ services:
         public: false
         tags:
             - { name: twig.extension }
+
+    oro_bugtracker.handler.project:
+        class: Oro\BugTrackerBundle\Form\Handler\ProjectHandler
+        public: true
+        arguments:
+            ["@request_stack","@doctrine.orm.entity_manager"]
