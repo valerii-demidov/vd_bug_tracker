@@ -2,6 +2,8 @@
 
 namespace Oro\BugTrackerBundle\Controller;
 
+use Oro\BugTrackerBundle\Entity\Comment;
+use Oro\BugTrackerBundle\Form\CommentType;
 use Oro\BugTrackerBundle\Form\IssueType;
 use Oro\BugTrackerBundle\Entity\Issue;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -14,8 +16,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class IssueController extends Controller
 {
 
-    const ISSUE_LIST_PAGE_SIZE = 3;  
-    
+    const ISSUE_LIST_PAGE_SIZE = 3;
+
 
     /**
      * Issue list action
@@ -33,14 +35,14 @@ class IssueController extends Controller
             'label' => 'View',
             'router' => 'oro_bugtracker_issue_view',
             'router_parameters' => [
-                ['collection_key' => 'id', 'router_key' => 'id']
+                ['collection_key' => 'id', 'router_key' => 'id'],
             ],
         ];
         $actions[] = [
             'label' => 'Edit',
             'router' => 'oro_bugtracker_issue_edit',
             'router_parameters' => [
-                ['collection_key' => 'id', 'router_key' => 'id']
+                ['collection_key' => 'id', 'router_key' => 'id'],
             ],
         ];
 
@@ -100,13 +102,23 @@ class IssueController extends Controller
      *
      * @Route("issue/view/{id}", name="oro_bugtracker_issue_view", requirements={"id" = "\d+"})
      */
-    public function viewAction(Issue $issueEntity, Request $request)
+    public function viewAction(Issue $issue, Request $request)
     {
+        $actionUrl = $this->generateUrl(
+            'oro_bugtracker_issue_addcomment',
+            array('id' => $issue->getId()),
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $comment = new Comment();
+        $commentForm = $this->createForm(CommentType::class, $comment, ['action' => $actionUrl]);
+
         return $this->render(
             'BugTrackerBundle:Issue:view.html.twig',
             array(
-                'entity' => $issueEntity,
-                'page_title' => sprintf("View Issue '%s'", $issueEntity->getCode()),
+                'entity' => $issue,
+                'page_title' => sprintf("View Issue '%s'", $issue->getCode()),
+                'comment_form' => $commentForm->createView(),
             )
         );
     }
@@ -134,7 +146,7 @@ class IssueController extends Controller
                         $request->getSession()
                             ->getFlashBag()
                             ->add('success', 'Issue has been updated successfully!');
-                    }else {
+                    } else {
                         $request->getSession()
                             ->getFlashBag()
                             ->add('error', "Issue wasn't updated successfully!");
@@ -152,7 +164,7 @@ class IssueController extends Controller
             array(
                 'entity' => $issueEntity,
                 'form' => $form->createView(),
-                'page_title' => sprintf("Edit Issue '%s'", $issueEntity->getCode())
+                'page_title' => sprintf("Edit Issue '%s'", $issueEntity->getCode()),
             )
         );
     }
@@ -196,6 +208,39 @@ class IssueController extends Controller
         );
     }
 
+    /**
+     * Add comment action
+     * @Route("issue/{id}/addcomment/",requirements={"id" = "\d+"}, name="oro_bugtracker_issue_addcomment")
+     */
+    public function addcommentAction(Issue $issue, Request $request)
+    {
+        $comment = new Comment();
+        $form = $this->createForm(CommentType::class, $comment);
+        try {
+            $formHandler = $this->getIssueHandler();
+            if ($request->getMethod() == 'POST') {
+                if ($formHandler->handleCreateCommentForm($form, $issue)) {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('success', 'Comment has been created successfully!');
+                } else {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('error', "Comment wasn't created successfully!");
+                }
+            }
+        } catch (\Exception $exception) {
+            $request->getSession()
+                ->getFlashBag()
+                ->add('error', $exception->getMessage());
+        }
+
+        return $this->redirectToRoute('oro_bugtracker_issue_view', array('id' => $issue->getId()));
+    }
+
+    /**
+     * @return object|\Oro\BugTrackerBundle\Form\Handler\IssueHandler
+     */
     public function getIssueHandler()
     {
         return $this->get('oro_bugtracker.handler.issue');

@@ -539,37 +539,4 @@ class Issue
             return $this->$key;
         }
     }
-
-    /**
-     * Add comments
-     *
-     * @param \Oro\BugTrackerBundle\Entity\Comment $comments
-     * @return Issue
-     */
-    public function addComment(\Oro\BugTrackerBundle\Entity\Comment $comments)
-    {
-        $this->comments[] = $comments;
-
-        return $this;
-    }
-
-    /**
-     * Remove comments
-     *
-     * @param \Oro\BugTrackerBundle\Entity\Comment $comments
-     */
-    public function removeComment(\Oro\BugTrackerBundle\Entity\Comment $comments)
-    {
-        $this->comments->removeElement($comments);
-    }
-
-    /**
-     * Get comments
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getComments()
-    {
-        return $this->comments;
-    }
 }

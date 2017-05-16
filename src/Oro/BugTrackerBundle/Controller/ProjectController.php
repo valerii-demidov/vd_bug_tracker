@@ -339,6 +339,9 @@ class ProjectController extends Controller
         return $membersHtml;
     }
 
+    /**
+     * @return object|\Oro\BugTrackerBundle\Form\Handler\ProjectHandler
+     */
     public function getProjectHandler()
     {
         return $this->get('oro_bugtracker.handler.project');

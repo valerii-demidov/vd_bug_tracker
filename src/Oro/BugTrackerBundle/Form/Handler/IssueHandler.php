@@ -2,6 +2,7 @@
 
 namespace Oro\BugTrackerBundle\Form\Handler;
 
+use Oro\BugTrackerBundle\Entity\Comment;
 use Oro\BugTrackerBundle\Entity\Issue;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,7 +43,6 @@ class IssueHandler
      */
     public function handleCreateForm($form)
     {
-
         $request = $this->request->getCurrentRequest();
         $form->handleRequest($request);
 
@@ -103,5 +103,36 @@ class IssueHandler
         }
 
         return true;
+    }
+
+    /**
+     * @param $form
+     * @param $issue
+     * @return bool
+     */
+    public function handleCreateCommentForm($form, $issue)
+    {
+        $request = $this->request->getCurrentRequest();
+        $form->handleRequest($request);
+
+        $comment = $form->getData();
+        if ($comment instanceof Comment) {
+            if ($form->isSubmitted() && $form->isValid()) {
+                $customer = $this->securityToken->getToken()->getUser();
+                $comment->setIssue($issue);
+
+                $project = $issue->getProject();
+                $comment->setProject($project);
+                $comment->setCustomer($customer);
+                $comment->setCreated(new \DateTime());
+
+                $this->manager->persist($comment);
+                $this->manager->flush();
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }
