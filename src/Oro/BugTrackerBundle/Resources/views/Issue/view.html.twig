@@ -118,8 +118,7 @@
             <li><a href="#activity">{{ 'Activity'|trans }}</a></li>
         </ul>
         <div id="comments">
-            11111111111111
-            11111111111111
+            {{ include('BugTrackerBundle:Comment:list.html.twig', {issue: entity, comment_form: comment_form} ) }}
         </div>
         <div id="activity">
             222222222222222222

@@ -100,21 +100,4 @@
             </div>
         </div>
     </div>
-    <div id="issue-main-tab" class="p-3 mt-3 mb-5">
-        <ul>
-            <li><a href="#comments">{{ 'Comments'|trans }}</a></li>
-            <li><a href="#activity">{{ 'Activity'|trans }}</a></li>
-        </ul>
-        <div id="comments">
-            11111111111111
-        </div>
-        <div id="activity">
-            222222222222222222
-        </div>
-    </div>
-{% endblock %}
-
-{% block javascripts_custom %}
-    {{ parent() }}
-    <script type="text/javascript" src="{{ absolute_url(asset('bundles/bugtracker/js/issue/custom.js')) }}"></script>
 {% endblock %}

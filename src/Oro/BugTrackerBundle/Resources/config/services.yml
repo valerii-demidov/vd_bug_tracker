@@ -1,9 +1,15 @@
 services:
-    app.twig_extension:
+    app.twig_extension.paginator:
         class: Oro\BugTrackerBundle\Twig\PaginatorExtension
         public: false
         tags:
             - { name: twig.extension }
+
+    app.twig_extension.order:
+            class: Oro\BugTrackerBundle\Twig\CollectionOrderExtension
+            public: false
+            tags:
+                - { name: twig.extension }
 
     oro_bugtracker.handler.project:
         class: Oro\BugTrackerBundle\Form\Handler\ProjectHandler
@@ -22,3 +28,9 @@ services:
             public: true
             arguments:
                 ["@request_stack","@doctrine.orm.entity_manager","@security.password_encoder"]
+
+    oro_bugtracker.handler.comment:
+                class: Oro\BugTrackerBundle\Form\Handler\CommentHandler
+                public: true
+                arguments:
+                    ["@request_stack","@doctrine.orm.entity_manager"]
