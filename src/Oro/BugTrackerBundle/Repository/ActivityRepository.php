@@ -4,6 +4,8 @@ namespace Oro\BugTrackerBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\BugTrackerBundle\Entity\Activity;
+use Oro\BugTrackerBundle\Entity\Customer;
+use Doctrine\Common\Collections\Criteria;
 
 /**
  * ActivityRepository
@@ -14,8 +16,69 @@ use Oro\BugTrackerBundle\Entity\Activity;
 class ActivityRepository extends EntityRepository
 {
 
-    public function createActivity()
+    public function getActivityHomepageCollection()
     {
 
+    }
+
+    /**
+     * @param Customer $customer
+     * @param null $limit
+     * @return array
+     */
+    public function getActivityCustomerCollection(Customer $customer, $limit = null)
+    {
+        $activities = $customer->getActivities();
+        $activities = $this->orderCollection($activities, 'date');
+        if (!is_null($limit)) {
+            $activities = $this->limitCollection($activities, $limit);
+        }
+
+        return $activities;
+    }
+
+    /***
+     * @param Project $project
+     */
+    public function getActivityProjectCollection(Project $project)
+    {
+    }
+
+    /**
+     * @param Issue $issue
+     */
+    public function getActivityIssueCollection(Issue $issue)
+    {
+    }
+
+    /**
+     * @param $collection
+     * @param $fieldName
+     * @param string $orderType
+     * @return mixed
+     */
+    public function orderCollection($collection, $fieldName, $orderType = Criteria::DESC)
+    {
+        $criteria = new Criteria();
+        $criteria->orderBy([$fieldName => $orderType]);
+        $collection = $collection->matching($criteria);
+
+        return $collection;
+    }
+
+    /**
+     * @param $collection
+     * @param $limit
+     * @return mixed
+     */
+    public function limitCollection($collection, $limit)
+    {
+        $criteria = new Criteria();
+        $criteria->setMaxResults(
+            $limit
+        );
+        $collection = $collection->matching($criteria);
+
+        return $collection;
     }
 }

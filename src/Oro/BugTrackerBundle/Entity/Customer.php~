@@ -32,7 +32,7 @@ class Customer implements UserInterface, \Serializable
 
     /**
      * One Customer have Many Activities.
-     * @ORM\OneToMany(targetEntity="Activity", mappedBy="customer")
+     * @ORM\OneToMany(targetEntity="Activity", mappedBy="project")
      */
     private $activities;
 
@@ -407,38 +407,5 @@ class Customer implements UserInterface, \Serializable
     public function __toString()
     {
         return (string)$this->getId();
-    }
-
-    /**
-     * Add activities
-     *
-     * @param \Oro\BugTrackerBundle\Entity\Activity $activities
-     * @return Customer
-     */
-    public function addActivity(\Oro\BugTrackerBundle\Entity\Activity $activities)
-    {
-        $this->activities[] = $activities;
-
-        return $this;
-    }
-
-    /**
-     * Remove activities
-     *
-     * @param \Oro\BugTrackerBundle\Entity\Activity $activities
-     */
-    public function removeActivity(\Oro\BugTrackerBundle\Entity\Activity $activities)
-    {
-        $this->activities->removeElement($activities);
-    }
-
-    /**
-     * Get activities
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getActivities()
-    {
-        return $this->activities;
     }
 }

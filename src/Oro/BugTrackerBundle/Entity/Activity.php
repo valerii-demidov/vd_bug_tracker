@@ -23,13 +23,15 @@ class Activity
     private $project;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Issue")
+     * @ORM\ManyToOne(targetEntity="Issue", inversedBy="activities")
+     * @ORM\JoinColumn(name="issue_id", referencedColumnName="id")
      */
     private $issue;
 
     /**
      * Many Activity has One Customer
-     * @ORM\ManyToOne(targetEntity="Customer")
+     * @ORM\ManyToOne(targetEntity="Customer", inversedBy="activities" )
+     * @ORM\JoinColumn(name="customer_id", referencedColumnName="id")
      */
     private $customer;
 
@@ -61,7 +63,7 @@ class Activity
      *
      * @ORM\Column(name="diff_data", type="text")
      */
-    private $diff_data;
+    private $diffData;
 
     /**
      * @var \DateTime
@@ -112,7 +114,7 @@ class Activity
      */
     public function setDiffData($diffData)
     {
-        $this->diff_data = serialize($diffData);
+        $this->diffData = serialize($diffData);
 
         return $this;
     }
@@ -124,7 +126,7 @@ class Activity
      */
     public function getDiffData()
     {
-        return unserialize($this->diff_data);
+        return unserialize($this->diffData);
     }
 
     /**

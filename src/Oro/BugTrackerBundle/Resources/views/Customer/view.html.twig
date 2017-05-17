@@ -70,12 +70,14 @@
         </div>
     </div>
 
-<div class="panel panel-default mt-3 panel-bold">
-    <!-- Default panel contents -->
-    <div class="panel-heading p-2">{{ 'Assigned to Me'|trans }}</div>
-    <div class="panel-body p-2">
-        {{ issue_grid_html|raw }}
+    {{ activity_html|raw }}
+
+    <div class="panel panel-default mt-3 panel-bold">
+        <!-- Default panel contents -->
+        <div class="panel-heading p-2">{{ 'Assigned to Me'|trans }}</div>
+        <div class="panel-body p-2">
+            {{ issue_grid_html|raw }}
+        </div>
     </div>
-</div>
 {% endblock %}
 

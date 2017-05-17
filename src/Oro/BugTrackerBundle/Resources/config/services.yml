@@ -1,12 +1,18 @@
 services:
-    app.twig_extension.paginator:
+    oro_bugtracker.twig_extension.paginator:
         class: Oro\BugTrackerBundle\Twig\PaginatorExtension
         public: false
         tags:
             - { name: twig.extension }
 
-    app.twig_extension.order:
+    oro_bugtracker.twig_extension.order:
             class: Oro\BugTrackerBundle\Twig\CollectionOrderExtension
+            public: false
+            tags:
+                - { name: twig.extension }
+
+    oro_bugtracker.twig_extension.activity:
+            class: Oro\BugTrackerBundle\Twig\ActivityExtension
             public: false
             tags:
                 - { name: twig.extension }

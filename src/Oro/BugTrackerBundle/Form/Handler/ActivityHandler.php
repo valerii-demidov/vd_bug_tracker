@@ -59,8 +59,17 @@ class ActivityHandler
         $activity->setIssue($comment->getIssue());
         $activity->setProject($comment->getProject());
 
+        $currentCommentData = $comment->__toArray();
+        $actualData = [];
+        foreach ($diffData as $fieldName => $fieldValue) {
+            $actualData[$fieldName] = $currentCommentData[$fieldName];
+        }
+        $fullDiffData['diff_fields'] = array_keys($diffData);
+        $fullDiffData['before_data'] = $diffData;
+        $fullDiffData['current_data'] = $actualData;
+
         $entityName = 'Comment';
-        $this->doSave($activity, $entityName, $type, $diffData);
+        $this->doSave($activity, $entityName, $type, $fullDiffData);
     }
 
     /**
@@ -71,7 +80,7 @@ class ActivityHandler
      * @param $type
      * @param array $diffData
      */
-    protected function doSave(Activity $activity, $entityName, $type, $diffData = [])
+    protected function doSave(Activity $activity, $entityName, $type, $fullDiffData = [])
     {
         // author of activity
         $author = $this->securityToken->getToken()->getUser();
@@ -80,7 +89,7 @@ class ActivityHandler
         $activity->setType($type);
 
         $currentDate = new \DateTime();
-        $activity->setDiffData($diffData);
+        $activity->setDiffData($fullDiffData);
         $activity->setDate($currentDate);
 
         $this->manager->persist($activity);
