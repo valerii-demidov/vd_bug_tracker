@@ -373,4 +373,33 @@ class Customer implements UserInterface, \Serializable
     {
         return $this->issues;
     }
+
+    /**
+     * @return array
+     */
+    public function __toArray()
+    {
+        $properties = array_keys(get_class_vars(Customer::class));
+        $data = [];
+        foreach ($properties as $property) {
+            if (is_object($this->$property)) {
+                if (method_exists($this->$property, '__toString')){
+                    $data[$property] = $this->$property->__toString();
+                }
+                continue;
+            }
+
+            $data[$property] = $this->$property;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }

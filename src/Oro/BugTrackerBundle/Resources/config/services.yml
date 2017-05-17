@@ -21,7 +21,7 @@ services:
             class: Oro\BugTrackerBundle\Form\Handler\IssueHandler
             public: true
             arguments:
-                ["@request_stack","@doctrine.orm.entity_manager","@security.token_storage"]
+                ["@request_stack","@doctrine.orm.entity_manager","@security.token_storage","@oro_bugtracker.handler.activity"]
 
     oro_bugtracker.handler.customer:
             class: Oro\BugTrackerBundle\Form\Handler\CustomerHandler
@@ -33,4 +33,10 @@ services:
                 class: Oro\BugTrackerBundle\Form\Handler\CommentHandler
                 public: true
                 arguments:
-                    ["@request_stack","@doctrine.orm.entity_manager"]
+                    ["@request_stack","@doctrine.orm.entity_manager","@oro_bugtracker.handler.activity"]
+
+    oro_bugtracker.handler.activity:
+                    class: Oro\BugTrackerBundle\Form\Handler\ActivityHandler
+                    public: true
+                    arguments:
+                        ["@request_stack","@doctrine.orm.entity_manager","@security.token_storage"]

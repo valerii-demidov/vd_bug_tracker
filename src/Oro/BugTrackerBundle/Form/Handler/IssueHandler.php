@@ -7,6 +7,8 @@ use Oro\BugTrackerBundle\Entity\Issue;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Oro\BugTrackerBundle\Form\Handler\activityHandler;
+use Oro\BugTrackerBundle\Entity\Activity;
 
 class IssueHandler
 {
@@ -19,6 +21,9 @@ class IssueHandler
     /** @var TokenStorage */
     protected $securityToken;
 
+    /** @var activityHandler */
+    protected $activityHandler;
+
     /**
      * IssueHandler constructor.
      * @param RequestStack $request
@@ -28,12 +33,14 @@ class IssueHandler
     public function __construct(
         RequestStack $request,
         EntityManagerInterface $manager,
-        TokenStorage $securityToken
+        TokenStorage $securityToken,
+        activityHandler $activityHandler
 
     ) {
         $this->request = $request;
         $this->manager = $manager;
         $this->securityToken = $securityToken;
+        $this->activityHandler = $activityHandler;
     }
 
 
@@ -56,6 +63,7 @@ class IssueHandler
                 $this->manager->persist($issue);
                 $this->manager->flush();
 
+                $this->activityHandler->handleIssueActivity($issue, Activity::TYPE_CREATED, $issue->__toArray());
                 return true;
             }
         }
@@ -70,15 +78,20 @@ class IssueHandler
     public function handleEditForm($form)
     {
         $request = $this->request->getCurrentRequest();
+        $entityPreview = $form->getData()->__toArray();
         $form->handleRequest($request);
 
         $issue = $form->getData();
         if ($form->isValid()) {
+            $entityAfter = $issue->__toArray();
             $issue->addCollaboration($issue->getAssignee());
             $issue->setUpdated(new \DateTime());
 
             $this->manager->merge($issue);
             $this->manager->flush();
+
+            $diffData = array_diff_assoc($entityPreview, $entityAfter);
+            $this->activityHandler->handleIssueActivity($issue, Activity::TYPE_UPDATED, $diffData);
         } else {
             return false;
         }
@@ -131,6 +144,7 @@ class IssueHandler
                 $this->manager->persist($comment);
                 $this->manager->flush();
 
+                $this->activityHandler->handleCommentActivity($comment, Activity::TYPE_CREATED, $comment->__toArray());
                 return true;
             }
         }
