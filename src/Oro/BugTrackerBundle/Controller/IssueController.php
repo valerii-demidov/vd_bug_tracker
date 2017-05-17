@@ -142,7 +142,7 @@ class IssueController extends Controller
             if ($request->getMethod() == 'POST') {
                 $formHandler = $this->getIssueHandler();
                 if ($request->getMethod() == 'POST') {
-                    if ($formHandler->handleCreateForm($form)) {
+                    if ($formHandler->handleEditForm($form)) {
                         $request->getSession()
                             ->getFlashBag()
                             ->add('success', 'Issue has been updated successfully!');

@@ -75,6 +75,8 @@ class IssueHandler
         $issue = $form->getData();
         if ($form->isValid()) {
             $issue->addCollaboration($issue->getAssignee());
+            $issue->setUpdated(new \DateTime());
+
             $this->manager->merge($issue);
             $this->manager->flush();
         } else {
