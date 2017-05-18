@@ -122,10 +122,10 @@ class IssueHandler
 
     /**
      * @param $form
-     * @param $issue
+     * @param Issue $issue
      * @return bool
      */
-    public function handleCreateCommentForm($form, $issue)
+    public function handleCreateCommentForm($form, Issue $issue)
     {
         $request = $this->request->getCurrentRequest();
         $form->handleRequest($request);
@@ -142,6 +142,9 @@ class IssueHandler
                 $comment->setCreated(new \DateTime());
 
                 $this->manager->persist($comment);
+
+                $issue->addCollaboration($customer);
+                $this->manager->persist($issue);
                 $this->manager->flush();
 
                 $this->activityHandler->handleCommentActivity($comment, Activity::TYPE_CREATED, $comment->__toArray());

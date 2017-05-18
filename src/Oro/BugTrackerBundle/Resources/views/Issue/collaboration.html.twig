@@ -6,7 +6,7 @@
             <ul class="list-box">
                 {% for item in collaboration %}
                     <li>
-                        <a href="{{ url('oro_bugtracker_customer_edit', { 'id': item.id}) }}">{{ item.username }}</a>
+                        <a href="{{ url('oro_bugtracker_customer_view', { 'id': item.id}) }}">{{ item.username }}</a>
                     </li>
                 {% endfor %}
             </ul>

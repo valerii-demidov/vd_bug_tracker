@@ -4,24 +4,12 @@
     </a> {{ 'commented on'|trans }}
     <a href="{{ url('oro_bugtracker_issue_view',{id: (activity.issue.id) }) }}">{{ activity.issue.code }}</a>
 </div>
-<div class="comment-body pb-2">
-    {{ 'Was updated' }} 1 {{ 'field' }}
+<div class="comment-body pb-2 ">
     <div class="row">
-        <div class="col-1 font-weight-bold">Body</div>
+        <div class="col-1 font-weight-bold">{{ 'body'|trans }}</div>
         <div class="col-5">
-            <div class="text-decoration-underline">
-                {{ 'From:' }}
-            </div>
             <div class="updated-field-value">
-                {{ dump(activity.diffData) }}
-            </div>
-        </div>
-        <div class="col-5">
-            <div class="text-decoration-underline">
-                {{ 'To:' }}
-            </div>
-            <div class="updated-field-value">
-                Was added form handler https://github.com/valerii-demidov/vd_bug_tracker/pull/14
+                {{ activity.diffData.before_data.body }}
             </div>
         </div>
     </div>

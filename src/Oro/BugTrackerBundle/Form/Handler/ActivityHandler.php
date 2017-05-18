@@ -37,6 +37,8 @@ class ActivityHandler
 
     /**
      * @param Issue $issue
+     * @param $type
+     * @param array $diffData
      */
     public function handleIssueActivity(Issue $issue, $type, $diffData = [])
     {
@@ -45,7 +47,7 @@ class ActivityHandler
         $activity->setProject($issue->getProject());
 
         $entityName = 'Issue';
-        $this->doSave($activity, $entityName, $type, $diffData);
+        $this->doSave($activity, $issue, $entityName, $type, $diffData);
     }
 
     /**
@@ -59,29 +61,32 @@ class ActivityHandler
         $activity->setIssue($comment->getIssue());
         $activity->setProject($comment->getProject());
 
-        $currentCommentData = $comment->__toArray();
-        $actualData = [];
-        foreach ($diffData as $fieldName => $fieldValue) {
-            $actualData[$fieldName] = $currentCommentData[$fieldName];
-        }
-        $fullDiffData['diff_fields'] = array_keys($diffData);
-        $fullDiffData['before_data'] = $diffData;
-        $fullDiffData['current_data'] = $actualData;
-
         $entityName = 'Comment';
-        $this->doSave($activity, $entityName, $type, $fullDiffData);
+        $this->doSave($activity, $comment, $entityName, $type, $diffData);
     }
 
     /**
-     * Saves entity
-     *
      * @param Activity $activity
+     * @param $entity
      * @param $entityName
      * @param $type
      * @param array $diffData
      */
-    protected function doSave(Activity $activity, $entityName, $type, $fullDiffData = [])
+    protected function doSave(Activity $activity, $entity, $entityName, $type, $diffData = [])
     {
+
+        $currentEntityData = $entity->__toArray();
+        $afterData = [];
+        if ($type == Activity::TYPE_UPDATED) {
+            foreach ($diffData as $fieldName => $fieldValue) {
+                $afterData[$fieldName] = $currentEntityData[$fieldName];
+            }
+        }
+
+        $fullDiffData['diff_fields'] = array_keys($diffData);
+        $fullDiffData['before_data'] = $diffData;
+        $fullDiffData['after_data'] = $afterData;
+
         // author of activity
         $author = $this->securityToken->getToken()->getUser();
         $activity->setCustomer($author);
