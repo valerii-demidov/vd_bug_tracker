@@ -21,10 +21,10 @@ class IssueController extends Controller
 
     /**
      * Issue list action
-     * @Route("issue/list/{page}", name="oro_bugtracker_issue_list", requirements={"page" = "\d+"},
-     *     defaults={"page" = 1})
+     *
+     * @Route("issue/list/", name="oro_bugtracker_issue_list")
      */
-    public function listAction($page)
+    public function listAction()
     {
         $em = $this->getDoctrine()->getManager();
         $entityRepository = $em->getRepository('BugTrackerBundle:Issue');
@@ -54,7 +54,7 @@ class IssueController extends Controller
                 'entity_repository' => $entityRepository,
                 'columns' => $columns,
                 'actions' => $actions,
-                'current_page' => $page,
+                'paginator_var' => 'issue_p'
             ]
         );
     }

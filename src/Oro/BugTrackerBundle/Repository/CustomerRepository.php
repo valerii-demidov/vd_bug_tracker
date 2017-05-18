@@ -21,7 +21,6 @@ class CustomerRepository extends EntityRepository
      */
     public function findByCondition(array $conditionCollection)
     {
-
         $customerQb = $this->createQueryBuilder('customer');
         $paramInc = 0;
         foreach ($conditionCollection as $fieldName => $fieldConditions) {

@@ -18,9 +18,9 @@ class ProjectController extends Controller
 
     /**
      * Project list action
-     * @Route("project/list/{page}", name="oro_bugtracker_project_list", requirements={"page" = "\d+"}, defaults={"page" = 1})
+     * @Route("project/list/", name="oro_bugtracker_project_list")
      */
-    public function listAction($page)
+    public function listAction()
     {
         $em = $this->getDoctrine()->getManager();
         $entityRepository = $em->getRepository('BugTrackerBundle:Project');
@@ -50,7 +50,7 @@ class ProjectController extends Controller
                 'entity_repository' => $entityRepository,
                 'columns' => $columns,
                 'actions' => $actions,
-                'current_page' => $page,
+                'paginator_var' => 'project_p'
             ]
         );
     }

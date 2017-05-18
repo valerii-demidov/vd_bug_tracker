@@ -24,17 +24,16 @@ class ActivityRepository extends EntityRepository
     /**
      * @param Customer $customer
      * @param null $limit
-     * @return array
+     * @return \Doctrine\ORM\QueryBuilder
      */
     public function getActivityCustomerCollection(Customer $customer, $limit = null)
     {
-        $activities = $customer->getActivities();
-        $activities = $this->orderCollection($activities, 'date');
-        if (!is_null($limit)) {
-            $activities = $this->limitCollection($activities, $limit);
-        }
+        $activityQb = $this->createQueryBuilder('activity');
+        $activityQb->where('activity.customer = :customer');
+        $activityQb->setParameter('customer', $customer);
+        $activityQb->orderBy('activity.date', Criteria::DESC);
 
-        return $activities;
+        return $activityQb;
     }
 
     /***
@@ -49,36 +48,5 @@ class ActivityRepository extends EntityRepository
      */
     public function getActivityIssueCollection(Issue $issue)
     {
-    }
-
-    /**
-     * @param $collection
-     * @param $fieldName
-     * @param string $orderType
-     * @return mixed
-     */
-    public function orderCollection($collection, $fieldName, $orderType = Criteria::DESC)
-    {
-        $criteria = new Criteria();
-        $criteria->orderBy([$fieldName => $orderType]);
-        $collection = $collection->matching($criteria);
-
-        return $collection;
-    }
-
-    /**
-     * @param $collection
-     * @param $limit
-     * @return mixed
-     */
-    public function limitCollection($collection, $limit)
-    {
-        $criteria = new Criteria();
-        $criteria->setMaxResults(
-            $limit
-        );
-        $collection = $collection->matching($criteria);
-
-        return $collection;
     }
 }

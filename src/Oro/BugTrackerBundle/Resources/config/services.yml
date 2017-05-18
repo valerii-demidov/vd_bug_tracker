@@ -1,6 +1,8 @@
 services:
     oro_bugtracker.twig_extension.paginator:
         class: Oro\BugTrackerBundle\Twig\PaginatorExtension
+        arguments:
+            - @request_stack
         public: false
         tags:
             - { name: twig.extension }

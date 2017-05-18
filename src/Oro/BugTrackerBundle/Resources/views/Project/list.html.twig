@@ -11,10 +11,10 @@
 
 {% block content %}
     <div id="project-list">
-        {% set entity_paginator = paginator_object(entity_repository, current_page) %}
+        {% set entity_paginator = paginator_object(entity_repository, paginator_var) %}
         {{ macros.renderGrid(entity_paginator.entity_collection, columns, actions) }}
         <div class="text-center">
-            {{ macros.renderPaginator(app.request.attributes.get('_route'), current_page, entity_paginator.max_pages) }}
+            {{ macros.renderPaginator(app.request.attributes.get('_route'), entity_paginator.max_pages, paginator_var) }}
         </div>
     </div>
 {% endblock %}

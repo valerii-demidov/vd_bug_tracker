@@ -18,9 +18,9 @@ class CustomerController extends Controller
 
     /**
      * Customer list action
-     * @Route("customer/list/{page}", requirements={"page" = "\d+"}, defaults={"page" = 1})
+     * @Route("customer/list/", name="oro_bugtracker_customer_list")
      */
-    public function listAction($page)
+    public function listAction()
     {
         $em = $this->getDoctrine()->getManager();
         $entityRepository = $em->getRepository('BugTrackerBundle:Customer');
@@ -49,7 +49,7 @@ class CustomerController extends Controller
                 'entity_repository' => $entityRepository,
                 'columns' => $columns,
                 'actions' => $actions,
-                'current_page' => $page,
+                'paginator_var' => 'customer_p',
             ]
         );
     }
@@ -96,9 +96,9 @@ class CustomerController extends Controller
 
     /**
      * Create edit action
-     * @Route("customer/view/{id}/{page}", name="oro_bugtracker_customer_view", requirements={"id" = "\d+"}, defaults={"page" = 1})
+     * @Route("customer/view/{id}/", name="oro_bugtracker_customer_view", requirements={"id" = "\d+"})
      */
-    public function viewAction(Customer $customer, $page, Request $request)
+    public function viewAction(Customer $customer, Request $request)
     {
         $issueGridActions = $this->getIssueGridAction();
         $issuesQb = $this->getDoctrine()->getRepository(Issue::class)->findByCondition(
@@ -108,7 +108,7 @@ class CustomerController extends Controller
             ]
         );
 
-        $issueGridHtml = $this->getIssuesGridHtml($issuesQb, $issueGridActions, $page, $customer->getId());
+        $issueGridHtml = $this->getIssuesGridHtml($issuesQb, $issueGridActions);
         $activitiesHtml = $this->getActivityHtml($customer, true);
 
         return $this->render(
@@ -228,7 +228,7 @@ class CustomerController extends Controller
      * @param $currentPage
      * @return string
      */
-    protected function getIssuesGridHtml($entityQueryBuilder, $actions, $currentPage, $staticRouteParam)
+    protected function getIssuesGridHtml($entityQueryBuilder, $actions)
     {
         $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary', 'status' => 'Status'];
         $membersHtml = $this->render(
@@ -237,8 +237,7 @@ class CustomerController extends Controller
                 'entity_query_builder' => $entityQueryBuilder,
                 'columns' => $columns,
                 'actions' => $actions,
-                'current_page' => $currentPage,
-                'static_route_params' => $staticRouteParam
+                'paginator_var' => 'issue_p'
             ]
         )->getContent();
 
@@ -258,6 +257,7 @@ class CustomerController extends Controller
             [
                 'limit' => self::ACTIVITY_CUSTOMER_PAGE_LIMIT,
                 'collection' => $activityCollection,
+                'paginator_var' => 'activity_p'
             ]
         )->getContent();
 
