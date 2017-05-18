@@ -4,6 +4,7 @@ namespace Oro\BugTrackerBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\BugTrackerBundle\Entity\Activity;
+use Oro\BugTrackerBundle\Entity\Issue;
 use Oro\BugTrackerBundle\Entity\Customer;
 use Doctrine\Common\Collections\Criteria;
 
@@ -46,7 +47,13 @@ class ActivityRepository extends EntityRepository
     /**
      * @param Issue $issue
      */
-    public function getActivityIssueCollection(Issue $issue)
+    public function getActivityIssueCollection(Issue $issue, $limit = null)
     {
+        $activityQb = $this->createQueryBuilder('activity');
+        $activityQb->where('activity.issue = :issue');
+        $activityQb->setParameter('issue', $issue);
+        $activityQb->orderBy('activity.date', Criteria::DESC);
+
+        return $activityQb;
     }
 }

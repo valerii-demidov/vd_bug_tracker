@@ -368,6 +368,10 @@ table.grid tbody tr.row-click-action {
     border-bottom-style: dashed;
 }
 
+.activity-list .activity-list-item a {
+    color: #0275d8;
+}
+
 .text-decoration-underline {
     text-decoration: underline;
 }

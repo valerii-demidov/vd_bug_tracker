@@ -2,6 +2,7 @@
 
 namespace Oro\BugTrackerBundle\Controller;
 
+use Oro\BugTrackerBundle\Entity\Activity;
 use Oro\BugTrackerBundle\Entity\Comment;
 use Oro\BugTrackerBundle\Form\CommentType;
 use Oro\BugTrackerBundle\Form\IssueType;
@@ -112,6 +113,11 @@ class IssueController extends Controller
 
         $comment = new Comment();
         $commentForm = $this->createForm(CommentType::class, $comment, ['action' => $actionUrl]);
+        $activityCollection = $this->getDoctrine()
+            ->getRepository(Activity::class)
+            ->getActivityIssueCollection($issue)
+            ->getQuery()
+            ->getResult();
 
         return $this->render(
             'BugTrackerBundle:Issue:view.html.twig',
@@ -119,6 +125,7 @@ class IssueController extends Controller
                 'entity' => $issue,
                 'page_title' => sprintf("View Issue '%s'", $issue->getCode()),
                 'comment_form' => $commentForm->createView(),
+                'activity_collection' => $activityCollection
             )
         );
     }

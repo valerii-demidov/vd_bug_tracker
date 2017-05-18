@@ -253,7 +253,7 @@ class CustomerController extends Controller
         );
 
         $activityHtml = $this->render(
-            'BugTrackerBundle:Activity:list.html.twig',
+            'BugTrackerBundle:Activity:paginator_list.html.twig',
             [
                 'limit' => self::ACTIVITY_CUSTOMER_PAGE_LIMIT,
                 'collection' => $activityCollection,
