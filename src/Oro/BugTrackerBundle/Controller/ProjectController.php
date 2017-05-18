@@ -5,6 +5,7 @@ namespace Oro\BugTrackerBundle\Controller;
 use Oro\BugTrackerBundle\Form\ProjectType;
 use Oro\BugTrackerBundle\Entity\Project;
 use Oro\BugTrackerBundle\Entity\Customer;
+use Oro\BugTrackerBundle\Entity\Activity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -97,20 +98,27 @@ class ProjectController extends Controller
      *
      * @Route("project/view/{id}", name="oro_bugtracker_project_view", requirements={"id" = "\d+"})
      */
-    public function viewAction(Project $projectEntity, Request $request)
+    public function viewAction(Project $project, Request $request)
     {
-        $membersCollection = $projectEntity->getCustomers();
-        $actions = $this->getMemberGridAction($projectEntity->getId(), true, false);
+        $membersCollection = $project->getCustomers();
+        $actions = $this->getMemberGridAction($project->getId(), true, false);
+
+        $activityRepository = $this->getDoctrine()->getRepository(Activity::class);
+        $activityCollection = $activityRepository->getActivityProjectCollection(
+            $project
+        );
 
         return $this->render(
             'BugTrackerBundle:Project:view.html.twig',
             array(
                 'page_title' => sprintf(
                     "View Project '%s'",
-                    $projectEntity->getCode()
+                    $project->getCode()
                 ),
-                'entity' => $projectEntity,
+                'entity' => $project,
                 'members_grid_html' => $this->getMembersGridHtml($membersCollection, $actions),
+                'activity_collection' => $activityCollection,
+                'activity_paginator_var' => 'activity_p'
             )
         );
     }

@@ -1,46 +1,45 @@
 {% set comments = collection_order(issue.comments, 'created') %}
-{% if comments is not empty %}
-    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
     <div class="comment-container">
         <div class="row">
-            {% for item in comments %}
-                <div class="col-sm-8 pb-3">
-                    <div class="panel panel-white post panel-shadow">
-                        <div class="post-heading">
-                            <div class="pull-left image">
-                                <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar"
-                                     alt="user profile image">
-                            </div>
-                            <div class="pull-right">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button"
-                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                            aria-expanded="false">
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item comment-action"
-                                           href="{{ url('oro_bugtracker_comment_edit',{id: item.id}) }}">{{ 'Edit'|trans }}</a>
-                                        <a class="dropdown-item comment-action"
-                                           href="{{ url('oro_bugtracker_comment_delete',{id: item.id}) }}">{{ 'Delete'|trans }}</a>
+            {% if comments is not empty %}
+                {% for item in comments %}
+                    <div class="col-sm-8 pb-3">
+                        <div class="panel panel-white post panel-shadow">
+                            <div class="post-heading">
+                                <div class="pull-left image">
+                                    <img src="http://bootdey.com/img/Content/user_1.jpg" class="img-circle avatar"
+                                         alt="user profile image">
+                                </div>
+                                <div class="pull-right">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item comment-action"
+                                               href="{{ url('oro_bugtracker_comment_edit',{id: item.id}) }}">{{ 'Edit'|trans }}</a>
+                                            <a class="dropdown-item comment-action"
+                                               href="{{ url('oro_bugtracker_comment_delete',{id: item.id}) }}">{{ 'Delete'|trans }}</a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="pull-left meta">
-                                <div class="title h5">
-                                    <a href="{{ url('oro_bugtracker_customer_view', {id: item.customer.id}) }}"><b>{{ item.customer.username }}</b></a>
-                                    {{ 'made a post.'|trans }}
+                                <div class="pull-left meta">
+                                    <div class="title h5">
+                                        <a href="{{ url('oro_bugtracker_customer_view', {id: item.customer.id}) }}"><b>{{ item.customer.username }}</b></a>
+                                        {{ 'made a post.'|trans }}
+                                    </div>
+                                    <h6 class="text-muted time">{{ 'Added on'|trans }}
+                                        - {{ item.created|date("m/d/Y g:ia") }}</h6>
                                 </div>
-                                <h6 class="text-muted time">{{ 'Added on'|trans }}
-                                    - {{ item.created|date("m/d/Y g:ia") }}</h6>
                             </div>
-                        </div>
-                        <div class="post-description">
-                            <p>{{ item.body }}</p>
+                            <div class="post-description">
+                                <p>{{ item.body }}</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-
+                {% endfor %}
+            {% endif %}
             <div class="col-sm-8 pb-3">
                 <div class="add-comment">
                     {{ form_start(comment_form) }}
@@ -53,7 +52,8 @@
             </div>
 
             <!-- Default bootstrap modal example -->
-            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                 aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-container">
@@ -63,4 +63,4 @@
             </div>
         </div>
     </div>
-{% endif %}
+

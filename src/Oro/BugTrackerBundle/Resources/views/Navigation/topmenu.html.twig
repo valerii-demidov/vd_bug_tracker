@@ -56,7 +56,7 @@
                                                     </p>
                                                     <div class="divider">
                                                     </div>
-                                                    <a href="{{ url('oro_bugtracker_customer_edit', { 'id': app.user.id } ) }}"
+                                                    <a href="{{ url('oro_bugtracker_customer_view', { 'id': app.user.id } ) }}"
                                                        class="btn btn-primary btn-sm active">
                                                         {{ 'View Profile'|trans }}
                                                     </a>
@@ -65,9 +65,9 @@
                                         </div>
                                         <div class="navbar-footer">
                                             <div class="navbar-footer-content">
-                                                <div class="text-right">
+                                                <div class=" text-right">
                                                     <a href="{{ url('oro_bugtracker_auth_logout') }}"
-                                                       class="btn btn-default btn-sm pull-right">{{ 'Sign Out'|trans }}</a>
+                                                       class="btn btn-default btn-sm">{{ 'Sign Out'|trans }}</a>
                                                 </div>
                                             </div>
                                         </div>

@@ -65,6 +65,9 @@
             {{ members_grid_html|raw }}
         </div>
     </div>
+
+    {{ include('BugTrackerBundle:Activity:paginator_list.html.twig',
+    {collection: (activity_collection), paginator_var: (activity_paginator_var)} ) }}
 {% endblock %}
 
 {% block javascripts_custom %}
