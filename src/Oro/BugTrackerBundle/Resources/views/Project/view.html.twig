@@ -58,16 +58,21 @@
         </div>
     </div>
 
-
-    <div class="panel panel-default mt-3 panel-bold">
-        <!-- Table -->
-        <div id="members-grid">
-            {{ members_grid_html|raw }}
+    <div class="row">
+        <div class="col-8">
+            {{ include('BugTrackerBundle:Activity:paginator_list.html.twig',
+            {collection: (activity_collection), paginator_var: (activity_paginator_var)} ) }}
+        </div>
+        <div class="col-4">
+            <div class="panel panel-default mt-3 panel-bold">
+                <div class="panel-heading p-2">{{ 'Project members'|trans }}</div>
+                <!-- Table -->
+                <div id="members-grid">
+                    {{ members_grid_html|raw }}
+                </div>
+            </div>
         </div>
     </div>
-
-    {{ include('BugTrackerBundle:Activity:paginator_list.html.twig',
-    {collection: (activity_collection), paginator_var: (activity_paginator_var)} ) }}
 {% endblock %}
 
 {% block javascripts_custom %}
