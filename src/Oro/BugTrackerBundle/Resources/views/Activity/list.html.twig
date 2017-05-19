@@ -1,0 +1,12 @@
+<div class="activity-list">
+    <div class="row">
+        {% for activity in collection %}
+            <div class="col-12 pt-1 pb-2">
+                <div class="block activity-list-item">
+                    {% set activityTemplate = activity_template_detect(activity) %}
+                    {{ include(activityTemplate, {activity: activity}) }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

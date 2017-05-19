@@ -1,0 +1,22 @@
+<div class="comment-heading">
+    <a href="{{ url('oro_bugtracker_customer_view', {id: (activity.customer.id)} ) }}">
+        {{ activity.customer.fullName }}
+    </a> {{ 'commented on'|trans }}
+    <a href="{{ url('oro_bugtracker_issue_view',{id: (activity.issue.id) }) }}">{{ activity.issue.code }}</a>
+</div>
+<div class="comment-body pb-2 ">
+    <div class="row">
+        <div class="col col-xl-1 mr-3">
+            <div class="font-weight-bold">{{ 'body'|trans }}</div>
+        </div>
+        <div class="col col-xl-9">
+            <div class="updated-field-value">
+                {{ activity.diffData.before_data.body }}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="date pb-2">
+    {{ 'Event was made - ' }}
+    {{ activity.date|date("m/d/Y g:ia") }}
+</div>

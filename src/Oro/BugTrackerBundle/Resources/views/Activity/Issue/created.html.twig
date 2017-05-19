@@ -1,0 +1,10 @@
+<div class="comment-heading">
+    <a href="{{ url('oro_bugtracker_customer_view', {id: (activity.customer.id)} ) }}">
+        {{ activity.customer.fullName }}
+    </a> {{ 'created an issue'|trans }}
+    <a href="{{ url('oro_bugtracker_issue_view',{id: (activity.issue.id) }) }}">{{ activity.issue.code }}</a>
+</div>
+<div class="date pb-2">
+    {{ 'Event was made - ' }}
+    {{ activity.date|date("m/d/Y g:ia") }}
+</div>

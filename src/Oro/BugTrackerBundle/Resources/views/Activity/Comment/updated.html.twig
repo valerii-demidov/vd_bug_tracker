@@ -1,0 +1,36 @@
+<div class="comment-heading">
+    <a href="{{ url('oro_bugtracker_customer_view', {id: (activity.customer.id)} ) }}">
+        {{ activity.customer.fullName }}
+    </a> {{ 'changed exist comment in'|trans }}
+    <a href="{{ url('oro_bugtracker_issue_view',{id: (activity.issue.id) }) }}">{{ activity.issue.code }}</a>
+</div>
+<div class="comment-body pb-2 ">
+    {{ 'Were changed' }} {{ activity.diffData.diff_fields|length }} {{ 'field(s) in exist comment' }}
+    {% for updated_field_name in activity.diffData.diff_fields %}
+        <div class="row">
+            <div class="col-xl-2 font-weight-bold">{{ updated_field_name }}</div>
+            <div class="col-xl-5">
+                <div class="text-decoration-underline">
+                    {{ 'From:' }}
+                </div>
+                <div class="updated-field-value">
+                    {{ activity.diffData.before_data[updated_field_name] }}
+                </div>
+            </div>
+            {% if activity.diffData.after_data[updated_field_name] is defined %}
+                <div class="col-xl-5">
+                    <div class="text-decoration-underline">
+                        {{ 'To:' }}
+                    </div>
+                    <div class="updated-field-value">
+                        {{ activity.diffData.after_data[updated_field_name] }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+<div class="date pb-2">
+    {{ 'Event was made - ' }}
+    {{ activity.date|date("m/d/Y g:ia") }}
+</div>

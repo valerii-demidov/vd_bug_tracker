@@ -2,11 +2,25 @@
 
 namespace Oro\BugTrackerBundle\Twig;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class PaginatorExtension extends \Twig_Extension
 {
     const DEFAULT_PAGE_SIZE = 3;
+
+    /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * PaginatorExtension constructor.
+     * @param RequestStack $request
+     */
+    public function __construct(RequestStack $request)
+    {
+        $this->request = $request;
+    }
 
     public function getFunctions()
     {
@@ -16,24 +30,25 @@ class PaginatorExtension extends \Twig_Extension
         );
     }
 
-    public function getPaginatorObject($entityRepository, $currentPage)
+    public function getPaginatorObject($entityRepository, $paginatorVar)
     {
         $queryBuilder = $entityRepository->createQueryBuilder('entity');
-        $result = $this->getPaginatorObjectByQb($queryBuilder, $currentPage);
+        $result = $this->getPaginatorObjectByQb($queryBuilder, $paginatorVar);
 
         return $result;
     }
 
-    public function getPaginatorObjectByQb($queryBuilder, $currentPage)
+    public function getPaginatorObjectByQb($queryBuilder, $paginatorVar, $pageSize = self::DEFAULT_PAGE_SIZE)
     {
+        $currentPage = (int)$this->request->getCurrentRequest()->get($paginatorVar);
+        $currentPage = ($currentPage) ?: 1;
         $entityAlias = current($queryBuilder->getRootAliases());
         $cloneQb = clone $queryBuilder;
-        $paginator = new Paginator($queryBuilder, false);
 
-        $entityCollection = $paginator
+        $entityCollection = $queryBuilder
             ->getQuery()
-            ->setFirstResult(self::DEFAULT_PAGE_SIZE * ($currentPage - 1))// Offset
-            ->setMaxResults(self::DEFAULT_PAGE_SIZE)
+            ->setFirstResult($pageSize * ($currentPage - 1))// Offset
+            ->setMaxResults($pageSize)
             ->getResult();
 
         // get collection qty
@@ -41,8 +56,9 @@ class PaginatorExtension extends \Twig_Extension
         $cloneQueryBuilder->select("count($entityAlias.id)");
         $totalCount = $cloneQueryBuilder->getQuery()->getSingleScalarResult();
 
-        $result['max_pages'] = ceil($totalCount / self::DEFAULT_PAGE_SIZE);
+        $result['max_pages'] = ceil($totalCount / $pageSize);
         $result['entity_collection'] =  $entityCollection;
+        $result['count'] = $totalCount;
 
         return $result;
     }

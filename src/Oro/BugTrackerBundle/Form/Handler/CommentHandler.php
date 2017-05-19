@@ -5,6 +5,8 @@ namespace Oro\BugTrackerBundle\Form\Handler;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\BugTrackerBundle\Entity\Comment;
+use Oro\BugTrackerBundle\Form\Handler\activityHandler;
+use Oro\BugTrackerBundle\Entity\Activity;
 
 class CommentHandler
 {
@@ -14,17 +16,23 @@ class CommentHandler
     /** @var EntityManagerInterface */
     protected $manager;
 
+    /** @var activityHandler */
+    protected $activityHandler;
+
     /**
      * CommentHandler constructor.
      * @param RequestStack $request
      * @param EntityManagerInterface $manager
+     * @param \Oro\BugTrackerBundle\Form\Handler\activityHandler $activityHandler
      */
     public function __construct(
         RequestStack $request,
-        EntityManagerInterface $manager
+        EntityManagerInterface $manager,
+        activityHandler $activityHandler
     ) {
         $this->request = $request;
         $this->manager = $manager;
+        $this->activityHandler = $activityHandler;
     }
 
     /**
@@ -34,12 +42,20 @@ class CommentHandler
     public function handleEditForm($form)
     {
         $request = $this->request->getCurrentRequest();
+        $entityPreview = $form->getData()->__toArray();
         $form->handleRequest($request);
 
-        $project = $form->getData();
+        $comment = $form->getData();
         if ($form->isValid()) {
-            $this->manager->merge($project);
+            $this->manager->merge($comment);
+            $entityAfter = $comment->__toArray();
             $this->manager->flush();
+
+            $diffData = array_diff_assoc($entityPreview, $entityAfter);
+            $this->activityHandler->handleCommentActivity(
+                $comment,
+                Activity::TYPE_UPDATED,
+                $diffData);
         } else {
             return false;
         }
@@ -58,6 +74,11 @@ class CommentHandler
 
         $comment = $form->getData();
         if ($form->isValid()) {
+            $this->activityHandler->handleCommentActivity(
+                $comment,
+                Activity::TYPE_DELETED,
+                $comment->__toArray()
+            );
             $this->manager->remove($comment);
             $this->manager->flush();
             $this->manager->clear();

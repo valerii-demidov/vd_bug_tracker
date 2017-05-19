@@ -9,16 +9,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Oro\BugTrackerBundle\Entity\Activity;
 
 class CustomerController extends Controller
 {
     CONST CUSTOMER_LIST_PAGE_SIZE = 3;
+    CONST ACTIVITY_CUSTOMER_PAGE_LIMIT = 5;
 
     /**
      * Customer list action
-     * @Route("customer/list/{page}", requirements={"page" = "\d+"}, defaults={"page" = 1})
+     * @Route("customer/list/", name="oro_bugtracker_customer_list")
      */
-    public function listAction($page)
+    public function listAction()
     {
         $em = $this->getDoctrine()->getManager();
         $entityRepository = $em->getRepository('BugTrackerBundle:Customer');
@@ -47,7 +49,7 @@ class CustomerController extends Controller
                 'entity_repository' => $entityRepository,
                 'columns' => $columns,
                 'actions' => $actions,
-                'current_page' => $page,
+                'paginator_var' => 'customer_p',
             ]
         );
     }
@@ -94,25 +96,28 @@ class CustomerController extends Controller
 
     /**
      * Create edit action
-     * @Route("customer/view/{id}/{page}", name="oro_bugtracker_customer_view", requirements={"id" = "\d+"}, defaults={"page" = 1})
+     * @Route("customer/view/{id}/", name="oro_bugtracker_customer_view", requirements={"id" = "\d+"})
      */
-    public function viewAction(Customer $customerEntity, $page, Request $request)
+    public function viewAction(Customer $customer, Request $request)
     {
         $issueGridActions = $this->getIssueGridAction();
         $issuesQb = $this->getDoctrine()->getRepository(Issue::class)->findByCondition(
             [
-                'assignee' => ['=' => $customerEntity->getId()],
+                'assignee' => ['=' => $customer->getId()],
                 'status' => ['in' => [Issue::STATUS_OPEN, Issue::STATUS_REOPEN, Issue::STATUS_IN_PROGRESS]],
             ]
         );
 
-        $issueGridHtml = $this->getIssuesGridHtml($issuesQb, $issueGridActions, $page, $customerEntity->getId());
+        $issueGridHtml = $this->getIssuesGridHtml($issuesQb, $issueGridActions);
+        $activitiesHtml = $this->getActivityHtml($customer, true);
+
         return $this->render(
             'BugTrackerBundle:Customer:view.html.twig',
             array(
-                'page_title' => sprintf("View User '%s'", $customerEntity->getUsername()),
-                'entity' => $customerEntity,
+                'page_title' => sprintf("View User '%s'", $customer->getUsername()),
+                'entity' => $customer,
                 'issue_grid_html' => $issueGridHtml,
+                'activity_html' => $activitiesHtml
             )
         );
     }
@@ -121,11 +126,11 @@ class CustomerController extends Controller
      * Create edit action
      * @Route("customer/edit/{id}/{page}", name="oro_bugtracker_customer_edit", requirements={"id" = "\d+"}, defaults={"page" = 1})
      */
-    public function editAction(Customer $customerEntity, Request $request)
+    public function editAction(Customer $customer, Request $request)
     {
         $form = $this->createForm(
             CustomerType::class,
-            $customerEntity,
+            $customer,
             array(
                 'validation_groups' => array('edit'),
             )
@@ -150,8 +155,8 @@ class CustomerController extends Controller
             'BugTrackerBundle:Customer:edit.html.twig',
             array(
                 'form' => $form->createView(),
-                'page_title' => sprintf("Edit User '%s'", $customerEntity->getUsername()),
-                'entity_id' => $customerEntity->getId(),
+                'page_title' => sprintf("Edit User '%s'", $customer->getUsername()),
+                'entity_id' => $customer->getId(),
             )
         );
     }
@@ -160,21 +165,21 @@ class CustomerController extends Controller
      * Customer delete action
      * @Route("customer/delete/{id}",requirements={"id" = "\d+"})
      */
-    public function deleteAction(Customer $customerEntity, Request $request)
+    public function deleteAction(Customer $customer, Request $request)
     {
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_customer_delete',
-            array('id' => $customerEntity->getId()),
+            array('id' => $customer->getId()),
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $form = $this->createFormBuilder($customerEntity, array('validation_groups' => array('edit')))
+        $form = $this->createFormBuilder($customer, array('validation_groups' => array('edit')))
             ->setAction($actionUrl)
             ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
             ->getForm();
 
         if ($request->getMethod() == 'POST') {
-            $username = $customerEntity->getUsername();
+            $username = $customer->getUsername();
             $formHandler = $this->getCustomerHandler();
 
             if ($formHandler->handleDeleteForm($form)) {
@@ -223,7 +228,7 @@ class CustomerController extends Controller
      * @param $currentPage
      * @return string
      */
-    protected function getIssuesGridHtml($entityQueryBuilder, $actions, $currentPage, $staticRouteParam)
+    protected function getIssuesGridHtml($entityQueryBuilder, $actions)
     {
         $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary', 'status' => 'Status'];
         $membersHtml = $this->render(
@@ -232,12 +237,31 @@ class CustomerController extends Controller
                 'entity_query_builder' => $entityQueryBuilder,
                 'columns' => $columns,
                 'actions' => $actions,
-                'current_page' => $currentPage,
-                'static_route_params' => $staticRouteParam
+                'paginator_var' => 'issue_p'
             ]
         )->getContent();
 
         return $membersHtml;
+    }
+
+    public function getActivityHtml(Customer $customer, $limited = false)
+    {
+        $activityRepository = $this->getDoctrine()->getRepository(Activity::class);
+        $activityCollection = $activityRepository->getActivityCustomerCollection(
+            $customer,
+            self::ACTIVITY_CUSTOMER_PAGE_LIMIT
+        );
+
+        $activityHtml = $this->render(
+            'BugTrackerBundle:Activity:paginator_list.html.twig',
+            [
+                'limit' => self::ACTIVITY_CUSTOMER_PAGE_LIMIT,
+                'collection' => $activityCollection,
+                'paginator_var' => 'activity_p'
+            ]
+        )->getContent();
+
+        return $activityHtml;
     }
 
     public function getCustomerHandler()

@@ -1,5 +1,9 @@
 {# src/Oro/BugTrackerBundle/Resources/views/project/edit.html.twig #}
 {% extends 'BugTrackerBundle::base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ absolute_url(asset('bundles/bugtracker/css/font-awesome.css')) }}" rel="stylesheet"/>
+{% endblock %}
 {% block page_header_content %}
     {{ parent() }}
     <div class="p-2">
@@ -121,7 +125,7 @@
             {{ include('BugTrackerBundle:Comment:list.html.twig', {issue: entity, comment_form: comment_form} ) }}
         </div>
         <div id="activity">
-            222222222222222222
+            {{ include('BugTrackerBundle:Activity:list.html.twig', {collection: activity_collection} ) }}
         </div>
     </div>
 {% endblock %}

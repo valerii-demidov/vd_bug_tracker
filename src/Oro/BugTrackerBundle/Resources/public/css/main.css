@@ -359,3 +359,20 @@ table.grid tbody tr.row-click-action {
 }
 /* end(comment) */
 
+/* activity list */
+.activity-list .activity-list-item {
+    color: #333;
+    padding: 0;
+    margin: 14px;
+    border-width: 1px;
+    border-bottom-style: dashed;
+}
+
+.activity-list .activity-list-item a {
+    color: #0275d8;
+}
+
+.text-decoration-underline {
+    text-decoration: underline;
+}
+/* end(activity list)*/
