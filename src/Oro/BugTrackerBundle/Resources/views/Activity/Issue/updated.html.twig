@@ -1,6 +1,6 @@
 <div class="comment-heading">
     <a href="{{ url('oro_bugtracker_customer_view', {id: (activity.customer.id)} ) }}">
-        {{ activity.customer.fullName }}
+        {{ activity.customer.username }}
     </a> {{ 'changed exist issue in'|trans }}
     <a href="{{ url('oro_bugtracker_issue_view',{id: (activity.issue.id) }) }}">{{ activity.issue.code }}</a>
 </div>

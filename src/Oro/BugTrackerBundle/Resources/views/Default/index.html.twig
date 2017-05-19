@@ -4,6 +4,18 @@
 
 {% block content %}
     <div class="main">
-        main
+        <div class="row">
+            <div class="col-xl-8">
+                <div class="panel panel-default mt-3 panel-bold">
+                    <div class="panel-heading p-2">{{ 'Assigned to Me'|trans }}</div>
+                    <div class="panel-body p-2">
+                        {{ issue_grid_html|raw }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4">
+                {{ activity_html|raw }}
+            </div>
+        </div>
     </div>
 {% endblock %}
