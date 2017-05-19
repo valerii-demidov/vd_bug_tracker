@@ -17,18 +17,11 @@ use Doctrine\Common\Collections\Criteria;
  */
 class ActivityRepository extends EntityRepository
 {
-
-    public function getActivityHomepageCollection()
-    {
-
-    }
-
     /**
      * @param Customer $customer
-     * @param null $limit
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getActivityCustomerCollection(Customer $customer, $limit = null)
+    public function getActivityCustomerCollection(Customer $customer)
     {
         $activityQb = $this->createQueryBuilder('activity');
         $activityQb->where('activity.customer = :customer');
@@ -40,10 +33,9 @@ class ActivityRepository extends EntityRepository
 
     /**
      * @param Project $project
-     * @param null $limit
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getActivityProjectCollection(Project $project, $limit = null)
+    public function getActivityProjectCollection(Project $project)
     {
         $activityQb = $this->createQueryBuilder('activity');
         $activityQb->where('activity.project = :project');
@@ -55,10 +47,9 @@ class ActivityRepository extends EntityRepository
 
     /**
      * @param Issue $issue
-     * @param null $limit
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getActivityIssueCollection(Issue $issue, $limit = null)
+    public function getActivityIssueCollection(Issue $issue)
     {
         $activityQb = $this->createQueryBuilder('activity');
         $activityQb->where('activity.issue = :issue');
