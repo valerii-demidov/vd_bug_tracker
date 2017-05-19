@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\BugTrackerBundle\Entity\Comment;
 use Oro\BugTrackerBundle\Form\Handler\activityHandler;
 use Oro\BugTrackerBundle\Entity\Activity;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
 class CommentHandler
 {
@@ -19,6 +20,9 @@ class CommentHandler
     /** @var activityHandler */
     protected $activityHandler;
 
+    /** @var TokenStorage */
+    protected $securityToken;
+
     /**
      * CommentHandler constructor.
      * @param RequestStack $request
@@ -28,11 +32,13 @@ class CommentHandler
     public function __construct(
         RequestStack $request,
         EntityManagerInterface $manager,
-        activityHandler $activityHandler
+        activityHandler $activityHandler,
+        TokenStorage $securityToken
     ) {
         $this->request = $request;
         $this->manager = $manager;
         $this->activityHandler = $activityHandler;
+        $this->securityToken = $securityToken;
     }
 
     /**
@@ -46,9 +52,14 @@ class CommentHandler
         $form->handleRequest($request);
 
         $comment = $form->getData();
+        $issue = $comment->getIssue();
         if ($form->isValid()) {
-            $this->manager->merge($comment);
             $entityAfter = $comment->__toArray();
+            $сurrentUser = $this->securityToken->getToken()->getUser();
+            $issue->addCollaboration($сurrentUser);
+
+            $this->manager->persist($issue);
+            $this->manager->merge($comment);
             $this->manager->flush();
 
             $diffData = array_diff_assoc($entityPreview, $entityAfter);
@@ -73,12 +84,17 @@ class CommentHandler
         $form->handleRequest($request);
 
         $comment = $form->getData();
+        $issue = $comment->getIssue();
         if ($form->isValid()) {
             $this->activityHandler->handleCommentActivity(
                 $comment,
                 Activity::TYPE_DELETED,
                 $comment->__toArray()
             );
+            $сurrentUser = $this->securityToken->getToken()->getUser();
+            $issue->addCollaboration($сurrentUser);
+
+            $this->manager->persist($issue);
             $this->manager->remove($comment);
             $this->manager->flush();
             $this->manager->clear();

@@ -41,7 +41,7 @@ services:
                 class: Oro\BugTrackerBundle\Form\Handler\CommentHandler
                 public: true
                 arguments:
-                    ["@request_stack","@doctrine.orm.entity_manager","@oro_bugtracker.handler.activity"]
+                    ["@request_stack","@doctrine.orm.entity_manager","@oro_bugtracker.handler.activity","@security.token_storage"]
 
     oro_bugtracker.handler.activity:
                     class: Oro\BugTrackerBundle\Form\Handler\ActivityHandler

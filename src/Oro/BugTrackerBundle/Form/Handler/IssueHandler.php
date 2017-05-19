@@ -56,10 +56,11 @@ class IssueHandler
         $issue = $form->getData();
         if ($issue instanceof Issue) {
             if ($form->isSubmitted() && $form->isValid()) {
-                $reporter = $this->securityToken->getToken()->getUser();
-                $issue->setReporter($reporter);
+                $сurrentUser = $this->securityToken->getToken()->getUser();
+                $issue->setReporter($сurrentUser);
                 $issue->addCollaboration($issue->getAssignee());
                 $issue->addCollaboration($issue->getReporter());
+                $issue->addCollaboration($сurrentUser);
                 $this->manager->persist($issue);
                 $this->manager->flush();
 
@@ -84,6 +85,8 @@ class IssueHandler
         $issue = $form->getData();
         if ($form->isValid()) {
             $entityAfter = $issue->__toArray();
+            $currentUser = $this->securityToken->getToken()->getUser();
+            $issue->addCollaboration($currentUser);
             $issue->addCollaboration($issue->getAssignee());
             $issue->setUpdated(new \DateTime());
 
@@ -133,17 +136,17 @@ class IssueHandler
         $comment = $form->getData();
         if ($comment instanceof Comment) {
             if ($form->isSubmitted() && $form->isValid()) {
-                $customer = $this->securityToken->getToken()->getUser();
+                $currentUser = $this->securityToken->getToken()->getUser();
                 $comment->setIssue($issue);
 
                 $project = $issue->getProject();
                 $comment->setProject($project);
-                $comment->setCustomer($customer);
+                $comment->setCustomer($currentUser);
                 $comment->setCreated(new \DateTime());
 
                 $this->manager->persist($comment);
 
-                $issue->addCollaboration($customer);
+                $issue->addCollaboration($currentUser);
                 $this->manager->persist($issue);
                 $this->manager->flush();
 
