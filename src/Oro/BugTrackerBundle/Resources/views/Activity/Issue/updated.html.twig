@@ -8,8 +8,10 @@
     {{ 'Were changed' }} {{ activity.diffData.diff_fields|length }} {{ 'field(s) in exist issue' }}
     {% for updated_field_name in activity.diffData.diff_fields %}
         <div class="row">
-            <div class="col-1 font-weight-bold">{{ updated_field_name }}</div>
-            <div class="col-5">
+            <div class="col-xl-3 font-weight-bold">
+                {{ updated_field_name }}
+            </div>
+            <div class="col-xl-4">
                 <div class="text-decoration-underline">
                     {{ 'From:' }}
                 </div>
@@ -18,7 +20,7 @@
                 </div>
             </div>
             {% if activity.diffData.after_data[updated_field_name] is defined %}
-                <div class="col-5">
+                <div class="col-xl-4">
                     <div class="text-decoration-underline">
                         {{ 'To:' }}
                     </div>
