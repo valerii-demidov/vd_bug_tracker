@@ -7,10 +7,11 @@ use Oro\BugTrackerBundle\Entity\Comment;
 use Oro\BugTrackerBundle\Form\CommentType;
 use Oro\BugTrackerBundle\Form\IssueType;
 use Oro\BugTrackerBundle\Entity\Issue;
+use Oro\BugTrackerBundle\Security\IssueVoter;
+use Oro\BugTrackerBundle\Entity\Customer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
@@ -27,8 +28,13 @@ class IssueController extends Controller
      */
     public function listAction()
     {
+
         $em = $this->getDoctrine()->getManager();
         $entityRepository = $em->getRepository('BugTrackerBundle:Issue');
+        $user = $this->getUser();
+        $isManagerGranted = $this->isGranted(Customer::ROLE_MANAGER);
+        $issueCollection = $entityRepository->getGrantedIssues($user, $isManagerGranted);
+
         $pageTitle = 'Manage Issues';
 
         $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary'];
@@ -39,20 +45,22 @@ class IssueController extends Controller
                 ['collection_key' => 'id', 'router_key' => 'id'],
             ],
         ];
-        $actions[] = [
-            'label' => 'Edit',
-            'router' => 'oro_bugtracker_issue_edit',
-            'router_parameters' => [
-                ['collection_key' => 'id', 'router_key' => 'id'],
-            ],
-        ];
+        if ($isManagerGranted) {
+            $actions[] = [
+                'label' => 'Edit',
+                'router' => 'oro_bugtracker_issue_edit',
+                'router_parameters' => [
+                    ['collection_key' => 'id', 'router_key' => 'id'],
+                ],
+            ];
+        }
 
         return $this->render(
             'BugTrackerBundle:Issue:list.html.twig',
             [
                 'page_title' => $pageTitle,
                 'entity_create_router' => 'oro_bugtracker_issue_create',
-                'entity_repository' => $entityRepository,
+                'entity_collection' => $issueCollection,
                 'columns' => $columns,
                 'actions' => $actions,
                 'paginator_var' => 'issue_p'
@@ -105,6 +113,7 @@ class IssueController extends Controller
      */
     public function viewAction(Issue $issue, Request $request)
     {
+        $this->denyAccessUnlessGranted(IssueVoter::VIEW, $issue);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_issue_addcomment',
             array('id' => $issue->getId()),
@@ -135,11 +144,12 @@ class IssueController extends Controller
      *
      * @Route("issue/edit/{id}", name="oro_bugtracker_issue_edit", requirements={"id" = "\d+"})
      */
-    public function editAction(Issue $issueEntity, Request $request)
+    public function editAction(Issue $issue, Request $request)
     {
+        $this->denyAccessUnlessGranted(IssueVoter::EDIT, $issue);
         $form = $this->createForm(
             IssueType::class,
-            $issueEntity,
+            $issue,
             array(
                 'validation_groups' => array('edit'),
             )
@@ -148,16 +158,14 @@ class IssueController extends Controller
         try {
             if ($request->getMethod() == 'POST') {
                 $formHandler = $this->getIssueHandler();
-                if ($request->getMethod() == 'POST') {
-                    if ($formHandler->handleEditForm($form)) {
-                        $request->getSession()
-                            ->getFlashBag()
-                            ->add('success', 'Issue has been updated successfully!');
-                    } else {
-                        $request->getSession()
-                            ->getFlashBag()
-                            ->add('error', "Issue wasn't updated successfully!");
-                    }
+                if ($formHandler->handleEditForm($form)) {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('success', 'Issue has been updated successfully!');
+                } else {
+                    $request->getSession()
+                        ->getFlashBag()
+                        ->add('error', "Issue wasn't updated successfully!");
                 }
             }
         } catch (\Exception $exception) {
@@ -169,9 +177,9 @@ class IssueController extends Controller
         return $this->render(
             'BugTrackerBundle:Issue:edit.html.twig',
             array(
-                'entity' => $issueEntity,
+                'entity' => $issue,
                 'form' => $form->createView(),
-                'page_title' => sprintf("Edit Issue '%s'", $issueEntity->getCode()),
+                'page_title' => sprintf("Edit Issue '%s'", $issue->getCode()),
             )
         );
     }
@@ -180,22 +188,23 @@ class IssueController extends Controller
      * Issue delete action
      * @Route("issue/delete/{id}",requirements={"id" = "\d+"}, name="oro_bugtracker_issue_delete")
      */
-    public function deleteAction(Issue $issueEntity, Request $request)
+    public function deleteAction(Issue $issue, Request $request)
     {
+        $this->denyAccessUnlessGranted(IssueVoter::DELETE, $issue);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_issue_delete',
-            array('id' => $issueEntity->getId()),
+            array('id' => $issue->getId()),
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $form = $this->createFormBuilder($issueEntity, array('validation_groups' => array('edit')))
+        $form = $this->createFormBuilder($issue, array('validation_groups' => array('edit')))
             ->setAction($actionUrl)
             ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
             ->getForm();
 
         if ($request->getMethod() == 'POST') {
             if ($request->getMethod() == 'POST') {
-                $issueId = $issueEntity->getId();
+                $issueId = $issue->getId();
                 $formHandler = $this->getIssueHandler();
                 if ($formHandler->handleDeleteForm($form)) {
                     $request->getSession()
@@ -221,6 +230,7 @@ class IssueController extends Controller
      */
     public function addcommentAction(Issue $issue, Request $request)
     {
+        $this->denyAccessUnlessGranted(IssueVoter::VIEW, $issue);
         $comment = new Comment();
         $form = $this->createForm(CommentType::class, $comment);
         try {

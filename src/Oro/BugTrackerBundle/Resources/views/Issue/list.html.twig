@@ -12,7 +12,7 @@
 
 {% block content %}
     <div id="issue-list">
-        {% set entity_paginator = paginator_object(entity_repository, paginator_var) %}
+        {% set entity_paginator = paginator_object_by_qb(entity_collection, paginator_var) %}
         {{ macros.renderGrid(entity_paginator.entity_collection, columns, actions) }}
         <div class="text-center">
             {{ macros.renderPaginator(app.request.attributes.get('_route'), entity_paginator.max_pages, paginator_var) }}
