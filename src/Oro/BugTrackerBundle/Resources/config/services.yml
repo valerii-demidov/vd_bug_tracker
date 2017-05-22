@@ -48,3 +48,20 @@ services:
                     public: true
                     arguments:
                         ["@request_stack","@doctrine.orm.entity_manager","@security.token_storage"]
+
+    oro_bugtracker.issue_voter:
+            class: Oro\BugTrackerBundle\Security\IssueVoter
+            arguments:
+                    ["@doctrine.orm.entity_manager", "@security.access.decision_manager"]
+            public: false
+            tags:
+                - { name: security.voter }
+
+    oro_bugtracker.comment_voter:
+                class: Oro\BugTrackerBundle\Security\CommentVoter
+                arguments:
+                        ["@doctrine.orm.entity_manager", "@security.access.decision_manager"]
+                public: false
+                tags:
+                    - { name: security.voter }
+

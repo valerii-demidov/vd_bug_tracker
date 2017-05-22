@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Oro\BugTrackerBundle\Security\CommentVoter;
 
 
 class CommentController extends Controller
@@ -19,6 +20,7 @@ class CommentController extends Controller
      */
     public function editAction(Comment $comment, Request $request)
     {
+        $this->denyAccessUnlessGranted(CommentVoter::EDIT, $comment);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_comment_edit',
             array('id' => $comment->getId()),
@@ -65,6 +67,7 @@ class CommentController extends Controller
      */
     public function deleteAction(Comment $comment, Request $request)
     {
+        $this->denyAccessUnlessGranted(CommentVoter::DELETE, $comment);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_comment_delete',
             array('id' => $comment->getId()),

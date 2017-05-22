@@ -3,6 +3,9 @@
 namespace Oro\BugTrackerBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Collections\Criteria;
+use Oro\BugTrackerBundle\Entity\Customer;
+use Oro\BugTrackerBundle\Entity\Issue;
 
 /**
  * IssueRepository
@@ -33,19 +36,39 @@ class IssueRepository extends EntityRepository
         $condInc = 0;
         foreach ($conditionCollection as $fieldName => $fieldConditions) {
             foreach ($fieldConditions as $conditionName => $conditionValue) {
-                    $parameterName = 'param'.$paramInc;
-                    if (is_array($conditionValue)) {
-                        $query = "entity.$fieldName $conditionName (:$parameterName)";
-                    } else {
-                        $query = "entity.$fieldName $conditionName :$parameterName";
-                    }
-                    (!$condInc) ? $customerQb->where($query) : $customerQb->andWhere($query);
-                    $customerQb->setParameter($parameterName, $conditionValue);
-                    $condInc++;
+                $parameterName = 'param'.$paramInc;
+                if (is_array($conditionValue)) {
+                    $query = "entity.$fieldName $conditionName (:$parameterName)";
+                } else {
+                    $query = "entity.$fieldName $conditionName :$parameterName";
+                }
+                (!$condInc) ? $customerQb->where($query) : $customerQb->andWhere($query);
+                $customerQb->setParameter($parameterName, $conditionValue);
+                $condInc++;
             }
             $paramInc++;
         }
 
         return $customerQb;
     }
+
+    /**
+     * @param Customer $customer
+     * @param $isGranted
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getGrantedIssues(Customer $customer, $isGranted)
+    {
+        $qbIssues = $this->createQueryBuilder('issue');
+        $qbIssues->where('issue.status IN (:statuses)');
+        $qbIssues->setParameter('statuses', [Issue::STATUS_IN_PROGRESS, Issue::STATUS_OPEN, Issue::STATUS_REOPEN]);
+        if (!$isGranted) {
+            $qbIssues->andWhere(':customer MEMBER OF issue.collaboration');
+            $qbIssues->setParameter('customer', $customer);
+        }
+        $qbIssues->orderBy('issue.id', Criteria::DESC);
+
+        return $qbIssues;
+    }
+
 }
