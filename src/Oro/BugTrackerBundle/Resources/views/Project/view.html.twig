@@ -59,19 +59,21 @@
     </div>
 
     <div class="row">
-        <div class="col-8">
+        <div class="col-xl-8">
             {{ include('BugTrackerBundle:Activity:paginator_list.html.twig',
             {collection: (activity_collection), paginator_var: (activity_paginator_var)} ) }}
         </div>
-        <div class="col-4">
-            <div class="panel panel-default mt-3 panel-bold">
-                <div class="panel-heading p-2">{{ 'Project members'|trans }}</div>
-                <!-- Table -->
-                <div id="members-grid">
-                    {{ members_grid_html|raw }}
+        {% if entity.customers is not empty %}
+            <div class="col-xl-4">
+                <div class="panel panel-default mt-3 panel-bold">
+                    <div class="panel-heading p-2">{{ 'Project members'|trans }}</div>
+                    <!-- Table -->
+                    <div id="members-grid">
+                        {{ members_grid_html|raw }}
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
     </div>
 {% endblock %}
 
