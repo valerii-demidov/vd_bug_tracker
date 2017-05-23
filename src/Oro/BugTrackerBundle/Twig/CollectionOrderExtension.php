@@ -9,9 +9,9 @@ class CollectionOrderExtension extends \Twig_Extension
 {
     public function getFunctions()
     {
-        return array(
+        return [
             new \Twig_SimpleFunction('collection_order', [$this, 'getOrderedCollection']),
-        );
+        ];
     }
 
     /**

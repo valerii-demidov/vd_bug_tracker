@@ -8,6 +8,7 @@ use Oro\BugTrackerBundle\Entity\Issue;
 use Oro\BugTrackerBundle\Entity\Project;
 use Oro\BugTrackerBundle\Entity\Customer;
 use Doctrine\Common\Collections\Criteria;
+use Oro\BugTrackerBundle\Repository\Paginator\QueryPageBuilder;
 
 /**
  * ActivityRepository
@@ -17,6 +18,8 @@ use Doctrine\Common\Collections\Criteria;
  */
 class ActivityRepository extends EntityRepository
 {
+    use QueryPageBuilder;
+
     /**
      * @param Customer $customer
      * @return \Doctrine\ORM\QueryBuilder

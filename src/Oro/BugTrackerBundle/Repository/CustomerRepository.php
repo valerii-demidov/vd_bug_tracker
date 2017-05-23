@@ -3,6 +3,7 @@
 namespace Oro\BugTrackerBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\BugTrackerBundle\Repository\Paginator\QueryPageBuilder;
 
 /**
  * ProjectRepository
@@ -12,12 +13,13 @@ use Doctrine\ORM\EntityRepository;
  */
 class CustomerRepository extends EntityRepository
 {
+    use QueryPageBuilder;
+
     /**
      * Example for $conditionCollection = ['username' => ['like' => 'adm']]
      *
      * @param array $conditionCollection
-     * @param bool $isSingleResult
-     * @return array|mixed
+     * @return array
      */
     public function findByCondition(array $conditionCollection)
     {

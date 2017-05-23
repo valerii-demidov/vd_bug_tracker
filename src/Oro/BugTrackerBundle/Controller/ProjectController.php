@@ -23,8 +23,6 @@ class ProjectController extends Controller
      */
     public function listAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $entityRepository = $em->getRepository('BugTrackerBundle:Project');
 
         $pageTitle = 'Manage projects';
         $columns = ['id' => 'Id', 'label' => 'Label', 'summary' => 'Summary', 'code' => 'Code'];
@@ -48,7 +46,7 @@ class ProjectController extends Controller
             [
                 'page_title' => $pageTitle,
                 'entity_create_router' => 'oro_bugtracker_project_create',
-                'entity_repository' => $entityRepository,
+                'entity_class' => Project::class,
                 'columns' => $columns,
                 'actions' => $actions,
                 'paginator_var' => 'project_p'

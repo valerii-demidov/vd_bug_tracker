@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Common\Collections\Criteria;
 use Oro\BugTrackerBundle\Entity\Customer;
 use Oro\BugTrackerBundle\Entity\Issue;
+use Oro\BugTrackerBundle\Repository\Paginator\QueryPageBuilder;
 
 /**
  * IssueRepository
@@ -15,6 +16,8 @@ use Oro\BugTrackerBundle\Entity\Issue;
  */
 class IssueRepository extends EntityRepository
 {
+    use QueryPageBuilder;
+
     /**
      *
      *

@@ -9,9 +9,9 @@ class ActivityExtension extends \Twig_Extension
 {
     public function getFunctions()
     {
-        return array(
+        return [
             new \Twig_SimpleFunction('activity_template_detect', [$this, 'getActivityTemplate']),
-        );
+        ];
     }
 
     /**

@@ -1,6 +1,6 @@
 {# src/Oro/BugTrackerBundle/Resources/views/customer/issues.html.twig #}
 {% import 'BugTrackerBundle::macros.html.twig' as macros %}
-{% set entity_paginator = paginator_object_by_qb(entity_query_builder, paginator_var) %}
+{% set entity_paginator = paginator_object_by_qb(entity_class, entity_query_builder, paginator_var) %}
 {#{{ dump(entity_paginator) }}#}
 {{ macros.renderGrid(entity_paginator.entity_collection, columns, actions) }}
 <div class="text-center">

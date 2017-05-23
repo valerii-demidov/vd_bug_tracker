@@ -49,6 +49,7 @@ class DefaultController extends Controller
         $membersHtml = $this->render(
             'BugTrackerBundle:Customer:issue.html.twig',
             [
+                'entity_class' => Issue::class,
                 'entity_query_builder' => $entityQueryBuilder,
                 'columns' => $columns,
                 'actions' => $actions,
@@ -67,6 +68,7 @@ class DefaultController extends Controller
         $activityHtml = $this->render(
             'BugTrackerBundle:Activity:paginator_list.html.twig',
             [
+                'entity_class' => Activity::class,
                 'collection' => $activityCollection,
                 'paginator_var' => 'activity_p'
             ]
