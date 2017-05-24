@@ -2,15 +2,14 @@
 
 namespace Oro\BugTrackerBundle\Tests\Unit\Twig;
 
-
 use PHPUnit\Framework\TestCase;
 use Oro\BugTrackerBundle\Twig\PaginatorExtension;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Oro\BugTrackerBundle\Entity\Customer;
 use Oro\BugTrackerBundle\Repository\CustomerRepository;
+
 
 class PaginatorExtensionTest extends TestCase
 {
@@ -40,11 +39,7 @@ class PaginatorExtensionTest extends TestCase
             ->willReturn($customerRepository);
 
         $this->paginatorExtension = new PaginatorExtension($requestStack, $manager);
-    }
 
-    public function testGetPaginatorObject()
-    {
-        return true;
     }
 
     public function testGetPaginatorObjectByEntityClass()
@@ -79,5 +74,22 @@ class PaginatorExtensionTest extends TestCase
         $expectedResultArrayKeys = ['max_pages', 'entity_collection', 'entities_count'];
 
         $this->assertEquals($actualResultArrayKeys, $expectedResultArrayKeys);
+    }
+
+    public function testGetFunctions()
+    {
+        $this->assertEquals(
+            [
+                new \Twig_SimpleFunction(
+                    'paginator_object_by_qb',
+                    [$this->paginatorExtension, 'getPaginatorObjectByQb']
+                ),
+                new \Twig_SimpleFunction(
+                    'paginator_object_by_entity_class',
+                    [$this->paginatorExtension, 'getPaginatorObjectByEntityClass']
+                ),
+            ],
+            $this->paginatorExtension->getFunctions()
+        );
     }
 }

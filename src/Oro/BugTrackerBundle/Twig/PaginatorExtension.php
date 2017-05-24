@@ -33,23 +33,9 @@ class PaginatorExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('paginator_object', [$this, 'getPaginatorObject']),
             new \Twig_SimpleFunction('paginator_object_by_qb', [$this, 'getPaginatorObjectByQb']),
             new \Twig_SimpleFunction('paginator_object_by_entity_class', [$this, 'getPaginatorObjectByEntityClass']),
         ];
-    }
-
-    /**
-     * @param EntityRepository $entityRepository
-     * @param $paginatorVar
-     * @return mixed
-     */
-    public function getPaginatorObject(EntityRepository $entityRepository, $paginatorVar)
-    {
-        $queryBuilder = $entityRepository->createQueryBuilder('entity');
-        $result = $this->getPaginatorObjectByQb($queryBuilder, $paginatorVar);
-
-        return $result;
     }
 
     /**
