@@ -20,6 +20,8 @@ class ActivityExtension extends \Twig_Extension
      */
     public function getActivityTemplate(Activity $activity)
     {
+        // перенести в макрос
+
         $entity = $activity->getEntity();
         $type = $activity->getType();
         $templatePath = "BugTrackerBundle:Activity/$entity:$type.html.twig";

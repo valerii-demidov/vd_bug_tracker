@@ -3,7 +3,7 @@
 namespace Oro\BugTrackerBundle\Twig;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\Collection;
 
 class CollectionOrderExtension extends \Twig_Extension
 {
@@ -15,12 +15,12 @@ class CollectionOrderExtension extends \Twig_Extension
     }
 
     /**
-     * @param PersistentCollection $collection
-     * @param string $fieldName
+     * @param Collection $collection
+     * @param $fieldName
      * @param string $orderType
-     * @return \Doctrine\Common\Collections\Collection
+     * @return mixed
      */
-    public function getOrderedCollection(PersistentCollection $collection, $fieldName, $orderType = Criteria::DESC)
+    public function getOrderedCollection(Collection $collection, $fieldName, $orderType = Criteria::DESC)
     {
         $criteria = new Criteria();
         $criteria->orderBy([$fieldName => $orderType]);

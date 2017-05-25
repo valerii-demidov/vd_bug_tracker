@@ -47,7 +47,7 @@ class PaginatorExtension extends \Twig_Extension
      */
     public function getPaginatorObjectByQb(
         $entityClass,
-        QueryBuilder $queryBuilder,
+        QueryBuilder $queryBuilder, //, сделать опцианальный атрибут для метода репозитория
         $paginatorVar,
         $pageSize = self::DEFAULT_PAGE_SIZE
     )
@@ -57,19 +57,18 @@ class PaginatorExtension extends \Twig_Extension
         $result['entity_collection'] =  [];
         $result['entities_count'] = 0;
 
-        if ($currentRequest && is_object($currentRequest)) {
-            $currentPage = (int)$currentRequest->get($paginatorVar);
-            $currentPage = ($currentPage) ?: 1;
+        if ($currentRequest) {
+            $currentPage = (int)$currentRequest->get($paginatorVar, 1);
 
             $entityRepository = $this->manager->getRepository($entityClass);
-            if ($entityRepository) {
-                if ($queryBuilder) {
-                    if (method_exists($entityRepository, 'buildCurrentPageQb')) {
-                        $buildResult = $entityRepository->buildCurrentPageQb($queryBuilder, $currentPage, $pageSize);
-                        $result = array_merge($result, $buildResult);
-                    }
+            if ($queryBuilder) {
+                // вместо method -  instace off
+                if (method_exists($entityRepository, 'buildCurrentPageQb')) {
+                    $buildResult = $entityRepository->buildCurrentPageQb($queryBuilder, $currentPage, $pageSize);
+                    $result = array_merge($result, $buildResult);
                 }
             }
+
         }
 
         return $result;
