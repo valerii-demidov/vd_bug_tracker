@@ -13,12 +13,6 @@ services:
             tags:
                 - { name: twig.extension }
 
-    oro_bugtracker.twig_extension.activity:
-            class: Oro\BugTrackerBundle\Twig\ActivityExtension
-            public: false
-            tags:
-                - { name: twig.extension }
-
     oro_bugtracker.twig_extension.class:
                 class: Oro\BugTrackerBundle\Twig\ClassExtension
                 public: false
@@ -53,7 +47,7 @@ services:
                     class: Oro\BugTrackerBundle\Form\Handler\ActivityHandler
                     public: true
                     arguments:
-                        ["@request_stack","@doctrine.orm.entity_manager","@security.token_storage"]
+                        ["@doctrine.orm.entity_manager","@security.token_storage"]
 
     oro_bugtracker.issue_voter:
             class: Oro\BugTrackerBundle\Security\IssueVoter
