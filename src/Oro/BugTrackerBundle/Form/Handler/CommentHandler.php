@@ -5,9 +5,11 @@ namespace Oro\BugTrackerBundle\Form\Handler;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\BugTrackerBundle\Entity\Comment;
-use Oro\BugTrackerBundle\Form\Handler\activityHandler;
 use Oro\BugTrackerBundle\Entity\Activity;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Oro\BugTrackerBundle\Event\CommentBeforeUpdateEvent;
+use Oro\BugTrackerBundle\Event\CommentBeforeDeleteEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CommentHandler
 {
@@ -17,28 +19,29 @@ class CommentHandler
     /** @var EntityManagerInterface */
     protected $manager;
 
-    /** @var activityHandler */
-    protected $activityHandler;
-
     /** @var TokenStorage */
     protected $securityToken;
+
+    /** @var EventDispatcherInterface  */
+    protected $dispatcher;
 
     /**
      * CommentHandler constructor.
      * @param RequestStack $request
      * @param EntityManagerInterface $manager
-     * @param \Oro\BugTrackerBundle\Form\Handler\activityHandler $activityHandler
+     * @param TokenStorage $securityToken
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         RequestStack $request,
         EntityManagerInterface $manager,
-        activityHandler $activityHandler,
-        TokenStorage $securityToken
+        TokenStorage $securityToken,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->request = $request;
         $this->manager = $manager;
-        $this->activityHandler = $activityHandler;
         $this->securityToken = $securityToken;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -48,25 +51,18 @@ class CommentHandler
     public function handleEditForm($form)
     {
         $request = $this->request->getCurrentRequest();
-        $entityPreview = $form->getData()->__toArray();
         $form->handleRequest($request);
 
         $comment = $form->getData();
         $issue = $comment->getIssue();
         if ($form->isValid()) {
-            $entityAfter = $comment->__toArray();
+
             $сurrentUser = $this->securityToken->getToken()->getUser();
             $issue->addCollaboration($сurrentUser);
+            $this->dispatcher->dispatch(CommentBeforeUpdateEvent::EVENT_NAME, new CommentBeforeUpdateEvent($comment));
 
             $this->manager->persist($issue);
-            $this->manager->merge($comment);
             $this->manager->flush();
-
-            $diffData = array_diff_assoc($entityPreview, $entityAfter);
-            $this->activityHandler->handleCommentActivity(
-                $comment,
-                Activity::TYPE_UPDATED,
-                $diffData);
         } else {
             return false;
         }
@@ -86,16 +82,13 @@ class CommentHandler
         $comment = $form->getData();
         $issue = $comment->getIssue();
         if ($form->isValid()) {
-            $this->activityHandler->handleCommentActivity(
-                $comment,
-                Activity::TYPE_DELETED,
-                $comment->__toArray()
-            );
             $сurrentUser = $this->securityToken->getToken()->getUser();
             $issue->addCollaboration($сurrentUser);
 
             $this->manager->persist($issue);
             $this->manager->remove($comment);
+
+            $this->dispatcher->dispatch(CommentBeforeDeleteEvent::EVENT_NAME, new CommentBeforeDeleteEvent($comment));
             $this->manager->flush();
             $this->manager->clear();
         } else {

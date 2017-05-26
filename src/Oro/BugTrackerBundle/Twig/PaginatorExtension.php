@@ -59,7 +59,6 @@ class PaginatorExtension extends \Twig_Extension
 
         if ($currentRequest) {
             $currentPage = (int)$currentRequest->get($paginatorVar, 1);
-
             $entityRepository = $this->manager->getRepository($entityClass);
             if ($queryBuilder) {
                 // вместо method -  instace off

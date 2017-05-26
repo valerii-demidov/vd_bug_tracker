@@ -99,6 +99,7 @@ class CustomerController extends Controller
     public function viewAction(Customer $customer, Request $request)
     {
         $issueGridActions = $this->getIssueGridAction();
+        //todo  вызов медода без аргументов
         $issuesQb = $this->getDoctrine()->getRepository(Issue::class)->findByCondition(
             [
                 'assignee' => ['=' => $customer->getId()],

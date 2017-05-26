@@ -16,16 +16,16 @@
                     {{ 'From:' }}
                 </div>
                 <div class="updated-field-value">
-                    {{ activity.diffData.before_data[updated_field_name] }}
+                    {{ activity.diffData.changes[updated_field_name][0] }}
                 </div>
             </div>
-            {% if activity.diffData.after_data[updated_field_name] is defined %}
+            {% if activity.diffData.changes[updated_field_name][1] is defined %}
                 <div class="col-xl-4">
                     <div class="text-decoration-underline">
                         {{ 'To:' }}
                     </div>
                     <div class="updated-field-value">
-                        {{ activity.diffData.after_data[updated_field_name] }}
+                        {{ activity.diffData.changes[updated_field_name][1] }}
                     </div>
                 </div>
             {% endif %}
