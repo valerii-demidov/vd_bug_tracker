@@ -60,6 +60,7 @@ class IssueController extends Controller
             [
                 'page_title' => $pageTitle,
                 'entity_create_router' => 'oro_bugtracker_issue_create',
+                'entity_class' => Issue::class,
                 'entity_collection' => $issueCollection,
                 'columns' => $columns,
                 'actions' => $actions,

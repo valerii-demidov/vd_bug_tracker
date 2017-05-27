@@ -4,6 +4,7 @@ namespace Oro\BugTrackerBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\BugTrackerBundle\Entity\Customer;
+use Oro\BugTrackerBundle\Repository\Paginator\QueryPageBuilder;
 
 /**
  * ProjectRepository
@@ -13,6 +14,7 @@ use Oro\BugTrackerBundle\Entity\Customer;
  */
 class ProjectRepository extends EntityRepository
 {
+    use QueryPageBuilder;
     /**
      * @param array $objectCollection
      * @param array $fields

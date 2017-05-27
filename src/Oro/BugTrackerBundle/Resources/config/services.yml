@@ -1,11 +1,12 @@
 services:
+    #twig extensions
     oro_bugtracker.twig_extension.paginator:
-        class: Oro\BugTrackerBundle\Twig\PaginatorExtension
-        arguments:
-            - @request_stack
-        public: false
-        tags:
-            - { name: twig.extension }
+            class: Oro\BugTrackerBundle\Twig\PaginatorExtension
+            arguments:
+                 ["@request_stack","@doctrine.orm.entity_manager"]
+            public: false
+            tags:
+                - { name: twig.extension }
 
     oro_bugtracker.twig_extension.order:
             class: Oro\BugTrackerBundle\Twig\CollectionOrderExtension
@@ -13,23 +14,27 @@ services:
             tags:
                 - { name: twig.extension }
 
-    oro_bugtracker.twig_extension.activity:
-            class: Oro\BugTrackerBundle\Twig\ActivityExtension
+    oro_bugtracker.twig_extension.class:
+            class: Oro\BugTrackerBundle\Twig\ClassExtension
             public: false
             tags:
                 - { name: twig.extension }
 
+    # form handlers
     oro_bugtracker.handler.project:
-        class: Oro\BugTrackerBundle\Form\Handler\ProjectHandler
-        public: true
-        arguments:
-            ["@request_stack","@doctrine.orm.entity_manager"]
+            class: Oro\BugTrackerBundle\Form\Handler\ProjectHandler
+            public: true
+            arguments:
+                ["@request_stack","@doctrine.orm.entity_manager"]
 
     oro_bugtracker.handler.issue:
             class: Oro\BugTrackerBundle\Form\Handler\IssueHandler
             public: true
             arguments:
-                ["@request_stack","@doctrine.orm.entity_manager","@security.token_storage","@oro_bugtracker.handler.activity"]
+                - "@request_stack"
+                - "@doctrine.orm.entity_manager"
+                - "@security.token_storage"
+                - "@event_dispatcher"
 
     oro_bugtracker.handler.customer:
             class: Oro\BugTrackerBundle\Form\Handler\CustomerHandler
@@ -38,17 +43,15 @@ services:
                 ["@request_stack","@doctrine.orm.entity_manager","@security.password_encoder"]
 
     oro_bugtracker.handler.comment:
-                class: Oro\BugTrackerBundle\Form\Handler\CommentHandler
-                public: true
-                arguments:
-                    ["@request_stack","@doctrine.orm.entity_manager","@oro_bugtracker.handler.activity","@security.token_storage"]
+            class: Oro\BugTrackerBundle\Form\Handler\CommentHandler
+            public: true
+            arguments:
+                - "@request_stack"
+                - "@doctrine.orm.entity_manager"
+                - "@security.token_storage"
+                - "@event_dispatcher"
 
-    oro_bugtracker.handler.activity:
-                    class: Oro\BugTrackerBundle\Form\Handler\ActivityHandler
-                    public: true
-                    arguments:
-                        ["@request_stack","@doctrine.orm.entity_manager","@security.token_storage"]
-
+    #security
     oro_bugtracker.issue_voter:
             class: Oro\BugTrackerBundle\Security\IssueVoter
             arguments:
@@ -58,10 +61,24 @@ services:
                 - { name: security.voter }
 
     oro_bugtracker.comment_voter:
-                class: Oro\BugTrackerBundle\Security\CommentVoter
-                arguments:
-                        ["@doctrine.orm.entity_manager", "@security.access.decision_manager"]
-                public: false
-                tags:
-                    - { name: security.voter }
+            class: Oro\BugTrackerBundle\Security\CommentVoter
+            arguments:
+                    ["@doctrine.orm.entity_manager", "@security.access.decision_manager"]
+            public: false
+            tags:
+                - { name: security.voter }
+
+    # event listeners
+    oro_bugtracker.event_listener.handle_activity:
+            class: Oro\BugTrackerBundle\EventListener\ActivityListener
+            arguments:
+                - "@doctrine.orm.entity_manager"
+                - "@security.token_storage"
+            tags:
+                - { name: kernel.event_listener, event: oro_bugtracker.comment.before_create, method: addCommentCreateActivity }
+                - { name: kernel.event_listener, event: oro_bugtracker.comment.before_update, method: addCommentUpdateActivity }
+                - { name: kernel.event_listener, event: oro_bugtracker.comment.before_delete, method: addCommentDeleteActivity }
+                - { name: kernel.event_listener, event: oro_bugtracker.issue.before_create,   method: addIssueCreateActivity }
+                - { name: kernel.event_listener, event: oro_bugtracker.issue.before_update,   method: addIssueUpdateActivity }
+
 

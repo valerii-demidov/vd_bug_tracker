@@ -22,8 +22,6 @@ class CustomerController extends Controller
      */
     public function listAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $entityRepository = $em->getRepository('BugTrackerBundle:Customer');
         $pageTitle = 'Manage customers';
         $columns = ['id' => 'Id', 'username' => 'User Name', 'email' => 'Email', 'fullName' => 'Full Name'];
         $actions[] = [
@@ -46,7 +44,7 @@ class CustomerController extends Controller
             [
                 'page_title' => $pageTitle,
                 'entity_create_router' => 'oro_bugtracker_customer_create',
-                'entity_repository' => $entityRepository,
+                'entity_class' => Customer::class,
                 'columns' => $columns,
                 'actions' => $actions,
                 'paginator_var' => 'customer_p',
@@ -101,6 +99,7 @@ class CustomerController extends Controller
     public function viewAction(Customer $customer, Request $request)
     {
         $issueGridActions = $this->getIssueGridAction();
+        //todo  вызов медода без аргументов
         $issuesQb = $this->getDoctrine()->getRepository(Issue::class)->findByCondition(
             [
                 'assignee' => ['=' => $customer->getId()],
@@ -234,6 +233,7 @@ class CustomerController extends Controller
         $membersHtml = $this->render(
             'BugTrackerBundle:Customer:issue.html.twig',
             [
+                'entity_class' => Issue::class,
                 'entity_query_builder' => $entityQueryBuilder,
                 'columns' => $columns,
                 'actions' => $actions,
@@ -255,6 +255,7 @@ class CustomerController extends Controller
         $activityHtml = $this->render(
             'BugTrackerBundle:Activity:paginator_list.html.twig',
             [
+                'entity_class' => Customer::class,
                 'limit' => self::ACTIVITY_CUSTOMER_PAGE_LIMIT,
                 'collection' => $activityCollection,
                 'paginator_var' => 'activity_p'

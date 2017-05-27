@@ -7,8 +7,11 @@ use Oro\BugTrackerBundle\Entity\Issue;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Oro\BugTrackerBundle\Form\Handler\activityHandler;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\BugTrackerBundle\Entity\Activity;
+use Oro\BugTrackerBundle\Event\CommentBeforeCreateEvent;
+use Oro\BugTrackerBundle\Event\IssueBeforeCreateEvent;
+use Oro\BugTrackerBundle\Event\IssueBeforeUpdateEvent;
 
 class IssueHandler
 {
@@ -21,8 +24,8 @@ class IssueHandler
     /** @var TokenStorage */
     protected $securityToken;
 
-    /** @var activityHandler */
-    protected $activityHandler;
+    /** @var EventDispatcherInterface  */
+    protected $dispatcher;
 
     /**
      * IssueHandler constructor.
@@ -34,13 +37,13 @@ class IssueHandler
         RequestStack $request,
         EntityManagerInterface $manager,
         TokenStorage $securityToken,
-        activityHandler $activityHandler
+        EventDispatcherInterface $dispatcher
 
     ) {
         $this->request = $request;
         $this->manager = $manager;
         $this->securityToken = $securityToken;
-        $this->activityHandler = $activityHandler;
+        $this->dispatcher = $dispatcher;
     }
 
 
@@ -62,9 +65,9 @@ class IssueHandler
                 $issue->addCollaboration($issue->getReporter());
                 $issue->addCollaboration($сurrentUser);
                 $this->manager->persist($issue);
-                $this->manager->flush();
+                $this->dispatcher->dispatch(IssueBeforeCreateEvent::EVENT_NAME, new IssueBeforeCreateEvent($issue));
 
-                $this->activityHandler->handleIssueActivity($issue, Activity::TYPE_CREATED, $issue->__toArray());
+                $this->manager->flush();
                 return true;
             }
         }
@@ -79,22 +82,19 @@ class IssueHandler
     public function handleEditForm($form)
     {
         $request = $this->request->getCurrentRequest();
-        $entityPreview = $form->getData()->__toArray();
         $form->handleRequest($request);
 
         $issue = $form->getData();
         if ($form->isValid()) {
-            $entityAfter = $issue->__toArray();
             $currentUser = $this->securityToken->getToken()->getUser();
             $issue->addCollaboration($currentUser);
             $issue->addCollaboration($issue->getAssignee());
             $issue->setUpdated(new \DateTime());
 
-            $this->manager->merge($issue);
-            $this->manager->flush();
+            $this->manager->persist($issue);
+            $this->dispatcher->dispatch(IssueBeforeUpdateEvent::EVENT_NAME, new IssueBeforeUpdateEvent($issue));
 
-            $diffData = array_diff_assoc($entityPreview, $entityAfter);
-            $this->activityHandler->handleIssueActivity($issue, Activity::TYPE_UPDATED, $diffData);
+            $this->manager->flush();
         } else {
             return false;
         }
@@ -148,9 +148,10 @@ class IssueHandler
 
                 $issue->addCollaboration($currentUser);
                 $this->manager->persist($issue);
+
+                $this->dispatcher->dispatch(CommentBeforeCreateEvent::EVENT_NAME, new CommentBeforeCreateEvent($comment));
                 $this->manager->flush();
 
-                $this->activityHandler->handleCommentActivity($comment, Activity::TYPE_CREATED, $comment->__toArray());
                 return true;
             }
         }

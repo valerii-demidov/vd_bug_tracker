@@ -11,7 +11,7 @@
 
 {% block content %}
     <div id="customer-list">
-        {% set entity_paginator = paginator_object(entity_repository, paginator_var) %}
+        {% set entity_paginator = paginator_object_by_entity_class(entity_class, paginator_var) %}
         {{ macros.renderGrid(entity_paginator.entity_collection, columns, actions) }}
         <div class="text-center">
             {{ macros.renderPaginator(app.request.attributes.get('_route'), entity_paginator.max_pages, paginator_var) }}

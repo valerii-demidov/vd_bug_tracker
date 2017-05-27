@@ -3,62 +3,92 @@
 namespace Oro\BugTrackerBundle\Twig;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 
 class PaginatorExtension extends \Twig_Extension
 {
     const DEFAULT_PAGE_SIZE = 3;
 
-    /**
-     * @var Request
-     */
+    /** @var RequestStack */
     protected $request;
+
+    /** @var EntityManagerInterface */
+    protected $manager;
 
     /**
      * PaginatorExtension constructor.
      * @param RequestStack $request
      */
-    public function __construct(RequestStack $request)
+    public function __construct(
+        RequestStack $request,
+        EntityManagerInterface $manager
+    )
     {
         $this->request = $request;
+        $this->manager = $manager;
     }
 
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('paginator_object', [$this, 'getPaginatorObject']),
+        return [
             new \Twig_SimpleFunction('paginator_object_by_qb', [$this, 'getPaginatorObjectByQb']),
-        );
+            new \Twig_SimpleFunction('paginator_object_by_entity_class', [$this, 'getPaginatorObjectByEntityClass']),
+        ];
     }
 
-    public function getPaginatorObject($entityRepository, $paginatorVar)
+    /**
+     * @param $entityClass
+     * @param QueryBuilder $queryBuilder
+     * @param $paginatorVar
+     * @param int $pageSize
+     * @return mixed
+     */
+    public function getPaginatorObjectByQb(
+        $entityClass,
+        QueryBuilder $queryBuilder, //, сделать опцианальный атрибут для метода репозитория
+        $paginatorVar,
+        $pageSize = self::DEFAULT_PAGE_SIZE
+    )
     {
-        $queryBuilder = $entityRepository->createQueryBuilder('entity');
-        $result = $this->getPaginatorObjectByQb($queryBuilder, $paginatorVar);
+        $currentRequest = $this->request->getCurrentRequest();
+        $result['max_pages'] = 0;
+        $result['entity_collection'] =  [];
+        $result['entities_count'] = 0;
+
+        if ($currentRequest) {
+            $currentPage = (int)$currentRequest->get($paginatorVar, 1);
+            $entityRepository = $this->manager->getRepository($entityClass);
+            if ($queryBuilder) {
+                // вместо method -  instace off
+                if (method_exists($entityRepository, 'buildCurrentPageQb')) {
+                    $buildResult = $entityRepository->buildCurrentPageQb($queryBuilder, $currentPage, $pageSize);
+                    $result = array_merge($result, $buildResult);
+                }
+            }
+
+        }
 
         return $result;
     }
 
-    public function getPaginatorObjectByQb($queryBuilder, $paginatorVar, $pageSize = self::DEFAULT_PAGE_SIZE)
+    public function getPaginatorObjectByEntityClass($entityClass, $paginatorVar, $pageSize = self::DEFAULT_PAGE_SIZE)
     {
-        $currentPage = (int)$this->request->getCurrentRequest()->get($paginatorVar);
-        $currentPage = ($currentPage) ?: 1;
-        $entityAlias = current($queryBuilder->getRootAliases());
-        $cloneQb = clone $queryBuilder;
+        $result['max_pages'] = 0;
+        $result['entity_collection'] =  [];
+        $result['entities_count'] = 0;
 
-        $entityCollection = $queryBuilder
-            ->getQuery()
-            ->setFirstResult($pageSize * ($currentPage - 1))// Offset
-            ->setMaxResults($pageSize)
-            ->getResult();
-
-        // get collection qty
-        $cloneQueryBuilder = $cloneQb;
-        $cloneQueryBuilder->select("count($entityAlias.id)");
-        $totalCount = $cloneQueryBuilder->getQuery()->getSingleScalarResult();
-
-        $result['max_pages'] = ceil($totalCount / $pageSize);
-        $result['entity_collection'] =  $entityCollection;
-        $result['count'] = $totalCount;
+        $entityRepository = $this->manager->getRepository($entityClass);
+        if ($entityRepository) {
+            $queryBuilder = $entityRepository->createQueryBuilder('entity');
+            $result = $this->getPaginatorObjectByQb(
+                $entityClass,
+                $queryBuilder,
+                $paginatorVar,
+                $pageSize = self::DEFAULT_PAGE_SIZE
+            );
+        }
 
         return $result;
     }

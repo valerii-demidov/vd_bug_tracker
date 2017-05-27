@@ -3,7 +3,11 @@
         {% for activity in collection %}
             <div class="col-12 pt-1 pb-2">
                 <div class="block activity-list-item">
-                    {% set activityTemplate = activity_template_detect(activity) %}
+                    {% set activityTemplate = "BugTrackerBundle:Activity/"
+                    ~ (activity.entity)
+                    ~ ":"
+                    ~ (activity.type)
+                    ~ ".html.twig" %}
                     {{ include(activityTemplate, {activity: activity}) }}
                 </div>
             </div>
