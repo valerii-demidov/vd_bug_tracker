@@ -2,6 +2,27 @@
 {% extends 'BugTrackerBundle::base.html.twig' %}
 {% import 'BugTrackerBundle::macros.html.twig' as macros %}
 
+{#initialization#}
+{% set page_title = 'Manage issues'|trans %}
+{% set columns = {'id': 'Id', 'code': 'Code', 'summary': 'Summary'} %}
+{% set actions = [{
+    'label':'View',
+    'router': 'oro_bugtracker_issue_view',
+    'router_parameters': [{'collection_key': 'id', 'router_key': 'id'}]
+}] %}
+{% if is_granted('ROLE_MANAGER') %}
+    {% set actions = actions|merge(
+        [{
+            'label':'Edit',
+            'router': 'oro_bugtracker_issue_edit',
+            'router_parameters':  [{'collection_key': 'id', 'router_key': 'id'}]
+        }]
+    ) %}
+{% endif %}
+
+{% set paginator_var = 'issue_p' %}
+{% set entity_create_router = 'oro_bugtracker_issue_create' %}
+
 {% block page_header_content %}
     {{ parent() }}
     <div class="p-2">

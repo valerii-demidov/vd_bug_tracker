@@ -23,33 +23,10 @@ class ProjectController extends Controller
      */
     public function listAction()
     {
-
-        $pageTitle = 'Manage projects';
-        $columns = ['id' => 'Id', 'label' => 'Label', 'summary' => 'Summary', 'code' => 'Code'];
-        $actions[] = [
-            'label' => 'View',
-            'router' => 'oro_bugtracker_project_view',
-            'router_parameters' => [
-                ['collection_key' => 'id', 'router_key' => 'id']
-            ],
-        ];
-        $actions[] = [
-            'label' => 'Edit',
-            'router' => 'oro_bugtracker_project_edit',
-            'router_parameters' => [
-                ['collection_key' => 'id', 'router_key' => 'id']
-            ],
-        ];
-
         return $this->render(
             'BugTrackerBundle:Project:list.html.twig',
             [
-                'page_title' => $pageTitle,
-                'entity_create_router' => 'oro_bugtracker_project_create',
                 'entity_class' => Project::class,
-                'columns' => $columns,
-                'actions' => $actions,
-                'paginator_var' => 'project_p'
             ]
         );
     }

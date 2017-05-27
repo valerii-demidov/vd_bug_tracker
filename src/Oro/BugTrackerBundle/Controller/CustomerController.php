@@ -22,32 +22,10 @@ class CustomerController extends Controller
      */
     public function listAction()
     {
-        $pageTitle = 'Manage customers';
-        $columns = ['id' => 'Id', 'username' => 'User Name', 'email' => 'Email', 'fullName' => 'Full Name'];
-        $actions[] = [
-            'label' => 'View',
-            'router' => 'oro_bugtracker_customer_view',
-            'router_parameters' => [
-                ['collection_key' => 'id', 'router_key' => 'id'],
-            ],
-        ];
-        $actions[] = [
-            'label' => 'Edit',
-            'router' => 'oro_bugtracker_customer_edit',
-            'router_parameters' => [
-                ['collection_key' => 'id', 'router_key' => 'id'],
-            ],
-        ];
-
         return $this->render(
             'BugTrackerBundle:Customer:list.html.twig',
             [
-                'page_title' => $pageTitle,
-                'entity_create_router' => 'oro_bugtracker_customer_create',
                 'entity_class' => Customer::class,
-                'columns' => $columns,
-                'actions' => $actions,
-                'paginator_var' => 'customer_p',
             ]
         );
     }
