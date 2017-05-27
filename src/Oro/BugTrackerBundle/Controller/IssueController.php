@@ -20,7 +20,6 @@ class IssueController extends Controller
 
     const ISSUE_LIST_PAGE_SIZE = 3;
 
-
     /**
      * Issue list action
      *
@@ -28,43 +27,17 @@ class IssueController extends Controller
      */
     public function listAction()
     {
-
         $em = $this->getDoctrine()->getManager();
         $entityRepository = $em->getRepository('BugTrackerBundle:Issue');
         $user = $this->getUser();
         $isManagerGranted = $this->isGranted(Customer::ROLE_MANAGER);
         $issueCollection = $entityRepository->getGrantedIssues($user, $isManagerGranted);
 
-        $pageTitle = 'Manage Issues';
-
-        $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary'];
-        $actions[] = [
-            'label' => 'View',
-            'router' => 'oro_bugtracker_issue_view',
-            'router_parameters' => [
-                ['collection_key' => 'id', 'router_key' => 'id'],
-            ],
-        ];
-        if ($isManagerGranted) {
-            $actions[] = [
-                'label' => 'Edit',
-                'router' => 'oro_bugtracker_issue_edit',
-                'router_parameters' => [
-                    ['collection_key' => 'id', 'router_key' => 'id'],
-                ],
-            ];
-        }
-
         return $this->render(
             'BugTrackerBundle:Issue:list.html.twig',
             [
-                'page_title' => $pageTitle,
-                'entity_create_router' => 'oro_bugtracker_issue_create',
                 'entity_class' => Issue::class,
                 'entity_collection' => $issueCollection,
-                'columns' => $columns,
-                'actions' => $actions,
-                'paginator_var' => 'issue_p'
             ]
         );
     }
