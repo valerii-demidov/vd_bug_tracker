@@ -1,5 +1,4 @@
 {% import 'BugTrackerBundle::macros.html.twig' as macros %}
-{% set entity_paginator = paginator_object_by_qb(entity_class, collection, paginator_var) %}
 {% if entity_paginator.entities_count > 0 %}
     <div class="panel panel-default mt-3 panel-bold">
         <!-- Default panel contents -->

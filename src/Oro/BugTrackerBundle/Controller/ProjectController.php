@@ -78,11 +78,6 @@ class ProjectController extends Controller
         $membersCollection = $project->getCustomers();
         $actions = $this->getMemberGridAction($project->getId(), true, false);
 
-        $activityRepository = $this->getDoctrine()->getRepository(Activity::class);
-        $activityCollection = $activityRepository->getActivityProjectCollection(
-            $project
-        );
-
         return $this->render(
             'BugTrackerBundle:Project:view.html.twig',
             array(
@@ -91,9 +86,8 @@ class ProjectController extends Controller
                     $project->getCode()
                 ),
                 'entity' => $project,
+                'activity_class'=> Activity::class,
                 'members_grid_html' => $this->getMembersGridHtml($membersCollection, $actions),
-                'activity_collection' => $activityCollection,
-                'activity_paginator_var' => 'activity_p'
             )
         );
     }

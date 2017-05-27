@@ -58,16 +58,25 @@
         </div>
     </div>
 
+    {#Initialize activity#}
+    {% set activity_paginator_var = 'activity_p' %}
+    {% set entity_class = class(entity) %}
+    {% set entity_paginator = paginator_object_by_custom_condition(
+            activity_class,
+            'project_activities',
+            activity_paginator_var,
+            [entity]
+    ) %}
+
     <div class="row">
         <div class="col-xl-8">
             {{ include('BugTrackerBundle:Activity:paginator_list.html.twig',
-            {entity_class: class(entity), collection: (activity_collection), paginator_var: (activity_paginator_var)} ) }}
+            {entity_paginator: entity_paginator, paginator_var: activity_paginator_var} ) }}
         </div>
         {% if entity.customers is not empty %}
             <div class="col-xl-4">
                 <div class="panel panel-default mt-3 panel-bold">
                     <div class="panel-heading p-2">{{ 'Project members'|trans }}</div>
-                    <!-- Table -->
                     <div id="members-grid">
                         {{ members_grid_html|raw }}
                     </div>

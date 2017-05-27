@@ -70,17 +70,44 @@
         </div>
     </div>
 
+    {#Initialize customer activity#}
+    {% set activity_paginator_var = 'activity_p' %}
+    {% set activity_paginator = paginator_object_by_custom_condition(
+    activity_class,
+    'customer_activities',
+    activity_paginator_var,
+    [entity]
+    ) %}
+
+    {#Initialize customer issue#}
+    {% set issue_paginator_var = 'issue_p' %}
+    {% set issue_columns = {'id': 'Id', 'code': 'Code', 'summary': 'Summary', 'status': 'Status'} %}
+    {% set issue_actions = [{
+        'label':'View',
+        'router': 'oro_bugtracker_issue_view',
+        'router_parameters': [{'collection_key': 'id', 'router_key': 'id'}]
+    }] %}
+    {% set issue_paginator = paginator_object_by_custom_condition(
+    issue_class,
+    'customer_issues',
+    issue_paginator_var,
+    [entity]
+    ) %}
+
+
     <div class="row">
         <div class="col-8">
             <div class="panel panel-default mt-3 panel-bold">
                 <div class="panel-heading p-2">{{ 'Assigned to Me'|trans }}</div>
                 <div class="panel-body p-2">
-                    {{ issue_grid_html|raw }}
+                    {{ include('BugTrackerBundle:Customer:issue.html.twig',
+                    {entity_paginator: issue_paginator, columns: issue_columns, paginator_var: issue_paginator_var, actions: issue_actions} ) }}
                 </div>
             </div>
         </div>
         <div class="col-4">
-            {{ activity_html|raw }}
+            {{ include('BugTrackerBundle:Activity:paginator_list.html.twig',
+            {entity_paginator: activity_paginator, paginator_var: activity_paginator_var} ) }}
         </div>
     </div>
 {% endblock %}

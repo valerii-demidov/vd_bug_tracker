@@ -27,17 +27,10 @@ class IssueController extends Controller
      */
     public function listAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $entityRepository = $em->getRepository('BugTrackerBundle:Issue');
-        $user = $this->getUser();
-        $isManagerGranted = $this->isGranted(Customer::ROLE_MANAGER);
-        $issueCollection = $entityRepository->getGrantedIssues($user, $isManagerGranted);
-
         return $this->render(
             'BugTrackerBundle:Issue:list.html.twig',
             [
                 'entity_class' => Issue::class,
-                'entity_collection' => $issueCollection,
             ]
         );
     }

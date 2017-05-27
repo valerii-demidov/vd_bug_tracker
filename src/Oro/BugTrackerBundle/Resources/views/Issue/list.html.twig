@@ -31,12 +31,19 @@
     </div>
 {% endblock %}
 
+{#Initialize paginator object#}
+    {% set issue_paginator = paginator_object_by_custom_condition(
+    entity_class,
+    'issue_list',
+    paginator_var,
+    [app.user, is_granted('ROLE_MANAGER')]
+    ) %}
+
 {% block content %}
     <div id="issue-list">
-        {% set entity_paginator = paginator_object_by_qb(entity_class, entity_collection, paginator_var) %}
-        {{ macros.renderGrid(entity_paginator.entity_collection, columns, actions) }}
+        {{ macros.renderGrid(issue_paginator.entity_collection, columns, actions) }}
         <div class="text-center">
-            {{ macros.renderPaginator(app.request.attributes.get('_route'), entity_paginator.max_pages, paginator_var) }}
+            {{ macros.renderPaginator(app.request.attributes.get('_route'), issue_paginator.max_pages, paginator_var) }}
         </div>
     </div>
 {% endblock %}

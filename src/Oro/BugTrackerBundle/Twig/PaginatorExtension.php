@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\BugTrackerBundle\Repository\Paginator\PaginatorInterface;
 
 class PaginatorExtension extends \Twig_Extension
 {
@@ -33,7 +34,7 @@ class PaginatorExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('paginator_object_by_qb', [$this, 'getPaginatorObjectByQb']),
+            new \Twig_SimpleFunction('paginator_object_by_custom_condition', [$this, 'getPaginatorCustomCondition']),
             new \Twig_SimpleFunction('paginator_object_by_entity_class', [$this, 'getPaginatorObjectByEntityClass']),
         ];
     }
@@ -61,13 +62,38 @@ class PaginatorExtension extends \Twig_Extension
             $currentPage = (int)$currentRequest->get($paginatorVar, 1);
             $entityRepository = $this->manager->getRepository($entityClass);
             if ($queryBuilder) {
-                // вместо method -  instace off
-                if (method_exists($entityRepository, 'buildCurrentPageQb')) {
-                    $buildResult = $entityRepository->buildCurrentPageQb($queryBuilder, $currentPage, $pageSize);
+                if ($entityRepository instanceof PaginatorInterface) {
+                    $buildResult = $entityRepository->getCurrentPageByQb($queryBuilder, $currentPage, $pageSize);
                     $result = array_merge($result, $buildResult);
                 }
             }
+        }
 
+        return $result;
+    }
+
+    public function getPaginatorCustomCondition(
+        $entityClass,
+        $methodName,
+        $paginatorVar,
+        $methodAttributes,
+        $pageSize = self::DEFAULT_PAGE_SIZE
+    )
+    {
+        $currentRequest = $this->request->getCurrentRequest();
+        $result['max_pages'] = 0;
+        $result['entity_collection'] =  [];
+        $result['entities_count'] = 0;
+
+        $entityRepository = $this->manager->getRepository($entityClass);
+        if ($entityRepository instanceof PaginatorInterface) {
+            $qb = $entityRepository->getQbByCustomCondition($methodName, $methodAttributes);
+            if ($qb && ($qb instanceof QueryBuilder)) {
+                $currentPage = (int)$currentRequest->get($paginatorVar, 1);
+                $buildResult = $entityRepository->getCurrentPageByQb($qb, $currentPage, $pageSize);
+            }
+
+            $result = array_merge($result, $buildResult);
         }
 
         return $result;
