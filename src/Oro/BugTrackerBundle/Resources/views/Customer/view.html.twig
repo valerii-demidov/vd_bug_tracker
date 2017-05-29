@@ -11,9 +11,11 @@
                role="button">{{ 'Edit'|trans }}</a>
         </div>
     {% endif %}
-    <div class="p-2">
-        {{ render(controller('BugTrackerBundle:Customer:delete', { 'id': entity.id } )) }}
-    </div>
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="p-2">
+            {{ render(controller('BugTrackerBundle:Customer:delete', { 'id': entity.id } )) }}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}

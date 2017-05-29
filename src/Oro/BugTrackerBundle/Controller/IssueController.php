@@ -113,13 +113,13 @@ class IssueController extends Controller
      */
     public function editAction(Issue $issue, Request $request)
     {
-        $this->denyAccessUnlessGranted(IssueVoter::EDIT, $issue);
+        $this->isGranted(IssueVoter::EDIT, $issue);
         $form = $this->createForm(
             IssueType::class,
             $issue,
-            array(
+            [
                 'validation_groups' => array('edit'),
-            )
+            ]
         );
 
         try {
