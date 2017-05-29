@@ -69,7 +69,7 @@ class CommentVoter extends Voter
             case self::EDIT:
                 return $this->canEdit($comment, $customer);
             case self::DELETE:
-                return $this->canDelete($token);
+                return $this->canDelete($comment, $customer);
         }
 
         throw new \LogicException('This code should not be reached!');

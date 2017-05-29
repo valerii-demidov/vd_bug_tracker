@@ -5,13 +5,17 @@
     <div class="p-2">
         <a class="btn btn-secondary" href="{{ url('oro_bugtracker_project_list') }}" role="button">{{ 'Back'|trans }}</a>
     </div>
-    <div class="p-2">
-        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_project_edit', { 'id': entity.id }) }}"
-           role="button">{{ 'Edit'|trans }}</a>
-    </div>
-    <div class="p-2">
-        {{ render(controller('BugTrackerBundle:Project:delete', { 'id': entity.id } )) }}
-    </div>
+    {% if is_granted('ROLE_MANAGER') %}
+        <div class="p-2">
+            <a class="btn btn-secondary" href="{{ url('oro_bugtracker_project_edit', { 'id': entity.id }) }}"
+               role="button">{{ 'Edit'|trans }}</a>
+        </div>
+    {% endif %}
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="p-2">
+            {{ render(controller('BugTrackerBundle:Project:delete', { 'id': entity.id } )) }}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}

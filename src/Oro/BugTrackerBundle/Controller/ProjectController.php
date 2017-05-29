@@ -103,6 +103,7 @@ class ProjectController extends Controller
      */
     public function editAction(Project $projectEntity, Request $request)
     {
+        $this->isGranted(Customer::ROLE_MANAGER);
         $form = $this->createForm(
             ProjectType::class,
             $projectEntity,
@@ -153,6 +154,7 @@ class ProjectController extends Controller
      */
     public function deleteAction(Project $projectEntity, Request $request)
     {
+        $this->isGranted(Customer::ROLE_ADMIN);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_project_delete',
             array('id' => $projectEntity->getId()),
@@ -192,6 +194,7 @@ class ProjectController extends Controller
      */
     public function addmemberAction(Project $projectEntity, Request $request)
     {
+        $this->isGranted(Customer::ROLE_MANAGER);
         $response = new JsonResponse();
         $result = [];
         $result['success'] = true;
@@ -226,6 +229,7 @@ class ProjectController extends Controller
      */
     public function removememberAction(Project $projectEntity, $member_id, Request $request)
     {
+        $this->isGranted(Customer::ROLE_MANAGER);
         $em = $this->getDoctrine()->getManager();
         $customerEntity = $em->getRepository(Customer::class)->find($member_id);
         if ($customerEntity) {

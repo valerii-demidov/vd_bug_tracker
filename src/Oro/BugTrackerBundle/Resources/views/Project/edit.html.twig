@@ -9,9 +9,11 @@
         <a class="btn btn-secondary" href="{{ url('oro_bugtracker_project_view', { 'id': entity_id }) }}"
            role="button">{{ 'View'|trans }}</a>
     </div>
-    <div class="p-2">
-        {{ render(controller('BugTrackerBundle:Project:delete', { 'id': entity_id } )) }}
-    </div>
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="p-2">
+            {{ render(controller('BugTrackerBundle:Project:delete', { 'id': entity_id } )) }}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
