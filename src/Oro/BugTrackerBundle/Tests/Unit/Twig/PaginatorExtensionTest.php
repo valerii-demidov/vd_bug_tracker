@@ -30,8 +30,10 @@ class PaginatorExtensionTest extends TestCase
         $this->queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
+
         $customerRepository->method('createQueryBuilder')->willReturn($this->queryBuilder);
-        $customerRepository->method('buildCurrentPageQb')->willReturn([]);
+        $customerRepository->method('getCurrentPageByQb')->willReturn([]);
+        $customerRepository->method('getQbByCustomCondition')->willReturn($this->queryBuilder);
 
         $manager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
         $manager->expects($this->any())
@@ -41,6 +43,26 @@ class PaginatorExtensionTest extends TestCase
         $this->paginatorExtension = new PaginatorExtension($requestStack, $manager);
 
     }
+
+    public function testGetFunctions()
+    {
+        $functions = $this->paginatorExtension->getFunctions();
+
+        $this->assertInternalType('array', $functions);
+        $this->assertArrayHasKey(0, $functions);
+        $this->assertInstanceOf('\Twig_SimpleFunction', $functions[0]);
+
+        $function = $functions[0];
+        $this->assertInternalType('string', $function->getName());
+        $this->assertEquals($function->getName(),'paginator_object_by_custom_condition');
+        $this->assertInternalType('callable', $function->getCallable());
+
+        $function = $functions[1];
+        $this->assertInternalType('string', $function->getName());
+        $this->assertEquals($function->getName(),'paginator_object_by_entity_class');
+        $this->assertInternalType('callable', $function->getCallable());
+    }
+
 
     public function testGetPaginatorObjectByEntityClass()
     {
@@ -52,44 +74,30 @@ class PaginatorExtensionTest extends TestCase
             $paginatorVar
         );
 
-        $actualResultArrayKeys = array_keys($result);
-        $expectedResultArrayKeys = ['max_pages', 'entity_collection', 'entities_count'];
-
-        $this->assertEquals($actualResultArrayKeys, $expectedResultArrayKeys);
+        $this->assertInternalType('array', $result);
+        $this->assertArrayHasKey('max_pages', $result);
+        $this->assertArrayHasKey('entity_collection', $result);
+        $this->assertArrayHasKey('entities_count', $result);
     }
 
-    public function testGetPaginatorObjectByQb()
+   public function testGetPaginatorCustomCondition()
     {
         $entityClass = Customer::class;
-        $paginatorVar = 'test_param';
-        $queryBuilder = $this->queryBuilder;
+        $methodName = 'customer_issues';
+        $paginatorVar = 'issue_p';
+        $methodAttributes = [new Customer];
 
-        $result = $this->paginatorExtension->getPaginatorObjectByQb(
+
+        $result = $this->paginatorExtension->getPaginatorCustomCondition(
             $entityClass,
-            $queryBuilder,
-            $paginatorVar
+            $methodName,
+            $paginatorVar,
+            $methodAttributes
         );
 
-        $actualResultArrayKeys = array_keys($result);
-        $expectedResultArrayKeys = ['max_pages', 'entity_collection', 'entities_count'];
-
-        $this->assertEquals($actualResultArrayKeys, $expectedResultArrayKeys);
-    }
-
-    public function testGetFunctions()
-    {
-        $this->assertEquals(
-            [
-                new \Twig_SimpleFunction(
-                    'paginator_object_by_qb',
-                    [$this->paginatorExtension, 'getPaginatorObjectByQb']
-                ),
-                new \Twig_SimpleFunction(
-                    'paginator_object_by_entity_class',
-                    [$this->paginatorExtension, 'getPaginatorObjectByEntityClass']
-                ),
-            ],
-            $this->paginatorExtension->getFunctions()
-        );
+        $this->assertInternalType('array', $result);
+        $this->assertArrayHasKey('max_pages', $result);
+        $this->assertArrayHasKey('entity_collection', $result);
+        $this->assertArrayHasKey('entities_count', $result);
     }
 }

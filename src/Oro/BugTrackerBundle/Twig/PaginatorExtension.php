@@ -39,28 +39,17 @@ class PaginatorExtension extends \Twig_Extension
         ];
     }
 
-    /**
-     * @param $entityClass
-     * @param QueryBuilder $queryBuilder
-     * @param $paginatorVar
-     * @param int $pageSize
-     * @return mixed
-     */
-    public function getPaginatorObjectByQb(
-        $entityClass,
-        QueryBuilder $queryBuilder, //, сделать опцианальный атрибут для метода репозитория
-        $paginatorVar,
-        $pageSize = self::DEFAULT_PAGE_SIZE
-    )
+    public function getPaginatorObjectByEntityClass($entityClass, $paginatorVar, $pageSize = self::DEFAULT_PAGE_SIZE)
     {
-        $currentRequest = $this->request->getCurrentRequest();
         $result['max_pages'] = 0;
         $result['entity_collection'] =  [];
         $result['entities_count'] = 0;
+        $currentRequest = $this->request->getCurrentRequest();
 
-        if ($currentRequest) {
-            $currentPage = (int)$currentRequest->get($paginatorVar, 1);
-            $entityRepository = $this->manager->getRepository($entityClass);
+        $entityRepository = $this->manager->getRepository($entityClass);
+        if ($entityRepository) {
+            $queryBuilder = $entityRepository->createQueryBuilder('entity');
+            $currentPage = $currentRequest->get($paginatorVar, 1);
             if ($queryBuilder) {
                 if ($entityRepository instanceof PaginatorInterface) {
                     $buildResult = $entityRepository->getCurrentPageByQb($queryBuilder, $currentPage, $pageSize);
@@ -71,6 +60,7 @@ class PaginatorExtension extends \Twig_Extension
 
         return $result;
     }
+
 
     public function getPaginatorCustomCondition(
         $entityClass,
@@ -99,23 +89,5 @@ class PaginatorExtension extends \Twig_Extension
         return $result;
     }
 
-    public function getPaginatorObjectByEntityClass($entityClass, $paginatorVar, $pageSize = self::DEFAULT_PAGE_SIZE)
-    {
-        $result['max_pages'] = 0;
-        $result['entity_collection'] =  [];
-        $result['entities_count'] = 0;
 
-        $entityRepository = $this->manager->getRepository($entityClass);
-        if ($entityRepository) {
-            $queryBuilder = $entityRepository->createQueryBuilder('entity');
-            $result = $this->getPaginatorObjectByQb(
-                $entityClass,
-                $queryBuilder,
-                $paginatorVar,
-                $pageSize = self::DEFAULT_PAGE_SIZE
-            );
-        }
-
-        return $result;
-    }
 }
