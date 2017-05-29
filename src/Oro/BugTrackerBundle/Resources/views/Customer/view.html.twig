@@ -5,10 +5,12 @@
     <div class="p-2">
         <a class="btn btn-secondary" href="{{ url('oro_bugtracker_customer_list') }}" role="button">{{ 'Back'|trans }}</a>
     </div>
-    <div class="p-2">
-        <a class="btn btn-secondary" href="{{ url('oro_bugtracker_customer_edit', { 'id': entity.id } ) }}"
-           role="button">{{ 'Edit'|trans }}</a>
-    </div>
+    {% if is_granted('edit_customer', entity) %}
+        <div class="p-2">
+            <a class="btn btn-secondary" href="{{ url('oro_bugtracker_customer_edit', { 'id': entity.id } ) }}"
+               role="button">{{ 'Edit'|trans }}</a>
+        </div>
+    {% endif %}
     <div class="p-2">
         {{ render(controller('BugTrackerBundle:Customer:delete', { 'id': entity.id } )) }}
     </div>

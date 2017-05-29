@@ -2,7 +2,6 @@
 
 namespace Oro\BugTrackerBundle\Security;
 
-use Oro\BugTrackerBundle\Entity\Issue;
 use Oro\BugTrackerBundle\Entity\Customer;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -10,12 +9,11 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
 
-class IssueVoter extends Voter
+class CustomerVoter extends Voter
 {
     // these strings are just invented: you can use anything
-    const VIEW = 'view_issue';
-    const EDIT = 'edit_issue';
-    const DELETE = 'delete_issue';
+    const EDIT = 'edit_customer';
+    const DELETE = 'delete_customer';
 
     /**
      * @var EntityManager
@@ -35,12 +33,12 @@ class IssueVoter extends Voter
     protected function supports($attribute, $subject)
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, array(self::VIEW, self::EDIT, self::DELETE))) {
+        if (!in_array($attribute, array(self::EDIT, self::DELETE))) {
             return false;
         }
 
         // only vote on Post objects inside this voter
-        if (!$subject instanceof Issue) {
+        if (!$subject instanceof Customer) {
             return false;
         }
 
@@ -56,56 +54,30 @@ class IssueVoter extends Voter
             return false;
         }
 
-        if (in_array($attribute, [self::VIEW, self::EDIT])) {
-            if ($this->decisionManager->decide($token, array(Customer::ROLE_MANAGER))) {
+        if (in_array($attribute, [self::EDIT, self::DELETE])) {
+            if ($this->decisionManager->decide($token, array(Customer::ROLE_ADMIN))) {
                 return true;
             }
         }
 
-        // you know $subject is a Post object, thanks to supports
-        /** @var Post $post */
-        $issue = $subject;
+        // you know $subject is a Csutomer object, thanks to supports
+        $currentCustomer = $subject;
 
         switch ($attribute) {
-            case self::VIEW:
-                return $this->canView($issue, $customer);
             case self::EDIT:
-                return $this->canEdit($token);
-            case self::DELETE:
-                return $this->canDelete($token);
+                return $this->canEdit($currentCustomer, $customer);
         }
 
         throw new \LogicException('This code should not be reached!');
     }
 
     /**
-     * @param Issue $issue
+     * @param Customer $currentCustomer
      * @param Customer $customer
      * @return bool
      */
-    private function canView(Issue $issue, Customer $customer)
+    private function canEdit(Customer $currentCustomer, Customer $customer)
     {
-        $isCollaboration = $issue->getCollaboration()->contains($customer);
-
-        return $isCollaboration;
-    }
-
-    /**
-     * @param Issue $issue
-     * @param Customer $customer
-     * @return bool
-     */
-    private function canEdit($token)
-    {
-        return $this->decisionManager->decide($token, array(Customer::ROLE_MANAGER));
-    }
-
-    /**
-     * @param TokenInterface $token
-     * @return bool
-     */
-    private function canDelete(TokenInterface $token)
-    {
-        return $this->decisionManager->decide($token, array(Customer::ROLE_ADMIN));
+        return ($currentCustomer->getId() == $customer->getId());
     }
 }

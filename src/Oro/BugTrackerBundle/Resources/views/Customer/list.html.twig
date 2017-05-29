@@ -10,7 +10,7 @@
     'router': 'oro_bugtracker_customer_view',
     'router_parameters': [{'collection_key': 'id', 'router_key': 'id'}]
 }] %}
-{% if is_granted('ROLE_MANAGER') %}
+{% if is_granted('ROLE_ADMIN') %}
     {% set actions = actions|merge(
         [{
             'label':'Edit',
