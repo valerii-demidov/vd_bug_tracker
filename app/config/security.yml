@@ -29,8 +29,8 @@ security:
             anonymous: ~
             pattern: ^/auth/(login|register|forgotpassword)$
 
-        main:
-            http_basic: ~
+        #main:
+            #http_basic: ~
 
         secured_area:
             # this firewall applies to all URLs
