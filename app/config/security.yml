@@ -26,8 +26,11 @@ security:
             security: false
 
         login_area:
-                  anonymous: ~
-                  pattern: ^/auth/(login|register|forgotpassword)$
+            anonymous: ~
+            pattern: ^/auth/(login|register|forgotpassword)$
+
+        main:
+            http_basic: ~
 
         secured_area:
             # this firewall applies to all URLs

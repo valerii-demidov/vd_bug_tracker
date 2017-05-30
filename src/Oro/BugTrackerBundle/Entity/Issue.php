@@ -101,13 +101,14 @@ class Issue
     /**
      * One Issue has One Customer
      * @ORM\ManyToOne(targetEntity="Customer")
+     * @ORM\JoinColumn(name="reporter_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $reporter;
 
     /**
      * One Issue has One Customer.
      * @ORM\ManyToOne(targetEntity="Customer", inversedBy="issues")
-     * @ORM\JoinColumn(name="assignee_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="assignee_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $assignee;
 
@@ -121,6 +122,7 @@ class Issue
     /**
      * One Issue has One Project.
      * @ORM\ManyToOne(targetEntity="Project")
+     * @ORM\JoinColumn(name="project_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $project;
 

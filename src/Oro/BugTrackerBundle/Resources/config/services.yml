@@ -90,3 +90,5 @@ services:
                 - { name: kernel.event_listener, event: oro_bugtracker.issue.before_update,   method: addIssueUpdateActivity }
 
 
+
+

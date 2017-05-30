@@ -86,8 +86,7 @@ class IssueVoter extends Voter
     private function canView(Issue $issue, Customer $customer)
     {
         $isCollaboration = $issue->getCollaboration()->contains($customer);
-
-        return $isCollaboration;
+        return $isCollaboration || ($issue->getAssignee()->getId() == $customer->getId());
     }
 
     /**

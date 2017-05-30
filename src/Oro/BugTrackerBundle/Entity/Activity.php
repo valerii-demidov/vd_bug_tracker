@@ -19,19 +19,20 @@ class Activity
     /**
      * Many Activity has One Project
      * @ORM\ManyToOne(targetEntity="Project")
+     * @ORM\JoinColumn(name="project_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $project;
 
     /**
      * @ORM\ManyToOne(targetEntity="Issue", inversedBy="activities")
-     * @ORM\JoinColumn(name="issue_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="issue_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $issue;
 
     /**
      * Many Activity has One Customer
      * @ORM\ManyToOne(targetEntity="Customer", inversedBy="activities" )
-     * @ORM\JoinColumn(name="customer_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="customer_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $customer;
 

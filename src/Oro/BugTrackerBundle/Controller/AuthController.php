@@ -102,7 +102,7 @@ class AuthController extends Controller
      */
     public function logoutAction()
     {
-        return new Response('asd');
+        return $this->redirectToRoute('oro_bugtracker_auth_login');
     }
 
     /**
@@ -110,7 +110,7 @@ class AuthController extends Controller
      */
     public function loginpostAction()
     {
-        return new Response();
+        return $this->redirectToRoute('bug_tracker_homepage');
     }
 
     public function getCustomerHandler()

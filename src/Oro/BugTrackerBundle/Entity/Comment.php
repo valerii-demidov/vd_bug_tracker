@@ -23,16 +23,19 @@ class Comment
 
     /**
      * @ORM\ManyToOne(targetEntity="Project", inversedBy="comments")
+     * @ORM\JoinColumn(name="project_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $project;
 
     /**
      * @ORM\ManyToOne(targetEntity="Issue", inversedBy="comments")
+     * @ORM\JoinColumn(name="issue_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $issue;
 
     /**
      * @ORM\ManyToOne(targetEntity="Customer", inversedBy="comments")
+     * @ORM\JoinColumn(name="customer_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $customer;
 
