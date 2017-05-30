@@ -16,3 +16,11 @@ swiftmailer:
     disable_delivery: true
 
 liip_functional_test: ~
+
+doctrine:
+    dbal:
+        host:     127.0.0.1
+        dbname:   bugtracker_test
+        user:     root
+        password: 123
+
