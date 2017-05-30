@@ -46,7 +46,7 @@ class CustomerController extends Controller
                         ->getFlashBag()
                         ->add('success', 'User has been created successfully!');
 
-                    return $this->redirectToRoute('oro_bugtracker_customer_edit', array('id' => $customer->getId()));
+                    return $this->redirectToRoute('oro_bugtracker_customer_view', array('id' => $customer->getId()));
                 } else {
                     $request->getSession()
                         ->getFlashBag()

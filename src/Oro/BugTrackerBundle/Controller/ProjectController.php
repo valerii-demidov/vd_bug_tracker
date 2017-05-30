@@ -48,7 +48,7 @@ class ProjectController extends Controller
                         ->add('success', 'Project has been created successfully!');
 
                     return $this->redirectToRoute(
-                        'oro_bugtracker_project_edit',
+                        'oro_bugtracker_project_view',
                         array('id' => $project->getId())
                     );
                 }

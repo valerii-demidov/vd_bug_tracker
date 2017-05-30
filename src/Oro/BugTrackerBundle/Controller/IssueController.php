@@ -51,7 +51,7 @@ class IssueController extends Controller
                         ->getFlashBag()
                         ->add('success', 'Issue has been created successfully!');
 
-                    return $this->redirectToRoute('oro_bugtracker_issue_edit', array('id' => $issue->getId()));
+                    return $this->redirectToRoute('oro_bugtracker_issue_view', array('id' => $issue->getId()));
                 } else {
                     $request->getSession()
                         ->getFlashBag()

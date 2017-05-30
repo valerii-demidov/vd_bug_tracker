@@ -16,14 +16,11 @@ class DefaultControllerTest extends WebTestCase
 
     public function setUp()
     {
-        $this->connection = $this->getContainer()->get('doctrine.dbal.default_connection');
-        //$this->connection->beginTransaction();
+        /*$this->connection = $this->getContainer()->get('doctrine.dbal.default_connection');
+        /*$this->connection->beginTransaction();*/
 
         $this->loadFixtures([LoadCustomerData::class]);
-        //$this->connection->commit();
-
         $this->client = static::createClient();
-
     }
 
     public function testIndex()
@@ -60,6 +57,8 @@ class DefaultControllerTest extends WebTestCase
      */
     protected function tearDown()
     {
-        //$this->connection->rollback();
+        parent::tearDown();
+        /*$this->em->rollback();
+        $this->em->close();*/
     }
 }
