@@ -48,7 +48,7 @@ class ProjectController extends Controller
                         ->add('success', 'Project has been created successfully!');
 
                     return $this->redirectToRoute(
-                        'oro_bugtracker_project_edit',
+                        'oro_bugtracker_project_view',
                         array('id' => $project->getId())
                     );
                 }
@@ -78,11 +78,6 @@ class ProjectController extends Controller
         $membersCollection = $project->getCustomers();
         $actions = $this->getMemberGridAction($project->getId(), true, false);
 
-        $activityRepository = $this->getDoctrine()->getRepository(Activity::class);
-        $activityCollection = $activityRepository->getActivityProjectCollection(
-            $project
-        );
-
         return $this->render(
             'BugTrackerBundle:Project:view.html.twig',
             array(
@@ -91,9 +86,8 @@ class ProjectController extends Controller
                     $project->getCode()
                 ),
                 'entity' => $project,
+                'activity_class'=> Activity::class,
                 'members_grid_html' => $this->getMembersGridHtml($membersCollection, $actions),
-                'activity_collection' => $activityCollection,
-                'activity_paginator_var' => 'activity_p'
             )
         );
     }
@@ -109,6 +103,7 @@ class ProjectController extends Controller
      */
     public function editAction(Project $projectEntity, Request $request)
     {
+        $this->isGranted(Customer::ROLE_MANAGER);
         $form = $this->createForm(
             ProjectType::class,
             $projectEntity,
@@ -159,6 +154,7 @@ class ProjectController extends Controller
      */
     public function deleteAction(Project $projectEntity, Request $request)
     {
+        $this->isGranted(Customer::ROLE_ADMIN);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_project_delete',
             array('id' => $projectEntity->getId()),
@@ -198,6 +194,7 @@ class ProjectController extends Controller
      */
     public function addmemberAction(Project $projectEntity, Request $request)
     {
+        $this->isGranted(Customer::ROLE_MANAGER);
         $response = new JsonResponse();
         $result = [];
         $result['success'] = true;
@@ -232,6 +229,7 @@ class ProjectController extends Controller
      */
     public function removememberAction(Project $projectEntity, $member_id, Request $request)
     {
+        $this->isGranted(Customer::ROLE_MANAGER);
         $em = $this->getDoctrine()->getManager();
         $customerEntity = $em->getRepository(Customer::class)->find($member_id);
         if ($customerEntity) {

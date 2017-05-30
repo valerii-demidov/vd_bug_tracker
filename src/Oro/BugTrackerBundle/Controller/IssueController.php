@@ -27,17 +27,10 @@ class IssueController extends Controller
      */
     public function listAction()
     {
-        $em = $this->getDoctrine()->getManager();
-        $entityRepository = $em->getRepository('BugTrackerBundle:Issue');
-        $user = $this->getUser();
-        $isManagerGranted = $this->isGranted(Customer::ROLE_MANAGER);
-        $issueCollection = $entityRepository->getGrantedIssues($user, $isManagerGranted);
-
         return $this->render(
             'BugTrackerBundle:Issue:list.html.twig',
             [
                 'entity_class' => Issue::class,
-                'entity_collection' => $issueCollection,
             ]
         );
     }
@@ -58,7 +51,7 @@ class IssueController extends Controller
                         ->getFlashBag()
                         ->add('success', 'Issue has been created successfully!');
 
-                    return $this->redirectToRoute('oro_bugtracker_issue_edit', array('id' => $issue->getId()));
+                    return $this->redirectToRoute('oro_bugtracker_issue_view', array('id' => $issue->getId()));
                 } else {
                     $request->getSession()
                         ->getFlashBag()
@@ -120,13 +113,13 @@ class IssueController extends Controller
      */
     public function editAction(Issue $issue, Request $request)
     {
-        $this->denyAccessUnlessGranted(IssueVoter::EDIT, $issue);
+        $this->isGranted(IssueVoter::EDIT, $issue);
         $form = $this->createForm(
             IssueType::class,
             $issue,
-            array(
+            [
                 'validation_groups' => array('edit'),
-            )
+            ]
         );
 
         try {

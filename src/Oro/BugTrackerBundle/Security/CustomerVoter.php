@@ -2,7 +2,6 @@
 
 namespace Oro\BugTrackerBundle\Security;
 
-use Oro\BugTrackerBundle\Entity\Comment;
 use Oro\BugTrackerBundle\Entity\Customer;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -10,11 +9,11 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
 
-class CommentVoter extends Voter
+class CustomerVoter extends Voter
 {
     // these strings are just invented: you can use anything
-    const EDIT = 'edit_comment';
-    const DELETE = 'delete_comment';
+    const EDIT = 'edit_customer';
+    const DELETE = 'delete_customer';
 
     /**
      * @var EntityManager
@@ -39,7 +38,7 @@ class CommentVoter extends Voter
         }
 
         // only vote on Post objects inside this voter
-        if (!$subject instanceof Comment) {
+        if (!$subject instanceof Customer) {
             return false;
         }
 
@@ -61,37 +60,24 @@ class CommentVoter extends Voter
             }
         }
 
-        // you know $subject is a Post object, thanks to supports
-        /** @var Post $post */
-        $comment = $subject;
+        // you know $subject is a Csutomer object, thanks to supports
+        $currentCustomer = $subject;
 
         switch ($attribute) {
             case self::EDIT:
-                return $this->canEdit($comment, $customer);
-            case self::DELETE:
-                return $this->canDelete($comment, $customer);
+                return $this->canEdit($currentCustomer, $customer);
         }
 
         throw new \LogicException('This code should not be reached!');
     }
 
     /**
-     * @param Comment $comment
+     * @param Customer $currentCustomer
      * @param Customer $customer
      * @return bool
      */
-    private function canEdit(Comment $comment, Customer $customer)
+    private function canEdit(Customer $currentCustomer, Customer $customer)
     {
-        return ($comment->getCustomer()->getId() == $customer->getId());
-    }
-
-    /**
-     * @param Comment $comment
-     * @param Customer $customer
-     * @return bool
-     */
-    private function canDelete(Comment $comment, Customer $customer)
-    {
-        return ($comment->getCustomer()->getId() == $customer->getId());
+        return ($currentCustomer->getId() == $customer->getId());
     }
 }

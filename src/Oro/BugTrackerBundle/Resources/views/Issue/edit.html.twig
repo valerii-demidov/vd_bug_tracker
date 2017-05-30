@@ -9,9 +9,11 @@
         <a class="btn btn-secondary" href="{{ url('oro_bugtracker_issue_view',{'id': entity.id}) }}"
            role="button">{{ 'View'|trans }}</a>
     </div>
-    <div class="p-2">
-        {{ render(controller('BugTrackerBundle:Issue:delete', { 'id': entity.id } )) }}
-    </div>
+    {% if is_granted('delete_issue', entity) %}
+        <div class="p-2">
+            {{ render(controller('BugTrackerBundle:Issue:delete', { 'id': entity.id } )) }}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}

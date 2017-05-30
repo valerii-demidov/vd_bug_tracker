@@ -68,6 +68,14 @@ services:
             tags:
                 - { name: security.voter }
 
+    oro_bugtracker.customer_voter:
+            class: Oro\BugTrackerBundle\Security\CustomerVoter
+            arguments:
+                    ["@doctrine.orm.entity_manager", "@security.access.decision_manager"]
+            public: false
+            tags:
+                - { name: security.voter }
+
     # event listeners
     oro_bugtracker.event_listener.handle_activity:
             class: Oro\BugTrackerBundle\EventListener\ActivityListener
@@ -80,5 +88,7 @@ services:
                 - { name: kernel.event_listener, event: oro_bugtracker.comment.before_delete, method: addCommentDeleteActivity }
                 - { name: kernel.event_listener, event: oro_bugtracker.issue.before_create,   method: addIssueCreateActivity }
                 - { name: kernel.event_listener, event: oro_bugtracker.issue.before_update,   method: addIssueUpdateActivity }
+
+
 
 

@@ -4,7 +4,7 @@ namespace Oro\BugTrackerBundle\Repository\Paginator;
 
 use Doctrine\ORM\QueryBuilder;
 
-trait QueryPageBuilder
+trait PageBuilder
 {
     /**
      * @param QueryBuilder $queryBuilder
@@ -13,7 +13,7 @@ trait QueryPageBuilder
      *
      * @return array
      */
-    public function buildCurrentPageQb(QueryBuilder $queryBuilder, $currentPage,  $pageSize)
+    public function getCurrentPageByQb(QueryBuilder $queryBuilder, $currentPage,  $pageSize)
     {
         $result['max_pages'] = 0;
         $result['entity_collection'] = [];
@@ -34,7 +34,8 @@ trait QueryPageBuilder
             $cloneQueryBuilder->select("count($entityAlias)");
 
             $result['entities_count'] = (int)$cloneQueryBuilder->getQuery()->getSingleScalarResult();
-            $result['max_pages'] = (!$result['entities_count']) ?: ($result['entities_count'] / $pageSize);
+            $maxPages = (!$result['entities_count']) ?: ($result['entities_count'] / $pageSize);
+            $result['max_pages'] = ceil($maxPages);
         }
 
         return $result;

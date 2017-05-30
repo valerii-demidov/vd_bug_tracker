@@ -70,3 +70,5 @@ assetic:
     use_controller: "%kernel.debug%"
     filters:
         cssrewrite: ~
+
+liip_functional_test: ~

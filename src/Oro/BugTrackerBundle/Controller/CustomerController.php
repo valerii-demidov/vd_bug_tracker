@@ -46,7 +46,7 @@ class CustomerController extends Controller
                         ->getFlashBag()
                         ->add('success', 'User has been created successfully!');
 
-                    return $this->redirectToRoute('oro_bugtracker_customer_edit', array('id' => $customer->getId()));
+                    return $this->redirectToRoute('oro_bugtracker_customer_view', array('id' => $customer->getId()));
                 } else {
                     $request->getSession()
                         ->getFlashBag()
@@ -76,25 +76,13 @@ class CustomerController extends Controller
      */
     public function viewAction(Customer $customer, Request $request)
     {
-        $issueGridActions = $this->getIssueGridAction();
-        //todo  вызов медода без аргументов
-        $issuesQb = $this->getDoctrine()->getRepository(Issue::class)->findByCondition(
-            [
-                'assignee' => ['=' => $customer->getId()],
-                'status' => ['in' => [Issue::STATUS_OPEN, Issue::STATUS_REOPEN, Issue::STATUS_IN_PROGRESS]],
-            ]
-        );
-
-        $issueGridHtml = $this->getIssuesGridHtml($issuesQb, $issueGridActions);
-        $activitiesHtml = $this->getActivityHtml($customer, true);
-
         return $this->render(
             'BugTrackerBundle:Customer:view.html.twig',
             array(
                 'page_title' => sprintf("View User '%s'", $customer->getUsername()),
                 'entity' => $customer,
-                'issue_grid_html' => $issueGridHtml,
-                'activity_html' => $activitiesHtml
+                'activity_class' => Activity::class,
+                'issue_class' => Issue::class
             )
         );
     }
@@ -177,70 +165,6 @@ class CustomerController extends Controller
                 'form' => $form->createView(),
             )
         );
-    }
-
-    /**
-     * @param bool $useView
-     * @return array
-     */
-    public function getIssueGridAction($useView = true)
-    {
-        $actions = [];
-        if ($useView) {
-            $actions[] = [
-                'label' => 'View',
-                'router' => 'oro_bugtracker_issue_view',
-                'router_parameters' => [
-                    ['collection_key' => 'id', 'router_key' => 'id']
-                ],
-            ];
-        }
-
-        return $actions;
-    }
-
-    /**
-     * @param $entityQueryBuilder
-     * @param $actions
-     * @param $currentPage
-     * @return string
-     */
-    protected function getIssuesGridHtml($entityQueryBuilder, $actions)
-    {
-        $columns = ['id' => 'Id', 'code' => 'Code', 'summary' => 'Summary', 'status' => 'Status'];
-        $membersHtml = $this->render(
-            'BugTrackerBundle:Customer:issue.html.twig',
-            [
-                'entity_class' => Issue::class,
-                'entity_query_builder' => $entityQueryBuilder,
-                'columns' => $columns,
-                'actions' => $actions,
-                'paginator_var' => 'issue_p'
-            ]
-        )->getContent();
-
-        return $membersHtml;
-    }
-
-    public function getActivityHtml(Customer $customer, $limited = false)
-    {
-        $activityRepository = $this->getDoctrine()->getRepository(Activity::class);
-        $activityCollection = $activityRepository->getActivityCustomerCollection(
-            $customer,
-            self::ACTIVITY_CUSTOMER_PAGE_LIMIT
-        );
-
-        $activityHtml = $this->render(
-            'BugTrackerBundle:Activity:paginator_list.html.twig',
-            [
-                'entity_class' => Customer::class,
-                'limit' => self::ACTIVITY_CUSTOMER_PAGE_LIMIT,
-                'collection' => $activityCollection,
-                'paginator_var' => 'activity_p'
-            ]
-        )->getContent();
-
-        return $activityHtml;
     }
 
     public function getCustomerHandler()

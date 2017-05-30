@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\BugTrackerBundle\Repository\Paginator\PaginatorInterface;
 
 class PaginatorExtension extends \Twig_Extension
 {
@@ -33,22 +34,39 @@ class PaginatorExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('paginator_object_by_qb', [$this, 'getPaginatorObjectByQb']),
+            new \Twig_SimpleFunction('paginator_object_by_custom_condition', [$this, 'getPaginatorCustomCondition']),
             new \Twig_SimpleFunction('paginator_object_by_entity_class', [$this, 'getPaginatorObjectByEntityClass']),
         ];
     }
 
-    /**
-     * @param $entityClass
-     * @param QueryBuilder $queryBuilder
-     * @param $paginatorVar
-     * @param int $pageSize
-     * @return mixed
-     */
-    public function getPaginatorObjectByQb(
+    public function getPaginatorObjectByEntityClass($entityClass, $paginatorVar, $pageSize = self::DEFAULT_PAGE_SIZE)
+    {
+        $result['max_pages'] = 0;
+        $result['entity_collection'] =  [];
+        $result['entities_count'] = 0;
+        $currentRequest = $this->request->getCurrentRequest();
+
+        $entityRepository = $this->manager->getRepository($entityClass);
+        if ($entityRepository) {
+            $queryBuilder = $entityRepository->createQueryBuilder('entity');
+            $currentPage = $currentRequest->get($paginatorVar, 1);
+            if ($queryBuilder) {
+                if ($entityRepository instanceof PaginatorInterface) {
+                    $buildResult = $entityRepository->getCurrentPageByQb($queryBuilder, $currentPage, $pageSize);
+                    $result = array_merge($result, $buildResult);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+
+    public function getPaginatorCustomCondition(
         $entityClass,
-        QueryBuilder $queryBuilder, //, сделать опцианальный атрибут для метода репозитория
+        $methodName,
         $paginatorVar,
+        $methodAttributes,
         $pageSize = self::DEFAULT_PAGE_SIZE
     )
     {
@@ -57,39 +75,19 @@ class PaginatorExtension extends \Twig_Extension
         $result['entity_collection'] =  [];
         $result['entities_count'] = 0;
 
-        if ($currentRequest) {
-            $currentPage = (int)$currentRequest->get($paginatorVar, 1);
-            $entityRepository = $this->manager->getRepository($entityClass);
-            if ($queryBuilder) {
-                // вместо method -  instace off
-                if (method_exists($entityRepository, 'buildCurrentPageQb')) {
-                    $buildResult = $entityRepository->buildCurrentPageQb($queryBuilder, $currentPage, $pageSize);
-                    $result = array_merge($result, $buildResult);
-                }
+        $entityRepository = $this->manager->getRepository($entityClass);
+        if ($entityRepository instanceof PaginatorInterface) {
+            $qb = $entityRepository->getQbByCustomCondition($methodName, $methodAttributes);
+            if ($qb && ($qb instanceof QueryBuilder)) {
+                $currentPage = (int)$currentRequest->get($paginatorVar, 1);
+                $buildResult = $entityRepository->getCurrentPageByQb($qb, $currentPage, $pageSize);
             }
 
+            $result = array_merge($result, $buildResult);
         }
 
         return $result;
     }
 
-    public function getPaginatorObjectByEntityClass($entityClass, $paginatorVar, $pageSize = self::DEFAULT_PAGE_SIZE)
-    {
-        $result['max_pages'] = 0;
-        $result['entity_collection'] =  [];
-        $result['entities_count'] = 0;
 
-        $entityRepository = $this->manager->getRepository($entityClass);
-        if ($entityRepository) {
-            $queryBuilder = $entityRepository->createQueryBuilder('entity');
-            $result = $this->getPaginatorObjectByQb(
-                $entityClass,
-                $queryBuilder,
-                $paginatorVar,
-                $pageSize = self::DEFAULT_PAGE_SIZE
-            );
-        }
-
-        return $result;
-    }
 }

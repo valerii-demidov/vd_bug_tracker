@@ -70,7 +70,7 @@ class IssueVoter extends Voter
             case self::VIEW:
                 return $this->canView($issue, $customer);
             case self::EDIT:
-                return $this->canEdit();
+                return $this->canEdit($token);
             case self::DELETE:
                 return $this->canDelete($token);
         }
@@ -86,8 +86,7 @@ class IssueVoter extends Voter
     private function canView(Issue $issue, Customer $customer)
     {
         $isCollaboration = $issue->getCollaboration()->contains($customer);
-
-        return $isCollaboration;
+        return $isCollaboration || ($issue->getAssignee()->getId() == $customer->getId());
     }
 
     /**
@@ -95,9 +94,9 @@ class IssueVoter extends Voter
      * @param Customer $customer
      * @return bool
      */
-    private function canEdit(Issue $issue, Customer $customer)
+    private function canEdit($token)
     {
-        return false;
+        return $this->decisionManager->decide($token, array(Customer::ROLE_MANAGER));
     }
 
     /**

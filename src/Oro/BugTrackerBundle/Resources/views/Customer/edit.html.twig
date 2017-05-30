@@ -43,13 +43,17 @@
                         </small>
                     </div>
                 </div>
-                <div class="form-group row">
-                    {{ form_label(form.roles, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
-                    {{ form_errors(form.roles) }}
-                    <div class="col-3">
-                        {{ form_widget(form.roles,{'attr': {'class': 'form-control'}}) }}
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="form-group row">
+                        {{ form_label(form.roles, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
+                        {{ form_errors(form.roles) }}
+                        <div class="col-3">
+                            {{ form_widget(form.roles,{'attr': {'class': 'form-control'}}) }}
+                        </div>
                     </div>
-                </div>
+                {% else %}
+                    {% do form.roles.setRendered %}
+                {% endif %}
                 <div class="form-group row">
                     {{ form_label(form.plainPassword.first, null, {'label_attr': {'class': 'col-2 col-form-label'}}) }}
                     {{ form_errors(form.plainPassword.first) }}

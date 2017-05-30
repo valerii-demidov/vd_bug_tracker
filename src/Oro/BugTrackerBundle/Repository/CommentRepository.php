@@ -3,7 +3,6 @@
 namespace Oro\BugTrackerBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Oro\BugTrackerBundle\Repository\Paginator\QueryPageBuilder;
 
 /**
  * CommentRepository
@@ -13,5 +12,5 @@ use Oro\BugTrackerBundle\Repository\Paginator\QueryPageBuilder;
  */
 class CommentRepository extends EntityRepository
 {
-   use QueryPageBuilder;
+
 }

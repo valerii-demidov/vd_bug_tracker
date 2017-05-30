@@ -11,7 +11,9 @@
         </div>
         <div class="col col-xl-9">
             <div class="updated-field-value">
-                {{ activity.diffData.changes.body }}
+                {% if activity.diffData.changes is defined %}
+                    {{ activity.diffData.changes.body }}
+                {% endif %}
             </div>
         </div>
     </div>
