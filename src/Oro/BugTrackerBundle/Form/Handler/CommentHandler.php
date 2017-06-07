@@ -4,8 +4,6 @@ namespace Oro\BugTrackerBundle\Form\Handler;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\BugTrackerBundle\Entity\Comment;
-use Oro\BugTrackerBundle\Entity\Activity;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Oro\BugTrackerBundle\Event\CommentBeforeUpdateEvent;
 use Oro\BugTrackerBundle\Event\CommentBeforeDeleteEvent;
@@ -56,7 +54,6 @@ class CommentHandler
         $comment = $form->getData();
         $issue = $comment->getIssue();
         if ($form->isValid()) {
-
             $сurrentUser = $this->securityToken->getToken()->getUser();
             $issue->addCollaboration($сurrentUser);
             $this->dispatcher->dispatch(CommentBeforeUpdateEvent::EVENT_NAME, new CommentBeforeUpdateEvent($comment));

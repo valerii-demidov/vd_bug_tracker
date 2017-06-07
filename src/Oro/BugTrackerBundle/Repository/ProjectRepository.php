@@ -7,7 +7,6 @@ use Oro\BugTrackerBundle\Entity\Customer;
 use Oro\BugTrackerBundle\Repository\Paginator\PageBuilder;
 use Oro\BugTrackerBundle\Repository\Paginator\PaginatorInterface;
 use Oro\BugTrackerBundle\Entity\Activity;
-use Doctrine\ORM\QueryBuilder;
 
 /**
  * ProjectRepository
@@ -27,14 +26,12 @@ class ProjectRepository extends EntityRepository implements PaginatorInterface
     public function getQbByCustomCondition($method, array $attributes)
     {
         $qb = false;
-        switch ($method) {
-            case 'project_activities';
-                $activityRepository = $this->getRepository(Activity::class);
-                list($project) = $attributes;
-                $qb = $activityRepository->getActivityProjectCollection(
-                    $project
-                );
-            break;
+        if ($method == 'project_activities') {
+            $activityRepository = $this->getRepository(Activity::class);
+            list($project) = $attributes;
+            $qb = $activityRepository->getActivityProjectCollection(
+                $project
+            );
         }
 
         return $qb;
@@ -53,7 +50,7 @@ class ProjectRepository extends EntityRepository implements PaginatorInterface
         foreach ($objectCollection as $object) {
             foreach ($fields as $field) {
                 $result[$inc][$field] = '';
-                if ((is_object($object))) {
+                if (is_object($object)) {
                     $getFieldNameFunction = 'get'.ucfirst($field);
                     if (method_exists($object, $getFieldNameFunction)) {
                         $result[$inc][$field] = $object->$getFieldNameFunction();
@@ -75,10 +72,10 @@ class ProjectRepository extends EntityRepository implements PaginatorInterface
         if ($slug) {
             $conditionCollection = ['username' => ['like' => $slug.'%']];
             $findResult = $customerRepository->findByCondition($conditionCollection);
-            $findResult = (is_array($findResult)) ? $findResult : [$findResult];
+            $findResult = is_array($findResult) ? $findResult : [$findResult];
 
             $memberListAssoc = $customerRepository->convertCollectionToAssoc($findResult, ['username']);
-            return (empty($memberListAssoc)) ? [] : array_column($memberListAssoc, 'username');
+            return empty($memberListAssoc) ? [] : array_column($memberListAssoc, 'username');
         }
 
         return false;

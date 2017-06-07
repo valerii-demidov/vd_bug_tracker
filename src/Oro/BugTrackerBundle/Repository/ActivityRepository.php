@@ -3,7 +3,6 @@
 namespace Oro\BugTrackerBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Oro\BugTrackerBundle\Entity\Activity;
 use Oro\BugTrackerBundle\Entity\Issue;
 use Oro\BugTrackerBundle\Entity\Project;
 use Oro\BugTrackerBundle\Entity\Customer;
@@ -31,14 +30,13 @@ class ActivityRepository extends EntityRepository implements PaginatorInterface
     {
         $qb = false;
         switch ($method) {
-            case 'project_activities';
+            case 'project_activities':
                 list($project) = $attributes;
                 $qb = $this->getActivityProjectCollection(
                     $project
                 );
                 break;
-
-            case 'customer_activities';
+            case 'customer_activities':
                 list($customer) = $attributes;
                 $qb = $this->getActivityCustomerCollection(
                     $customer

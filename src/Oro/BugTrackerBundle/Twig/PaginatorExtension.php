@@ -25,8 +25,7 @@ class PaginatorExtension extends \Twig_Extension
     public function __construct(
         RequestStack $request,
         EntityManagerInterface $manager
-    )
-    {
+    ) {
         $this->request = $request;
         $this->manager = $manager;
     }
@@ -61,18 +60,16 @@ class PaginatorExtension extends \Twig_Extension
         return $result;
     }
 
-
     public function getPaginatorCustomCondition(
         $entityClass,
         $methodName,
         $paginatorVar,
         $methodAttributes,
         $pageSize = self::DEFAULT_PAGE_SIZE
-    )
-    {
+    ) {
         $currentRequest = $this->request->getCurrentRequest();
         $result['max_pages'] = 0;
-        $result['entity_collection'] =  [];
+        $result['entity_collection'] = [];
         $result['entities_count'] = 0;
 
         $entityRepository = $this->manager->getRepository($entityClass);
@@ -88,6 +85,4 @@ class PaginatorExtension extends \Twig_Extension
 
         return $result;
     }
-
-
 }

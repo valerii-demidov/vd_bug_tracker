@@ -8,12 +8,11 @@ use Oro\BugTrackerBundle\Form\CommentType;
 use Oro\BugTrackerBundle\Form\IssueType;
 use Oro\BugTrackerBundle\Entity\Issue;
 use Oro\BugTrackerBundle\Security\IssueVoter;
-use Oro\BugTrackerBundle\Entity\Customer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
 
 class IssueController extends Controller
 {
@@ -51,7 +50,7 @@ class IssueController extends Controller
                         ->getFlashBag()
                         ->add('success', 'Issue has been created successfully!');
 
-                    return $this->redirectToRoute('oro_bugtracker_issue_view', array('id' => $issue->getId()));
+                    return $this->redirectToRoute('oro_bugtracker_issue_view', ['id' => $issue->getId()]);
                 } else {
                     $request->getSession()
                         ->getFlashBag()
@@ -66,10 +65,10 @@ class IssueController extends Controller
 
         return $this->render(
             'BugTrackerBundle:Issue:create.html.twig',
-            array(
+            [
                 'form' => $form->createView(),
                 'page_title' => 'New Issue',
-            )
+            ]
         );
     }
 
@@ -78,12 +77,12 @@ class IssueController extends Controller
      *
      * @Route("issue/view/{id}", name="oro_bugtracker_issue_view", requirements={"id" = "\d+"})
      */
-    public function viewAction(Issue $issue, Request $request)
+    public function viewAction(Issue $issue)
     {
         $this->denyAccessUnlessGranted(IssueVoter::VIEW, $issue);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_issue_addcomment',
-            array('id' => $issue->getId()),
+            ['id' => $issue->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
@@ -97,12 +96,12 @@ class IssueController extends Controller
 
         return $this->render(
             'BugTrackerBundle:Issue:view.html.twig',
-            array(
+            [
                 'entity' => $issue,
                 'page_title' => sprintf("View Issue '%s'", $issue->getCode()),
                 'comment_form' => $commentForm->createView(),
                 'activity_collection' => $activityCollection
-            )
+            ]
         );
     }
 
@@ -118,7 +117,7 @@ class IssueController extends Controller
             IssueType::class,
             $issue,
             [
-                'validation_groups' => array('edit'),
+                'validation_groups' => ['edit'],
             ]
         );
 
@@ -143,11 +142,11 @@ class IssueController extends Controller
 
         return $this->render(
             'BugTrackerBundle:Issue:edit.html.twig',
-            array(
+            [
                 'entity' => $issue,
                 'form' => $form->createView(),
                 'page_title' => sprintf("Edit Issue '%s'", $issue->getCode()),
-            )
+            ]
         );
     }
 
@@ -160,34 +159,32 @@ class IssueController extends Controller
         $this->denyAccessUnlessGranted(IssueVoter::DELETE, $issue);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_issue_delete',
-            array('id' => $issue->getId()),
+            ['id' => $issue->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $form = $this->createFormBuilder($issue, array('validation_groups' => array('edit')))
+        $form = $this->createFormBuilder($issue, ['validation_groups' => ['edit']])
             ->setAction($actionUrl)
-            ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
+            ->add('delete', SubmitType::class, ['attr' => ['class' => 'btn btn-primary']])
             ->getForm();
 
         if ($request->getMethod() == 'POST') {
-            if ($request->getMethod() == 'POST') {
-                $issueId = $issue->getId();
-                $formHandler = $this->getIssueHandler();
-                if ($formHandler->handleDeleteForm($form)) {
-                    $request->getSession()
-                        ->getFlashBag()
-                        ->add('success', sprintf("Issue '%s' was deleted successfully!", $issueId));
+            $issueId = $issue->getId();
+            $formHandler = $this->getIssueHandler();
+            if ($formHandler->handleDeleteForm($form)) {
+                $request->getSession()
+                    ->getFlashBag()
+                    ->add('success', sprintf("Issue '%s' was deleted successfully!", $issueId));
 
-                    return $this->redirectToRoute('oro_bugtracker_issue_list');
-                }
+                return $this->redirectToRoute('oro_bugtracker_issue_list');
             }
         }
 
         return $this->render(
             'BugTrackerBundle:Widget:form.html.twig',
-            array(
+            [
                 'form' => $form->createView(),
-            )
+            ]
         );
     }
 
@@ -219,7 +216,7 @@ class IssueController extends Controller
                 ->add('error', $exception->getMessage());
         }
 
-        return $this->redirectToRoute('oro_bugtracker_issue_view', array('id' => $issue->getId()));
+        return $this->redirectToRoute('oro_bugtracker_issue_view', ['id' => $issue->getId()]);
     }
 
     /**

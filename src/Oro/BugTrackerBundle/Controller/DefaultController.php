@@ -10,6 +10,7 @@ class DefaultController extends Controller
 {
     public function indexAction()
     {
+        $stop = 2;
         return $this->render('BugTrackerBundle:Default:index.html.twig', [
             'issue_class' => Issue::class,
             'activity_class' => Activity::class,

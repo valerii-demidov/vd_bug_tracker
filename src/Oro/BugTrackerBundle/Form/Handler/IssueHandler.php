@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Oro\BugTrackerBundle\Entity\Activity;
 use Oro\BugTrackerBundle\Event\CommentBeforeCreateEvent;
 use Oro\BugTrackerBundle\Event\IssueBeforeCreateEvent;
 use Oro\BugTrackerBundle\Event\IssueBeforeUpdateEvent;
@@ -24,7 +23,7 @@ class IssueHandler
     /** @var TokenStorage */
     protected $securityToken;
 
-    /** @var EventDispatcherInterface  */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
     /**
@@ -32,13 +31,13 @@ class IssueHandler
      * @param RequestStack $request
      * @param EntityManagerInterface $manager
      * @param TokenStorage $securityToken
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         RequestStack $request,
         EntityManagerInterface $manager,
         TokenStorage $securityToken,
         EventDispatcherInterface $dispatcher
-
     ) {
         $this->request = $request;
         $this->manager = $manager;
@@ -68,6 +67,7 @@ class IssueHandler
                 $this->dispatcher->dispatch(IssueBeforeCreateEvent::EVENT_NAME, new IssueBeforeCreateEvent($issue));
 
                 $this->manager->flush();
+
                 return true;
             }
         }
@@ -149,7 +149,10 @@ class IssueHandler
                 $issue->addCollaboration($currentUser);
                 $this->manager->persist($issue);
 
-                $this->dispatcher->dispatch(CommentBeforeCreateEvent::EVENT_NAME, new CommentBeforeCreateEvent($comment));
+                $this->dispatcher->dispatch(
+                    CommentBeforeCreateEvent::EVENT_NAME,
+                    new CommentBeforeCreateEvent($comment)
+                );
                 $this->manager->flush();
 
                 return true;

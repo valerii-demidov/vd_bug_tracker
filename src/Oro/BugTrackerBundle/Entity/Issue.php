@@ -144,7 +144,7 @@ class Issue
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -167,7 +167,7 @@ class Issue
     /**
      * Get summary
      *
-     * @return string 
+     * @return string
      */
     public function getSummary()
     {
@@ -190,7 +190,7 @@ class Issue
     /**
      * Get code
      *
-     * @return string 
+     * @return string
      */
     public function getCode()
     {
@@ -213,7 +213,7 @@ class Issue
     /**
      * Get description
      *
-     * @return string 
+     * @return string
      */
     public function getDescription()
     {
@@ -236,7 +236,7 @@ class Issue
     /**
      * Get status
      *
-     * @return string 
+     * @return string
      */
     public function getStatus()
     {
@@ -259,7 +259,7 @@ class Issue
     /**
      * Get resolution
      *
-     * @return string 
+     * @return string
      */
     public function getResolution()
     {
@@ -283,7 +283,7 @@ class Issue
     /**
      * Get parent
      *
-     * @return integer 
+     * @return integer
      */
     public function getParent()
     {
@@ -306,7 +306,7 @@ class Issue
     /**
      * Get project
      *
-     * @return integer 
+     * @return integer
      */
     public function getProject()
     {
@@ -329,7 +329,7 @@ class Issue
     /**
      * Get created
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getCreated()
     {
@@ -352,7 +352,7 @@ class Issue
     /**
      * Get updated
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getUpdated()
     {
@@ -375,12 +375,13 @@ class Issue
     /**
      * Get priority
      *
-     * @return string 
+     * @return string
      */
     public function getPriority()
     {
         return $this->priority;
     }
+
     /**
      * Constructor
      */
@@ -418,7 +419,7 @@ class Issue
     /**
      * Get projects
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getProjects()
     {
@@ -441,7 +442,7 @@ class Issue
     /**
      * Get assignee
      *
-     * @return \Oro\BugTrackerBundle\Entity\Customer 
+     * @return \Oro\BugTrackerBundle\Entity\Customer
      */
     public function getAssignee()
     {
@@ -464,7 +465,7 @@ class Issue
     /**
      * Get reporter
      *
-     * @return \Oro\BugTrackerBundle\Entity\Customer 
+     * @return \Oro\BugTrackerBundle\Entity\Customer
      */
     public function getReporter()
     {
@@ -499,7 +500,7 @@ class Issue
     /**
      * Get collaboration
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getCollaboration()
     {
@@ -522,7 +523,7 @@ class Issue
     /**
      * Get type
      *
-     * @return string 
+     * @return string
      */
     public function getType()
     {
@@ -568,7 +569,7 @@ class Issue
     /**
      * Get comments
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getComments()
     {
@@ -584,7 +585,7 @@ class Issue
         $data = [];
         foreach ($properties as $property) {
             if (is_object($this->$property)) {
-                if (method_exists($this->$property, '__toString')){
+                if (method_exists($this->$property, '__toString')) {
                     $data[$property] = $this->$property->__toString();
                 }
                 continue;

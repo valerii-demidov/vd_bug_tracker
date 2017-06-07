@@ -14,9 +14,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class Customer implements UserInterface, \Serializable
 {
-    CONST ROLE_ADMIN = 'ROLE_ADMIN';
-    CONST ROLE_MANAGER = 'ROLE_MANAGER';
-    CONST ROLE_OPERATOR = 'ROLE_OPERATOR';
+    const ROLE_ADMIN = 'ROLE_ADMIN';
+    const ROLE_MANAGER = 'ROLE_MANAGER';
+    const ROLE_OPERATOR = 'ROLE_OPERATOR';
 
     /**
      * Many Customers have Many Projects.
@@ -389,7 +389,7 @@ class Customer implements UserInterface, \Serializable
         $data = [];
         foreach ($properties as $property) {
             if (is_object($this->$property)) {
-                if (method_exists($this->$property, '__toString')){
+                if (method_exists($this->$property, '__toString')) {
                     $data[$property] = $this->$property->__toString();
                 }
                 continue;
@@ -435,7 +435,7 @@ class Customer implements UserInterface, \Serializable
     /**
      * Get activities
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getActivities()
     {

@@ -17,8 +17,6 @@ use Oro\BugTrackerBundle\Form\CustomerType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Authentication\Provider\UserAuthenticationProvider;
 
 class AuthController extends Controller
 {
@@ -26,6 +24,8 @@ class AuthController extends Controller
 
     /**
      * @Route("/auth/login")
+     * @param Request $request
+     * @return Response
      */
     public function loginAction(Request $request)
     {
@@ -39,18 +39,22 @@ class AuthController extends Controller
 
         $auth = new Auth();
 
-        $actionUrl = $this->generateUrl('oro_bugtracker_auth_loginpost', array(), UrlGeneratorInterface::ABSOLUTE_URL);
-        $form = $this->createForm(LoginForm::class, $auth, array(
-            'action' => $actionUrl
-        ));
+        $actionUrl = $this->generateUrl('oro_bugtracker_auth_loginpost', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $form = $this->createForm(
+            LoginForm::class,
+            $auth,
+            [
+                'action' => $actionUrl,
+            ]
+        );
 
         return $this->render(
             'BugTrackerBundle:Auth:login.html.twig',
-            array(
+            [
                 'form' => $form->createView(),
                 'error' => $error,
-                'last_username' => $lastUsername
-            )
+                'last_username' => $lastUsername,
+            ]
         );
     }
 
@@ -64,6 +68,8 @@ class AuthController extends Controller
 
     /**
      * @Route("/auth/register")
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function registerAction(Request $request)
     {
@@ -71,18 +77,18 @@ class AuthController extends Controller
         $form = $this->createForm(CustomerType::class, $customer);
         try {
             $formHandler = $this->getCustomerHandler();
-            if ($request->getMethod() == 'POST') {
+            if ($request->getMethod() === 'POST') {
                 if ($formHandler->handleCreateForm($form)) {
                     $this->addFlash('success', 'User has been created successfully! Please log in.');
 
-                    return $this->redirectToRoute('oro_bugtracker_customer_edit', array('id' => $customer->getId()));
-                } else {
-                    $request->getSession()
-                        ->getFlashBag()
-                        ->add('success', "User wasn't created successfully!");
-
-                    return $this->redirectToRoute('oro_bugtracker_auth_login');
+                    return $this->redirectToRoute('oro_bugtracker_customer_edit', ['id' => $customer->getId()]);
                 }
+
+                $request->getSession()
+                    ->getFlashBag()
+                    ->add('success', "User wasn't created successfully!");
+
+                return $this->redirectToRoute('oro_bugtracker_auth_login');
             }
         } catch (\Exception $exception) {
             $request->getSession()
@@ -91,7 +97,8 @@ class AuthController extends Controller
         }
 
         return $this->render(
-            'BugTrackerBundle:Auth:register.html.twig',[
+            'BugTrackerBundle:Auth:register.html.twig',
+            [
                 'form' => $form->createView(),
             ]
         );

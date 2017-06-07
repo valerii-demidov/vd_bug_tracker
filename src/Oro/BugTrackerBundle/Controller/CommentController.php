@@ -4,13 +4,12 @@ namespace Oro\BugTrackerBundle\Controller;
 
 use Oro\BugTrackerBundle\Form\CommentType;
 use Oro\BugTrackerBundle\Entity\Comment;
-use Oro\BugTrackerBundle\Entity\Customer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Oro\BugTrackerBundle\Security\CommentVoter;
-
 
 class CommentController extends Controller
 {
@@ -23,18 +22,22 @@ class CommentController extends Controller
         $this->denyAccessUnlessGranted(CommentVoter::EDIT, $comment);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_comment_edit',
-            array('id' => $comment->getId()),
+            ['id' => $comment->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $form = $this->createForm(CommentType::class, $comment,[
-            'action' => $actionUrl,
-            'method' => 'POST',
-        ]);
+        $form = $this->createForm(
+            CommentType::class,
+            $comment,
+            [
+                'action' => $actionUrl,
+                'method' => 'POST',
+            ]
+        );
 
         try {
             $formHandler = $this->getCommentHandler();
-            if ($request->getMethod() == 'POST') {
+            if ($request->getMethod() === 'POST') {
                 if ($formHandler->handleEditForm($form)) {
                     $request->getSession()
                         ->getFlashBag()
@@ -42,7 +45,7 @@ class CommentController extends Controller
 
                     return $this->redirectToRoute(
                         'oro_bugtracker_issue_view',
-                        array('id' => $comment->getIssue()->getId())
+                        ['id' => $comment->getIssue()->getId()]
                     );
                 }
             }
@@ -54,10 +57,10 @@ class CommentController extends Controller
 
         return $this->render(
             'BugTrackerBundle:Comment:edit.html.twig',
-            array(
+            [
                 'form' => $form->createView(),
                 'entity' => $comment,
-            )
+            ]
         );
     }
 
@@ -70,16 +73,16 @@ class CommentController extends Controller
         $this->denyAccessUnlessGranted(CommentVoter::DELETE, $comment);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_comment_delete',
-            array('id' => $comment->getId()),
+            ['id' => $comment->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $form = $this->createFormBuilder($comment, array('validation_groups' => array('edit')))
+        $form = $this->createFormBuilder($comment, ['validation_groups' => ['edit']])
             ->setAction($actionUrl)
-            ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
+            ->add('delete', SubmitType::class, ['attr' => ['class' => 'btn btn-primary']])
             ->getForm();
 
-        if ($request->getMethod() == 'POST') {
+        if ($request->getMethod() === 'POST') {
             $commentId = $comment->getId();
             $issueId = $comment->getIssue()->getId();
             $formHandler = $this->getCommentHandler();
@@ -89,16 +92,16 @@ class CommentController extends Controller
                     ->getFlashBag()
                     ->add('success', sprintf("Comment '%s' was deleted successfully!", $commentId));
 
-                return $this->redirectToRoute('oro_bugtracker_issue_view',['id'=> $issueId]);
+                return $this->redirectToRoute('oro_bugtracker_issue_view', ['id' => $issueId]);
             }
         }
 
         return $this->render(
             'BugTrackerBundle:Comment:delete.html.twig',
-            array(
+            [
                 'form' => $form->createView(),
                 'entity' => $comment
-            )
+            ]
         );
     }
 

@@ -21,6 +21,10 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class CustomerType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $customerChoiceList = [
@@ -32,24 +36,37 @@ class CustomerType extends AbstractType
         $builder
             ->add('email', EmailType::class)
             ->add('username', TextType::class)
-            ->add('fullName',TextType::class)
-            ->add('roles', ChoiceType::class, array(
+            ->add('fullName', TextType::class)
+            ->add(
+                'roles',
+                ChoiceType::class,
+                [
                     'multiple' => true,
-                    'choices'=> $customerChoiceList
-            ))
-            ->add('plainPassword', RepeatedType::class, array(
-                'type' => PasswordType::class,
-                'first_options'  => array('label' => 'Password'),
-                'second_options' => array('label' => 'Repeat Password'),
-            ))
-            ->add('submit', SubmitType::class, array('label' => 'Save'));
+                    'choices' => $customerChoiceList,
+                ]
+            )
+            ->add(
+                'plainPassword',
+                RepeatedType::class,
+                [
+                    'type' => PasswordType::class,
+                    'first_options' => ['label' => 'Password'],
+                    'second_options' => ['label' => 'Repeat Password'],
+                ]
+            )
+            ->add('submit', SubmitType::class, ['label' => 'Save']);
     }
 
+    /**
+     * @param OptionsResolver $resolver
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
-            'data_class' => Customer::class,
-            'csrf_field_name' => '_token'
-        ));
+        $resolver->setDefaults(
+            [
+                'data_class' => Customer::class,
+                'csrf_field_name' => '_token',
+            ]
+        );
     }
 }

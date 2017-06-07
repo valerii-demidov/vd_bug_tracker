@@ -28,7 +28,7 @@ class IssueRepository extends EntityRepository implements PaginatorInterface
     {
         $qb = false;
         switch ($method) {
-            case 'customer_issues';
+            case 'customer_issues':
                 list($customer) = $attributes;
                 //todo  вызов медода без аргументов
                 $qb = $this->findByCondition(
@@ -38,7 +38,6 @@ class IssueRepository extends EntityRepository implements PaginatorInterface
                     ]
                 );
                 break;
-
             case 'issue_list':
                 list($customer, $isManagerGranted) = $attributes;
                 $qb = $this->getGrantedIssues($customer, $isManagerGranted);
@@ -53,7 +52,7 @@ class IssueRepository extends EntityRepository implements PaginatorInterface
      * @param array $conditionCollection
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function findByCondition($conditionCollection = [])
+    public function findByCondition(array $conditionCollection = [])
     {
         $customerQb = $this->createQueryBuilder('entity');
         $paramInc = 0;
@@ -94,5 +93,4 @@ class IssueRepository extends EntityRepository implements PaginatorInterface
 
         return $qbIssues;
     }
-
 }

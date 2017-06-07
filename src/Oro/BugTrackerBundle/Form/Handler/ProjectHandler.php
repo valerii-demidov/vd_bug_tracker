@@ -42,7 +42,6 @@ class ProjectHandler
 
         $project = $form->getData();
         if ($project instanceof Project) {
-
             if ($form->isSubmitted() && $form->isValid()) {
                 $this->manager->persist($project);
                 $this->manager->flush();

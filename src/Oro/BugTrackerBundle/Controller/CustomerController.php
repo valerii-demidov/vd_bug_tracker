@@ -7,14 +7,15 @@ use Oro\BugTrackerBundle\Entity\Customer;
 use Oro\BugTrackerBundle\Entity\Issue;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Oro\BugTrackerBundle\Entity\Activity;
 
 class CustomerController extends Controller
 {
-    CONST CUSTOMER_LIST_PAGE_SIZE = 3;
-    CONST ACTIVITY_CUSTOMER_PAGE_LIMIT = 5;
+    const CUSTOMER_LIST_PAGE_SIZE = 3;
+    const ACTIVITY_CUSTOMER_PAGE_LIMIT = 5;
 
     /**
      * Customer list action
@@ -47,13 +48,13 @@ class CustomerController extends Controller
                         ->add('success', 'User has been created successfully!');
 
                     return $this->redirectToRoute('oro_bugtracker_customer_view', array('id' => $customer->getId()));
-                } else {
-                    $request->getSession()
-                        ->getFlashBag()
-                        ->add('success', "User wasn't created successfully!");
-
-                    return $this->redirectToRoute('oro_bugtracker_customer_create');
                 }
+
+                $request->getSession()
+                    ->getFlashBag()
+                    ->add('success', "User wasn't created successfully!");
+
+                return $this->redirectToRoute('oro_bugtracker_customer_create');
             }
         } catch (\Exception $exception) {
             $request->getSession()
@@ -74,7 +75,7 @@ class CustomerController extends Controller
      * Create edit action
      * @Route("customer/view/{id}/", name="oro_bugtracker_customer_view", requirements={"id" = "\d+"})
      */
-    public function viewAction(Customer $customer, Request $request)
+    public function viewAction(Customer $customer)
     {
         return $this->render(
             'BugTrackerBundle:Customer:view.html.twig',
@@ -89,7 +90,8 @@ class CustomerController extends Controller
 
     /**
      * Create edit action
-     * @Route("customer/edit/{id}/{page}", name="oro_bugtracker_customer_edit", requirements={"id" = "\d+"}, defaults={"page" = 1})
+     * @Route("customer/edit/{id}/{page}", name="oro_bugtracker_customer_edit", requirements={"id" = "\d+"},
+     *     defaults={"page" = 1})
      */
     public function editAction(Customer $customer, Request $request)
     {
@@ -110,7 +112,7 @@ class CustomerController extends Controller
                         ->add('success', 'Customer has been updated successfully!');
                 }
             }
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             $request->getSession()
                 ->getFlashBag()
                 ->add('error', $exception->getMessage());
@@ -140,7 +142,7 @@ class CustomerController extends Controller
 
         $form = $this->createFormBuilder($customer, array('validation_groups' => array('edit')))
             ->setAction($actionUrl)
-            ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
+            ->add('delete', SubmitType::class, array('attr' => array('class' => 'btn btn-primary')))
             ->getForm();
 
         if ($request->getMethod() == 'POST') {

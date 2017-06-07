@@ -13,7 +13,7 @@ trait PageBuilder
      *
      * @return array
      */
-    public function getCurrentPageByQb(QueryBuilder $queryBuilder, $currentPage,  $pageSize)
+    public function getCurrentPageByQb(QueryBuilder $queryBuilder, $currentPage, $pageSize)
     {
         $result['max_pages'] = 0;
         $result['entity_collection'] = [];

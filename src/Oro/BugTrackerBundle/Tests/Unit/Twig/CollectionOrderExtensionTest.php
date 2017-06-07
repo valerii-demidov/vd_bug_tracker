@@ -6,10 +6,8 @@ use Oro\BugTrackerBundle\Twig\CollectionOrderExtension;
 use Oro\BugTrackerBundle\Entity\Issue;
 use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-
 
 class CollectionOrderExtensionTest extends TestCase
 {
@@ -38,10 +36,9 @@ class CollectionOrderExtensionTest extends TestCase
         $this->assertInstanceOf('\Twig_SimpleFunction', $functions[0]);
         $function = $functions[0];
         $this->assertInternalType('string', $function->getName());
-        $this->assertEquals($function->getName(),'collection_order');
+        $this->assertEquals($function->getName(), 'collection_order');
         $this->assertInternalType('callable', $function->getCallable());
     }
-
 
     public function testGetOrderedCollection()
     {

@@ -18,7 +18,7 @@ class ActivityListener
     /** @var  EntityManagerInterface */
     protected $em;
 
-    /** @var TokenStorage  */
+    /** @var TokenStorage */
     protected $securityToken;
 
     /**
@@ -133,7 +133,7 @@ class ActivityListener
      * @param $type
      * @param array $changes
      */
-    protected function doSave(Activity $activity, $entityName, $type, $changes = [])
+    protected function doSave(Activity $activity, $entityName, $type, array $changes = [])
     {
         // author of activity
         $author = $this->securityToken->getToken()->getUser();
