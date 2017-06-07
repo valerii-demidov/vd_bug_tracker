@@ -4,7 +4,6 @@ namespace Oro\BugTrackerBundle\Form\Handler;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\BugTrackerBundle\Entity\Project;
 use Oro\BugTrackerBundle\Entity\Customer;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 

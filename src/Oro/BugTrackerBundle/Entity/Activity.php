@@ -77,7 +77,7 @@ class Activity
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -100,7 +100,7 @@ class Activity
     /**
      * Get entity
      *
-     * @return string 
+     * @return string
      */
     public function getEntity()
     {
@@ -123,7 +123,7 @@ class Activity
     /**
      * Get diffData
      *
-     * @return string 
+     * @return string
      */
     public function getDiffData()
     {
@@ -146,7 +146,7 @@ class Activity
     /**
      * Get date
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getDate()
     {
@@ -169,7 +169,7 @@ class Activity
     /**
      * Get project
      *
-     * @return \Oro\BugTrackerBundle\Entity\Project 
+     * @return \Oro\BugTrackerBundle\Entity\Project
      */
     public function getProject()
     {
@@ -192,7 +192,7 @@ class Activity
     /**
      * Get type
      *
-     * @return string 
+     * @return string
      */
     public function getType()
     {
@@ -215,7 +215,7 @@ class Activity
     /**
      * Get customer
      *
-     * @return \Oro\BugTrackerBundle\Entity\Customer 
+     * @return \Oro\BugTrackerBundle\Entity\Customer
      */
     public function getCustomer()
     {
@@ -238,7 +238,7 @@ class Activity
     /**
      * Get issue
      *
-     * @return \Oro\BugTrackerBundle\Entity\Issue 
+     * @return \Oro\BugTrackerBundle\Entity\Issue
      */
     public function getIssue()
     {

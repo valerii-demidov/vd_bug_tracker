@@ -17,14 +17,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CommentType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('body', TextareaType::class)
-            ->add('submit', SubmitType::class, array('label' => 'Update'));
-        ;
+            ->add('submit', SubmitType::class, ['label' => 'Update']);
     }
 
+    /**
+     * @param OptionsResolver $resolver
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

@@ -129,6 +129,7 @@ class Project
     {
         return $this->code;
     }
+
     /**
      * Constructor
      */
@@ -146,7 +147,6 @@ class Project
     public function addCustomer(\Oro\BugTrackerBundle\Entity\Customer $customer)
     {
         if (!$this->customers->contains($customer)) {
-
             $this->customers->add($customer);
         }
 
@@ -195,7 +195,7 @@ class Project
         $data = [];
         foreach ($properties as $property) {
             if (is_object($this->$property)) {
-                if (method_exists($this->$property, '__toString')){
+                if (method_exists($this->$property, '__toString')) {
                     $data[$property] = $this->$property->__toString();
                 }
                 continue;

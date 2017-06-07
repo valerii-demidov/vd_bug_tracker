@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\BugTrackerBundle\Entity\Customer;
 use Oro\BugTrackerBundle\Repository\CustomerRepository;
 
-
 class PaginatorExtensionTest extends TestCase
 {
 
@@ -41,7 +40,6 @@ class PaginatorExtensionTest extends TestCase
             ->willReturn($customerRepository);
 
         $this->paginatorExtension = new PaginatorExtension($requestStack, $manager);
-
     }
 
     public function testGetFunctions()
@@ -54,12 +52,12 @@ class PaginatorExtensionTest extends TestCase
 
         $function = $functions[0];
         $this->assertInternalType('string', $function->getName());
-        $this->assertEquals($function->getName(),'paginator_object_by_custom_condition');
+        $this->assertEquals($function->getName(), 'paginator_object_by_custom_condition');
         $this->assertInternalType('callable', $function->getCallable());
 
         $function = $functions[1];
         $this->assertInternalType('string', $function->getName());
-        $this->assertEquals($function->getName(),'paginator_object_by_entity_class');
+        $this->assertEquals($function->getName(), 'paginator_object_by_entity_class');
         $this->assertInternalType('callable', $function->getCallable());
     }
 
@@ -80,7 +78,7 @@ class PaginatorExtensionTest extends TestCase
         $this->assertArrayHasKey('entities_count', $result);
     }
 
-   public function testGetPaginatorCustomCondition()
+    public function testGetPaginatorCustomCondition()
     {
         $entityClass = Customer::class;
         $methodName = 'customer_issues';

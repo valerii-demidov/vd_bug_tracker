@@ -7,13 +7,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Oro\BugTrackerBundle\Entity\Activity;
 use Oro\BugTrackerBundle\Entity\Issue;
 use Oro\BugTrackerBundle\Entity\Project;
 use Oro\BugTrackerBundle\Form\Handler\ActivityHandler;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class ActivityHandlerTest extends TestCase
@@ -54,7 +52,9 @@ class ActivityHandlerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->usernamePasswordToken = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken')
+        $this->usernamePasswordToken = $this->getMockBuilder(
+            'Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken'
+        )
             ->disableOriginalConstructor()
             ->getMock();
         $this->usernamePasswordToken
@@ -68,9 +68,9 @@ class ActivityHandlerTest extends TestCase
 
         $this->activityHandler = new ActivityHandler(
             $this->em,
-            $this->securityToken);
+            $this->securityToken
+        );
     }
-
 
     public function testHandleIssueActivity()
     {
@@ -87,54 +87,54 @@ class ActivityHandlerTest extends TestCase
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////
-   /* public function handleIssueActivity(Issue $issue, $type, $diffData = [])
-    {
-        $activity = new Activity();
-        $activity->setIssue($issue);
-        $activity->setProject($issue->getProject());
+    /* public function handleIssueActivity(Issue $issue, $type, $diffData = [])
+     {
+         $activity = new Activity();
+         $activity->setIssue($issue);
+         $activity->setProject($issue->getProject());
 
-        $entityName = 'Issue';
-        $this->doSave($activity, $issue, $entityName, $type, $diffData);
-    }
-
-
-    public function handleCommentActivity(Comment $comment, $type, $diffData = [])
-    {
-        $activity = new Activity();
-        $activity->setIssue($comment->getIssue());
-        $activity->setProject($comment->getProject());
-
-        $entityName = 'Comment';
-        $this->doSave($activity, $comment, $entityName, $type, $diffData);
-    }
+         $entityName = 'Issue';
+         $this->doSave($activity, $issue, $entityName, $type, $diffData);
+     }
 
 
-    protected function doSave(Activity $activity, $entity, $entityName, $type, $diffData = [])
-    {
+     public function handleCommentActivity(Comment $comment, $type, $diffData = [])
+     {
+         $activity = new Activity();
+         $activity->setIssue($comment->getIssue());
+         $activity->setProject($comment->getProject());
 
-        $currentEntityData = $entity->__toArray();
-        $afterData = [];
-        if ($type == Activity::TYPE_UPDATED) {
-            foreach ($diffData as $fieldName => $fieldValue) {
-                $afterData[$fieldName] = $currentEntityData[$fieldName];
-            }
-        }
+         $entityName = 'Comment';
+         $this->doSave($activity, $comment, $entityName, $type, $diffData);
+     }
 
-        $fullDiffData['diff_fields'] = array_keys($diffData);
-        $fullDiffData['before_data'] = $diffData;
-        $fullDiffData['after_data'] = $afterData;
 
-        // author of activity
-        $author = $this->securityToken->getToken()->getUser();
-        $activity->setCustomer($author);
-        $activity->setEntity($entityName);
-        $activity->setType($type);
+     protected function doSave(Activity $activity, $entity, $entityName, $type, $diffData = [])
+     {
 
-        $currentDate = new \DateTime();
-        $activity->setDiffData($fullDiffData);
-        $activity->setDate($currentDate);
+         $currentEntityData = $entity->__toArray();
+         $afterData = [];
+         if ($type == Activity::TYPE_UPDATED) {
+             foreach ($diffData as $fieldName => $fieldValue) {
+                 $afterData[$fieldName] = $currentEntityData[$fieldName];
+             }
+         }
 
-        $this->manager->persist($activity);
-        $this->manager->flush();
-    }*/
+         $fullDiffData['diff_fields'] = array_keys($diffData);
+         $fullDiffData['before_data'] = $diffData;
+         $fullDiffData['after_data'] = $afterData;
+
+         // author of activity
+         $author = $this->securityToken->getToken()->getUser();
+         $activity->setCustomer($author);
+         $activity->setEntity($entityName);
+         $activity->setType($type);
+
+         $currentDate = new \DateTime();
+         $activity->setDiffData($fullDiffData);
+         $activity->setDate($currentDate);
+
+         $this->manager->persist($activity);
+         $this->manager->flush();
+     }*/
 }

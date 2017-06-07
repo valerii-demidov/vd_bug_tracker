@@ -8,7 +8,6 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 
-
 class CustomerVoter extends Voter
 {
     // these strings are just invented: you can use anything

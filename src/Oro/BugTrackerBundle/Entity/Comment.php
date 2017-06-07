@@ -57,7 +57,7 @@ class Comment
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -80,7 +80,7 @@ class Comment
     /**
      * Get body
      *
-     * @return string 
+     * @return string
      */
     public function getBody()
     {
@@ -103,7 +103,7 @@ class Comment
     /**
      * Get created
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getCreated()
     {
@@ -126,7 +126,7 @@ class Comment
     /**
      * Get customer
      *
-     * @return \Oro\BugTrackerBundle\Entity\Customer 
+     * @return \Oro\BugTrackerBundle\Entity\Customer
      */
     public function getCustomer()
     {
@@ -149,7 +149,7 @@ class Comment
     /**
      * Get project
      *
-     * @return \Oro\BugTrackerBundle\Entity\Project 
+     * @return \Oro\BugTrackerBundle\Entity\Project
      */
     public function getProject()
     {
@@ -172,7 +172,7 @@ class Comment
     /**
      * Get issue
      *
-     * @return \Oro\BugTrackerBundle\Entity\Issue 
+     * @return \Oro\BugTrackerBundle\Entity\Issue
      */
     public function getIssue()
     {
@@ -204,7 +204,7 @@ class Comment
         $data = [];
         foreach ($properties as $property) {
             if (is_object($this->$property)) {
-                if (method_exists($this->$property, '__toString')){
+                if (method_exists($this->$property, '__toString')) {
                     $data[$property] = $this->$property->__toString();
                 }
                 continue;

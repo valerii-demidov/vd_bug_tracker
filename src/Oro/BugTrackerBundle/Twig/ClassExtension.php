@@ -8,7 +8,6 @@
 
 namespace Oro\BugTrackerBundle\Twig;
 
-use phpDocumentor\Reflection\Types\Object_;
 use Doctrine\Common\Util\ClassUtils;
 
 class ClassExtension extends \Twig_Extension
@@ -17,13 +16,14 @@ class ClassExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction(
-                'class', function ($object) {
-                if (is_object($object)) {
-                    return ClassUtils::getClass($object);
-                }
+                'class',
+                function ($object) {
+                    if (is_object($object)) {
+                        return ClassUtils::getClass($object);
+                    }
 
-                return false;
-            }
+                    return false;
+                }
             ),
         ];
     }

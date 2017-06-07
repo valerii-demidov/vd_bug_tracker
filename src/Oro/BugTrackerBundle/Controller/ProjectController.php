@@ -8,14 +8,14 @@ use Oro\BugTrackerBundle\Entity\Customer;
 use Oro\BugTrackerBundle\Entity\Activity;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-
 class ProjectController extends Controller
 {
-    CONST PROJECT_LIST_PAGE_SIZE = 3;
+    const PROJECT_LIST_PAGE_SIZE = 3;
 
     /**
      * Project list action
@@ -49,7 +49,7 @@ class ProjectController extends Controller
 
                     return $this->redirectToRoute(
                         'oro_bugtracker_project_view',
-                        array('id' => $project->getId())
+                        ['id' => $project->getId()]
                     );
                 }
             }
@@ -61,10 +61,10 @@ class ProjectController extends Controller
 
         return $this->render(
             'BugTrackerBundle:Project:create.html.twig',
-            array(
+            [
                 'form' => $form->createView(),
                 'page_title' => 'New Project',
-            )
+            ]
         );
     }
 
@@ -73,14 +73,14 @@ class ProjectController extends Controller
      *
      * @Route("project/view/{id}", name="oro_bugtracker_project_view", requirements={"id" = "\d+"})
      */
-    public function viewAction(Project $project, Request $request)
+    public function viewAction(Project $project)
     {
         $membersCollection = $project->getCustomers();
         $actions = $this->getMemberGridAction($project->getId(), true, false);
 
         return $this->render(
             'BugTrackerBundle:Project:view.html.twig',
-            array(
+            [
                 'page_title' => sprintf(
                     "View Project '%s'",
                     $project->getCode()
@@ -88,7 +88,7 @@ class ProjectController extends Controller
                 'entity' => $project,
                 'activity_class'=> Activity::class,
                 'members_grid_html' => $this->getMembersGridHtml($membersCollection, $actions),
-            )
+            ]
         );
     }
 
@@ -107,9 +107,9 @@ class ProjectController extends Controller
         $form = $this->createForm(
             ProjectType::class,
             $projectEntity,
-            array(
-                'validation_groups' => array('edit'),
-            )
+            [
+                'validation_groups' => ['edit'],
+            ]
         );
         try {
             if ($request->getMethod() == 'POST') {
@@ -136,7 +136,7 @@ class ProjectController extends Controller
 
         return $this->render(
             'BugTrackerBundle:Project:edit.html.twig',
-            array(
+            [
                 'form' => $form->createView(),
                 'page_title' => sprintf(
                     "Edit Project '%s'",
@@ -144,7 +144,7 @@ class ProjectController extends Controller
                 ),
                 'entity_id' => $projectEntity->getId(),
                 'members_grid_html' => $this->getMembersGridHtml($membersCollection, $actions),
-            )
+            ]
         );
     }
 
@@ -157,13 +157,13 @@ class ProjectController extends Controller
         $this->isGranted(Customer::ROLE_ADMIN);
         $actionUrl = $this->generateUrl(
             'oro_bugtracker_project_delete',
-            array('id' => $projectEntity->getId()),
+            ['id' => $projectEntity->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $form = $this->createFormBuilder($projectEntity, array('validation_groups' => array('edit')))
+        $form = $this->createFormBuilder($projectEntity, ['validation_groups' => ['edit']])
             ->setAction($actionUrl)
-            ->add('delete', 'submit', array('attr' => array('class' => 'btn btn-primary')))
+            ->add('delete', SubmitType::class, ['attr' => ['class' => 'btn btn-primary']])
             ->getForm();
 
         if ($request->getMethod() == 'POST') {
@@ -181,9 +181,9 @@ class ProjectController extends Controller
 
         return $this->render(
             'BugTrackerBundle:Widget:form.html.twig',
-            array(
+            [
                 'form' => $form->createView(),
-            )
+            ]
         );
     }
 
@@ -211,23 +211,12 @@ class ProjectController extends Controller
         return $response;
     }
 
-
-
-    /**
-     * @Route("/blog/{id}/comments/{comment_id}")
-     */
-    public function showAction(Post $post, Comment $comment)
-    {
-    }
-
-
-
     /**
      * Add new Project Member
      *
      * @Route("project/{id}/removemember/{member_id}", name="oro_bugtracker_project_removemember")
      */
-    public function removememberAction(Project $projectEntity, $member_id, Request $request)
+    public function removememberAction(Project $projectEntity, $member_id)
     {
         $this->isGranted(Customer::ROLE_MANAGER);
         $em = $this->getDoctrine()->getManager();
@@ -240,7 +229,7 @@ class ProjectController extends Controller
             $em->flush();
         }
 
-        return $this->redirectToRoute('oro_bugtracker_project_edit', array('id' => $projectEntity->getId()));
+        return $this->redirectToRoute('oro_bugtracker_project_edit', ['id' => $projectEntity->getId()]);
     }
 
     /**
@@ -255,7 +244,7 @@ class ProjectController extends Controller
         $result['success'] = true;
         $result['members_list'] = '';
 
-        if ($request->getMethod() == 'POST') {
+        if ($request->getMethod() === 'POST') {
             $projectRepository = $this->getDoctrine()->getRepository(Project::class);
             $requiredUsername = $request->get('username');
             $membersList = $projectRepository->getProjectMembersListBySlug($requiredUsername);
@@ -304,7 +293,7 @@ class ProjectController extends Controller
      * @param $actions
      * @return string
      */
-    protected function getMembersGridHtml($collection = [], $actions)
+    protected function getMembersGridHtml($collection, $actions)
     {
         $columns = ['id' => 'Id', 'username' => 'User Name', 'email' => 'Email', 'fullName' => 'Full Name'];
 

@@ -16,6 +16,11 @@ class CustomerRepository extends EntityRepository implements PaginatorInterface
 {
     use PageBuilder;
 
+    /**
+     * @param $method
+     * @param array $attributes
+     * @return bool
+     */
     public function getQbByCustomCondition($method, array $attributes)
     {
         return false;
@@ -61,7 +66,7 @@ class CustomerRepository extends EntityRepository implements PaginatorInterface
         foreach ($objectCollection as $object) {
             foreach ($fields as $field) {
                 $result[$inc][$field] = '';
-                if ((is_object($object))) {
+                if (is_object($object)) {
                     $getFieldNameFunction = 'get'.ucfirst($field);
                     if (method_exists($object, $getFieldNameFunction)) {
                         $result[$inc][$field] = $object->$getFieldNameFunction();
